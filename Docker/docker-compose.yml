@@ -4,15 +4,11 @@ services:
     container_name: nodejs_backend
     ports:
       - '3000:3000'
-    volumes:
-      - ./Backend/Node.js:/app
   react:
     build: ./Frontend/devreact
     container_name: react_frontend
     ports:
-      - '4000:4000'
-    volumes:
-      - ./Frontend/devreact:/app/src
+      - '5173:5173'
     stdin_open: true
     tty: true
   database:
