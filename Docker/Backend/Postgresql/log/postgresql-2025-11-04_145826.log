@@ -1,0 +1,11 @@
+2025-11-04 14:58:26.864 UTC [1] LOG:  starting PostgreSQL 14.19 on x86_64-pc-linux-musl, compiled by gcc (Alpine 14.2.0) 14.2.0, 64-bit
+2025-11-04 14:58:26.864 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5557
+2025-11-04 14:58:26.864 UTC [1] LOG:  listening on IPv6 address "::", port 5557
+2025-11-04 14:58:26.871 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5557"
+2025-11-04 14:58:26.901 UTC [28] LOG:  database system was shut down at 2025-11-04 14:58:23 UTC
+2025-11-04 14:58:26.936 UTC [1] LOG:  database system is ready to accept connections
+2025-11-04 14:58:49.031 UTC [1] LOG:  received fast shutdown request
+2025-11-04 14:58:49.040 UTC [1] LOG:  aborting any active transactions
+2025-11-04 14:58:49.043 UTC [1] LOG:  background worker "logical replication launcher" (PID 34) exited with exit code 1
+2025-11-04 14:58:49.043 UTC [29] LOG:  shutting down
+2025-11-04 14:58:49.141 UTC [1] LOG:  database system is shut down
