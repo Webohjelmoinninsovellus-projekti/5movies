@@ -12,7 +12,7 @@ services:
     ports:
       - '4000:4000'
     volumes:
-      - ./Frontend/devreact:/app
+      - ./Frontend/devreact:/app/src
     stdin_open: true
     tty: true
   database:
