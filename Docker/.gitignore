@@ -12,7 +12,6 @@
 
 *.pid
 *.opts
-*.auto.conf
 
 npm-debug.log*
 yarn-debug.log*

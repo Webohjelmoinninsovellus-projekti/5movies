@@ -3,12 +3,12 @@ services:
     build: ./Backend/Node.js
     container_name: nodejs_backend
     ports:
-      - '3000:3000'
+      - '5555:5555'
   react:
     build: ./Frontend/devreact
     container_name: react_frontend
     ports:
-      - '5173:5173'
+      - '5556:5556'
     stdin_open: true
     tty: true
   database:
