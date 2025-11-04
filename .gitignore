@@ -1,3 +1,9 @@
+# Container
 **/node_modules
 **/package-lock.json
-Docker/Backend/Postqresql/**
+
+# Database
+/Docker/Backend/Postgresql
+
+# env
+.env

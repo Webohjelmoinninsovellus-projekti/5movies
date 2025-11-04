@@ -4,13 +4,21 @@ services:
     container_name: nodejs_backend
     ports:
       - '5555:5555'
+    volumes: 
+      - ./Backend/Node.js:/app
+      - /app/node_modules
   react:
     build: ./Frontend/devreact
     container_name: react_frontend
     ports:
-      - '5556:5546'
+      - '5556:5556'
+    volumes: 
+      - ./Frontend/devreact:/app
+      - /app/node_modules
     stdin_open: true
     tty: true
+    environment:
+      - CHOKIDAR_USEPOLLING=true
   database:
     image: postgres:14-alpine
     container_name: database_backend
@@ -22,3 +30,4 @@ services:
       - POSTGRES_PASSWORD=test
       - POSTGRES_USER=test
       - POSTGRES_DB=testdb
+      - PGPORT=5557
