@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kirjaudu sisään</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+    background:#000;
+    color:#fff;
+    font-family:Arial, sans-serif;
+    background-attachment: fixed;
+}
+h1,h2,h3{font-family:'Anton',sans-serif;letter-spacing:2px;}
+.container{width:90%;max-width:1400px;margin:auto}
+
+/* ===== HEADER ===== */
+header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:15px 5%;background:rgba(0,0,0,0.75);
+}
+header img.logo{width:40px;height:40px}
+nav{display:flex;gap:15px}
+nav a{
+    background:#B30000;padding:6px 18px;border-radius:20px;
+    color:white;text-decoration:none;font-size:14px;
+}
+.search-box input{
+    padding:6px 15px;border-radius:20px;border:none;outline:none;
+}
+.flag{width:35px}
+
+/* ===== LOGIN AREA ===== */
+.login-wrapper{
+    text-align:center;
+    margin-top:120px;
+}
+.login-wrapper h2{
+    font-size:42px;
+    margin-bottom:25px;
+    text-shadow:3px 3px 5px black;
+}
+.login-box input{
+    display:block;
+    width:270px;
+    margin:10px auto;
+    padding:10px 15px;
+    border-radius:20px;
+    border:none;
+    background:#b30000;
+    color:white;
+    font-size:16px;
+}
+.login-box button{
+    width:150px;
+    margin-top:10px;
+    padding:10px;
+    background:#b30000;
+    border:none;
+    border-radius:20px;
+    color:white;
+    font-size:16px;
+    cursor:pointer;
+}
+.login-box button:hover{background:#d00000}
+
+.login-extra{
+    margin-top:20px;
+    font-size:14px;
+}
+.login-extra a{
+    color:#d00000;
+    text-decoration:none;
+    font-weight:bold;
+}
+
+/* ===== SOCIAL BLOCKS ===== */
+.info-section{
+    display:flex;
+    justify-content:space-around;
+    margin-top:120px;
+    padding-bottom:60px;
+}
+.info-card{
+    background:rgba(0,0,0,0.65);
+    border:1px solid #333;
+    width:350px;
+    padding:25px;
+    border-radius:12px;
+    text-align:center;
+}
+.info-card h3{
+    font-size:28px;
+    margin-bottom:15px;
+}
+.social-icons img{
+    width:60px;margin:8px;
+}
+.qr img{width:150px}
+
+/* ===== FOOTER ===== */
+footer{
+    margin-top:60px;padding:20px;text-align:center;
+    font-size:12px;color:#ccc;background:rgba(0,0,0,0.7);
+}
+footer a{color:#ddd;text-decoration:none;margin:0 5px}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:900px){
+    nav{display:none}
+    .info-section{flex-direction:column;align-items:center;gap:25px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <img src="https://via.placeholder.com/40" class="logo" alt="logo">
+    <nav>
+        <a href="#">jotakin</a>
+        <a href="#">jotakin</a>
+        <a href="#">jotakin</a>
+        <a href="#">jotakin</a>
+        <a href="#">jotakin</a>
+    </nav>
+    <div class="search-box">
+        <input type="text" placeholder="Hae">
+    </div>
+    <img src="https://flagsapi.com/FI/flat/64.png" class="flag">
+</header>
+
+<div class="login-wrapper">
+    <h2>KIRJAUDU SISÄÄN</h2>
+
+    <div class="login-box">
+        <input type="text" placeholder="Käyttäjänimi">
+        <input type="password" placeholder="Salasana">
+        <button>Kirjaudu ⚡</button>
+    </div>
+
+    <div class="login-extra">
+        Etkö ole vielä käyttäjä?<br>
+        <a href="#">Luo käyttäjätunnus ⚡</a>
+    </div>
+</div>
+
+<div class="info-section">
+
+    <div class="info-card">
+        <h3>SEURAA MEITÄ</h3>
+        <div class="social-icons">
+            <img src="https://via.placeholder.com/60?text=IG">
+            <img src="https://via.placeholder.com/60?text=TT">
+            <img src="https://via.placeholder.com/60?text=X">
+        </div>
+    </div>
+
+    <div class="info-card">
+        <h3>LATAA SOVELLUS</h3>
+        <div class="qr">
+            <img src="https://via.placeholder.com/150?text=QR">
+        </div>
+    </div>
+
+</div>
+
+<footer>
+    <p>Press Room - Advertising - Jobs - Conditions of Use - Privacy Policy</p>
+    <p>© 1975-2025 by NaN</p>
+</footer>
+
+</body>
+</html>

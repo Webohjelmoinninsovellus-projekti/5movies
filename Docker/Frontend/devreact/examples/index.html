@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Suositellut Elokuvat</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+
+<style>
+/* ===== YLEISET ASETUKSET ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    background: #000;
+    color: #fff;
+    font-family: Arial, sans-serif;
+}
+h2, h3 {
+    font-family: 'Anton', sans-serif;
+    letter-spacing: 2px;
+}
+.container {
+    width: 90%;
+    margin: auto;
+    max-width: 1400px;
+}
+
+/* ===== NAVIGAATIO ===== */
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 5%;
+    background: #111;
+}
+header img.logo {
+    width: 40px;
+    height: 40px;
+}
+nav {
+    display: flex;
+    gap: 15px;
+}
+nav a {
+    background: #B30000;
+    padding: 6px 18px;
+    border-radius: 20px;
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+}
+.search-box input {
+    padding: 6px 15px;
+    border-radius: 20px;
+    border: none;
+    outline: none;
+}
+.flag {
+    width: 35px;
+}
+
+/* ===== HERO SLIDER ===== */
+.slider {
+    position: relative;
+    width: 100%;
+    height: 450px;
+    overflow: hidden;
+}
+.slide {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transition: opacity 1s ease-in-out;
+}
+.slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.slide h2 {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 45px;
+    color: white;
+    text-shadow: 3px 3px 5px black;
+}
+
+/* Radio buttons to switch slider (no JS) */
+input[type="radio"] {
+    display: none;
+}
+#s1:checked ~ .slides .slide:nth-child(1),
+#s2:checked ~ .slides .slide:nth-child(2),
+#s3:checked ~ .slides .slide:nth-child(3) {
+    opacity: 1;
+    z-index: 2;
+}
+.slides .slide { opacity: 0; }
+
+/* Slider nav buttons */
+.slider-nav {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+}
+.slider-nav label {
+    width: 14px;
+    height: 14px;
+    background: white;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+/* ===== KATEGORIAT ===== */
+.section-title {
+    font-size: 35px;
+    margin: 50px 0 15px;
+}
+.category-row,
+.media-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+}
+.card {
+    background: #111;
+    height: 250px;
+    position: relative;
+    overflow: hidden;
+}
+.card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(70%);
+}
+.card span {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Anton';
+    font-size: 24px;
+}
+
+/* ===== FOOTER ===== */
+footer {
+    margin-top: 60px;
+    padding: 20px;
+    text-align: center;
+    font-size: 12px;
+    color: #888;
+}
+footer a {
+    color: #ccc;
+    text-decoration: none;
+    margin: 0 5px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+    .category-row,
+    .media-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .slider { height: 300px; }
+    .section-title { font-size: 28px; }
+}
+@media (max-width: 600px) {
+    nav { display: none; }
+    .slider { height: 250px; }
+    .category-row,
+    .media-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+#kummeliPopup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.85);
+    color: #fff;
+    font-family: 'Anton', sans-serif;
+    font-size: 28px;
+    padding: 25px 40px;
+    border: 2px solid #b30000;
+    border-radius: 12px;
+    display: none;
+    z-index: 9999;
+    text-align: center;
+}
+
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header>
+    <img src="https://via.placeholder.com/40" class="logo" alt="logo">
+    <nav>
+        <a href="#">jotakin</a>
+        <a href="#">jotakin</a>
+        <a href="#">jotakin</a>
+        <a href="#">jotakin</a>
+        <a href="#">jotakin</a>
+    </nav>
+    <div class="search-box">
+        <input type="text" placeholder="Hae">
+    </div>
+    <img src="https://flagsapi.com/FI/flat/64.png" class="flag" alt="flag">
+</header>
+
+<!-- ===== HERO SLIDER ===== -->
+<section class="slider">
+    <input type="radio" name="slider" id="s1" checked>
+    <input type="radio" name="slider" id="s2">
+    <input type="radio" name="slider" id="s3">
+
+    <div class="slides">
+        <div class="slide">
+            <img src="https://via.placeholder.com/1400x450?text=Stranger+Things+5">
+            <h2>SUOSITELLUT ELOKUVAT</h2>
+        </div>
+        <div class="slide">
+            <img src="https://via.placeholder.com/1400x450?text=Elokuva+2">
+            <h2>SUOSITELLUT ELOKUVAT</h2>
+        </div>
+        <div class="slide">
+            <img src="https://via.placeholder.com/1400x450?text=Elokuva+3">
+            <h2>SUOSITELLUT ELOKUVAT</h2>
+        </div>
+    </div>
+
+    <div class="slider-nav">
+        <label for="s1"></label>
+        <label for="s2"></label>
+        <label for="s3"></label>
+    </div>
+</section>
+
+<div class="container">
+
+<!-- ===== KATEGORIAT ===== -->
+<h2 class="section-title">Kategoriat</h2>
+<div class="category-row">
+    <div class="card"><img src="https://via.placeholder.com/300x400?text=Kauhu"><span>KAUHU</span></div>
+    <div class="card"><img src="https://via.placeholder.com/300x400?text=Komedia"><span>KOMEDIA</span></div>
+    <div class="card"><img src="https://via.placeholder.com/300x400?text=Draama"><span>DRAAMA</span></div>
+    <div class="card"><img src="https://via.placeholder.com/300x400?text=Toiminta"><span>TOIMINTA</span></div>
+</div>
+
+<!-- ===== ELOKUVAT ===== -->
+<h2 class="section-title">Elokuvat</h2>
+<div class="media-row">
+    <div class="card"><img src="https://via.placeholder.com/300x400?text=Movie+1"><span>Elokuva 1</span></div>
+    <div class="card"><img src="https://via.placeholder.com/300x400?text=Movie+2"><span>Elokuva 2</span></div>
+    <div class="card"><img src="https://via.placeholder.com/300x400?text=Movie+3"><span>Elokuva 3</span></div>
+    <div class="card"><img src="https://via.placeholder.com/300x400?text=Movie+4"><span>Elokuva 4</span></div>
+</div>
+
+<!-- ===== SARJAT ===== -->
+<h2 class="section-title">Sarjat</h2>
+<div class="media-row">
+    <div class="card"><img src="https://via.placeholder.com/300x400?text=Sarja+1"><span>Sarja 1</span></div>
+    <div class="card"><img src="https://via.placeholder.com/300x400?text=Sarja+2"><span>Sarja 2</span></div>
+    <div class="card"><img src="https://via.placeholder.com/300x400?text=Sarja+3"><span>Sarja 3</span></div>
+    <div class="card"><img src="https://via.placeholder.com/300x400?text=Sarja+4"><span>Sarja 4</span></div>
+</div>
+
+</div>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+    <p>Press Room - Advertising - Jobs - Conditions of Use - Privacy Policy</p>
+    <p>© 1975-2025 by NaN</p>
+</footer>
+
+<div id="kummeliPopup"><img src="https://media1.tenor.com/m/0sTpX4F98VAAAAAd/kummeli-mieti-rauhassa.gif"></div>
+
+<script>
+let idleTimer;
+let idleTimeLimit = 10000; // 10 sekuntia
+
+const popup = document.getElementById("kummeliPopup");
+
+function resetIdleTimer() {
+    popup.style.display = "none";
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(() => {
+        popup.style.display = "flex";
+    }, idleTimeLimit);
+}
+
+window.onload = resetIdleTimer;
+document.onmousemove = resetIdleTimer;
+document.onkeydown = resetIdleTimer;
+</script>
+
+
+</body>
+</html>

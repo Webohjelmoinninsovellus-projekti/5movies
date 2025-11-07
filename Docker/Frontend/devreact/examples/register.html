@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ryhmät</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;color:#fff;font-family:Arial,sans-serif;}
+h1,h2,h3{font-family:'Anton',sans-serif;letter-spacing:2px;}
+.container{width:90%;max-width:1400px;margin:auto}
+
+/* ===== HEADER ===== */
+header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:15px 5%;background:#111;
+}
+header img.logo{width:40px;height:40px}
+nav{display:flex;gap:15px}
+nav a{
+    background:#B30000;padding:6px 18px;border-radius:20px;
+    color:white;text-decoration:none;font-size:14px;
+}
+.search-box input{
+    padding:6px 15px;border-radius:20px;border:none;outline:none;
+}
+.flag{width:35px}
+
+/* ===== LOOMA-LOMAKE ===== */
+.form-card{
+    background:#8a0000;
+    border:2px solid #b30000;
+    margin-top:60px;
+    padding:25px;
+    text-align:center;
+    border-radius:12px;
+}
+.form-card h2{font-size:32px;margin-bottom:18px}
+.form-card input,.form-card textarea{
+    width:260px;padding:10px;border-radius:20px;border:none;
+    margin:8px auto;display:block;background:#111;color:white;
+}
+.form-card button{
+    background:#b30000;color:#fff;border:none;border-radius:20px;
+    padding:10px 25px;margin-top:10px;cursor:pointer;font-size:16px;
+}
+.form-card button:hover{background:#d00000}
+
+/* ===== RYHMÄLISTA ===== */
+.list-section{margin-top:60px;text-align:center}
+#searchBox{
+    width:300px;padding:10px;border-radius:20px;border:none;
+    margin-bottom:25px;background:#111;color:white;
+}
+.group-list{
+    display:flex;flex-direction:column;gap:12px;
+    max-width:700px;margin:auto;
+}
+.group-card{
+    background:#111;border:2px solid #b30000;
+    padding:15px;border-radius:8px;
+    display:flex;justify-content:space-between;align-items:center;
+}
+.group-card span{font-size:18px}
+.group-card button{
+    background:#b30000;border:none;color:white;
+    padding:6px 15px;border-radius:15px;cursor:pointer;
+}
+.group-card button:hover{background:#d00000}
+
+/* ===== FOOTER ===== */
+footer{
+    margin-top:80px;padding:20px;text-align:center;
+    font-size:12px;color:#ccc;background:#111;
+}
+footer a{color:#ddd;text-decoration:none;margin:0 5px}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:700px){
+    nav{display:none}
+    .group-card{flex-direction:column;gap:8px;padding:20px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <img src="https://via.placeholder.com/40" class="logo" alt="logo">
+    <nav>
+        <a href="#">jotakin</a>
+        <a href="#">jotakin</a>
+        <a href="#">jotakin</a>
+        <a href="#">jotakin</a>
+        <a href="#">jotakin</a>
+    </nav>
+    <div class="search-box"><input type="text" placeholder="Hae"></div>
+    <img src="https://flagsapi.com/FI/flat/64.png" class="flag">
+</header>
+
+<div class="container">
+
+<!-- ===== LUO RYHMÄ ===== -->
+<div class="form-card">
+    <h2>Luo ryhmä</h2>
+    <input type="text" placeholder="Ryhmän nimi">
+    <textarea rows="3" placeholder="Kuvaus (valinnainen)"></textarea>
+    <button>Luo ryhmä ⚡</button>
+</div>
+
+<!-- ===== RYHMÄLISTA ===== -->
+<section class="list-section">
+    <h2 style="font-size:32px;margin-bottom:15px;">Liity ryhmään</h2>
+    <input type="text" id="searchBox" placeholder="Etsi ryhmää...">
+
+    <div class="group-list" id="groupList">
+        <div class="group-card"><span>5 Movies Testryhmä</span><button>Liity</button></div>
+        <div class="group-card"><span>Klassikkojen kerho</span><button>Liity</button></div>
+        <div class="group-card"><span>Sci-fi & Horror Fans</span><button>Liity</button></div>
+        <div class="group-card"><span>Marvel Movie Club</span><button>Liity</button></div>
+        <div class="group-card"><span>Ystäväporukan katselulista</span><button>Liity</button></div>
+        <div class="group-card"><span>Kotimaiset +90-luvun leffat</span><button>Liity</button></div>
+    </div>
+</section>
+
+</div>
+
+<footer>
+    <p>Press Room - Advertising - Jobs - Conditions of Use - Privacy Policy</p>
+    <p>© 1975-2025 by NaN</p>
+</footer>
+
+<script>
+// Live search filter
+document.getElementById("searchBox").addEventListener("keyup", function(){
+    let filter = this.value.toLowerCase();
+    let cards = document.querySelectorAll(".group-card");
+    cards.forEach(card=>{
+        let text = card.innerText.toLowerCase();
+        card.style.display = text.includes(filter) ? "flex" : "none";
+    });
+});
+</script>
+
+</body>
+</html>
