@@ -1,0 +1,40 @@
+import { Link } from "react-router-dom";
+
+export default function Login() {
+  return (
+    <main>
+      <div className="login-wrapper">
+        <h2>LOG IN</h2>
+        <div className="login-box">
+          <input type="text" placeholder="Username" />
+          <input type="password" placeholder="Password" />
+          <Link to="/profile"><button>Login</button></Link>
+        </div>
+      </div>
+
+      <div className="login-extra">
+        Do not have an account?
+        <br />
+        <Link to="/register">Create account</Link>
+      </div>
+
+      <div className="info-section">
+        <div className="info-card">
+          <h3>FOLLOW US</h3>
+          <div className="social-icons">
+            <img src="#" alt="Instagram" />
+            <img src="#" alt="TikTok" />
+            <img src="#" alt="X" />
+          </div>
+        </div>
+
+        <div className="info-card">
+          <h3>DOWNLOAD APP</h3>
+          <div className="qr">
+            <img src="#" alt="QR" />
+          </div>
+        </div>
+      </div>
+    </main>
+  );
+}
