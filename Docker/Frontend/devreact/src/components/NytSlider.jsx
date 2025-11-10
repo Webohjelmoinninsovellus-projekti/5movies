@@ -3,7 +3,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
-function SimpleSlider() {
+function NytSlider() {
   const settings = {
     dots: false,
     lazyLoad: true,
@@ -14,8 +14,8 @@ function SimpleSlider() {
     autoplay: true
   };
   return (
-    <div class="slider">
-        <h2>RECOMMENDED MOVIES</h2>
+    <div class="slider-container">
+        <h2>NYT</h2>
     <Slider {...settings}>
         <div class="slide">
             <img src="../public/harrypotter.jpg" style={{
@@ -40,4 +40,4 @@ function SimpleSlider() {
   );
 }
 
-export default SimpleSlider;
+export default NytSlider;
