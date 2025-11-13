@@ -60,12 +60,38 @@ nav a {
 
 .search-box {
   margin-left: auto;
+  position: relative;
+  border-color: #b30000;
 }
 
 .search-box input {
   padding: 6px 15px;
   border-radius: 20px;
   border: 2px solid #b30000;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: rgb(14, 13, 13);
+  color: black;
+  border-radius: 1px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-height: 450px;
+  z-index: 50;
+  overflow-y: auto;
+}
+
+.dropdown-item {
+  padding: 0, 5rem;
+  border-bottom: 1px solid #f3f4f6;
+  display: flex;
+  align-items: center;
+  gap: 0, 75rem;
+  transition: background-color 0.2s ease;
+  border-color: #b30000;
 }
 
 .user-icon {
@@ -120,6 +146,16 @@ nav a {
   text-shadow: 3px 3px 5px black;
 }
 
+.slider-title {
+  position: relative;
+  width: 100%;
+  font-size: 20px;
+  padding-bottom: 5%;
+  color: white;
+  z-index: 10;
+  text-shadow: 3px 3px 5px black;
+}
+
 .section-title {
   font-size: 20pt;
   margin: 50px 0 15px;
@@ -164,7 +200,7 @@ a:active {
   left: 50%;
   transform: translateX(-50%);
   font-family: "Anton";
-  font-size: 24px;
+  font-size: 18px;
 }
 
 .login-wrapper {
@@ -483,11 +519,12 @@ a:active {
 #movieCard {
   display: flex;
   flex-direction: row;
-  gap: 10px;
   justify-content: space-between;
+  gap: 1rem;
+  margin: 1rem;
+  padding: 1.4rem;
   border: 1px #b30000 solid;
   border-radius: 10px;
-  padding: 14px;
 }
 
 #movieHeader {
@@ -502,6 +539,10 @@ a:active {
   flex-direction: column;
   align-items: start;
   gap: 8px;
+}
+
+#movieCard img {
+  max-height: 30rem;
 }
 
 .btn-red:hover {

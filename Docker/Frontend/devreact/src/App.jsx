@@ -7,7 +7,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
-import Movie from "./pages/Movie";
+import Info from "./pages/Info";
 import Groups from "./pages/Groups";
 import Series from "./pages/Series";
 import Movies from "./pages/Movies";
@@ -37,9 +37,9 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/movie/:id" element={<Movie />} />
+          <Route path="/movie/:id" element={<Info />} />
+          <Route path="/tv/:id" element={<Info />} />
           <Route path="/groups" element={<Groups />} />
-          <Route path="/series" element={<Series />} />
           <Route path="/movies" element={<Movies />} />
         </Routes>
       </Wrapper>

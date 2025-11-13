@@ -1,6 +1,6 @@
 import axios from "axios";
 
-async function inTheatersData() {
+export default async function fetchPopular() {
   try {
     const response = await axios({
       method: "get",
@@ -8,14 +8,12 @@ async function inTheatersData() {
         accept: "application/json",
         Authorization: `Bearer ${import.meta.env.VITE_API_KEY}`,
       },
-      url: `https://api.themoviedb.org/3/movie/now_playing?language=en-US&page=1`,
+      url: `https://api.themoviedb.org/3/movie/popular?language=en-US&page=1`,
     });
 
-    return response.data.results;
+    if (response) return response.data.results;
   } catch (error) {
     console.error("Error fetching movie:", error);
     return null;
   }
 }
-
-export { inTheatersData };
