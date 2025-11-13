@@ -77,11 +77,14 @@ export default function Home() {
               <div key={movie.id} className="card">
                 <img
                   src={`https://image.tmdb.org/t/p/w500${movie.backdrop_path}`}
-                  alt={movie.title}
+                  alt={movie.name}
                 />
-                <span>{movie.title}</span>
+                <span>{movie.name}</span>
               </div>
             ))}
+          <div class="slider-title">
+            <h2>Now in theaters</h2>
+          </div>
         </div>
       </div>
 

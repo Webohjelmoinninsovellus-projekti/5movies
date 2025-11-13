@@ -1,55 +1,48 @@
-import React from "react";
+import { useState, useEffect, React } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { inTheatersData } from "../utilities/inTheatersData";
 
 function InTheatersSlider() {
   const settings = {
-    dots: false,
-    infinite: true,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    autoplay: true,
-    speed: 12000, // Tee siirtymä pitkäksi ja pehmeäksi
-    autoplaySpeed: 0, // Ei taukoa
-    cssEase: "linear", // Tasainen liike
-    pauseOnHover: false,
-    pauseOnFocus: false,
-    lazyLoad: true,
-    arrows: false, // Piilota nuolet (jos ei tarvita)
-    swipe: false, // Poistaa käsinpyyhkäisyn, estää “nykimisen”
+    dots: false, // Piilottaa pienet navigointipisteet (dot-indikaattorit)
+    infinite: true, // Mahdollistaa jatkuvan silmukan (karuselli ei lopu)
+    slidesToShow: 1, // Näytetään yksi dia kerrallaan
+    slidesToScroll: 1, // Siirretään yksi dia kerrallaan
+    autoplay: true, // Käynnistää automaattisen liikkeen
+    speed: 12000, // Siirtymän (animaation) kesto millisekunneissa – hidas ja pehmeä liike
+    autoplayspeed: 0, // Ei taukoa liikkeiden välissä (jatkuva liike)
+    cssEase: "linear", // Tasainen nopeus koko animaation ajan (ei kiihdytystä tai hidastusta)
+    pauseOnHover: false, // Ei pysäytä liikkumista, vaikka hiiri viedään karusellin päälle
+    pauseOnFocus: false, // Ei pysäytä liikkumista, vaikka elementti saa fokuksen (esim. tabilla)
+    lazyLoad: true, // Lataa kuvat vasta, kun niitä tarvitaan (parantaa suorituskykyä)
+    arrows: false, // Piilottaa seuraava/edellinen-nuolinäppäimet
+    swipe: false, // Poistaa kosketus- ja hiiripyyhkäisyn (estää nykimistä ja manuaalisen liikkeen)
   };
+
+  const [inTheaters, setInTheater] = useState([]);
+
+  useEffect(() => {
+    async function load() {
+      const results = await inTheatersData();
+      setInTheater(results);
+    }
+
+    load();
+  }, []);
+
   return (
     <div class="theater-slider">
-      <h2>NOW IN THEATERS</h2>
       <Slider {...settings}>
-        <div class="slide">
-          <img
-            src="../public/harrypotter.jpg"
-            style={{
-              width: "100%",
-              transform: "translateY(-200px) translateX(1px)",
-            }}
-          ></img>
-        </div>
-        <div class="slide">
-          <img
-            src="../public/interstellar.png"
-            style={{
-              width: "100%",
-              transform: "translateY(-50px) translateX(1px)",
-            }}
-          ></img>
-        </div>
-        <div class="slide">
-          <img
-            src="../public/starwars.jpg"
-            style={{
-              width: "100%",
-              transform: "translateY(-100px) translateX(1px)",
-            }}
-          ></img>
-        </div>
+        {inTheaters.map((object) => (
+          <div class="slide">
+            <h2>{object.title}</h2>
+            <img
+              src={`https://image.tmdb.org/t/p/original${object.backdrop_path}`}
+            ></img>
+          </div>
+        ))}
       </Slider>
     </div>
   );

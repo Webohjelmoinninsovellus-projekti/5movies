@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+import axios from "axios";
 
 export default function Header() {
   const apiKey = import.meta.env.VITE_API_KEY;
@@ -9,18 +10,33 @@ export default function Header() {
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (query.length > 2) {
-        fetch(
-          `https://api.themoviedb.org/3/search/multi?api_key=${apiKey}&language=fi-FI&query=${encodeURIComponent(
-            query
-          )}`
-        )
-          .then((res) => res.json())
-          .then((data) => setResults(data.results || []))
-          .catch((err) => console.error(err));
+        axios
+          .get(
+            "https://api.themoviedb.org/3/search/multi?include_adult=false",
+            {
+              headers: {
+                Accept: "application/json",
+                Authorization: `Bearer ${import.meta.env.VITE_API_KEY}`,
+              },
+
+              params: {
+                query: query,
+                language: "en-US",
+                page: 1,
+              },
+            }
+          )
+          .then((response) => {
+            setResults(response.data.results.slice(0, 5));
+          })
+          .catch((error) => {
+            console.error("Error fetching search results:", error);
+            setResults([]);
+          });
       } else {
         setResults([]);
       }
-    }, 400);
+    }, 300);
     return () => clearTimeout(timeout);
   }, [query, apiKey]);
 
@@ -28,7 +44,7 @@ export default function Header() {
     <header>
       <div>
         <Link to="/">
-          <img src="./5moviestransparent.png" className="logo" alt="logo"></img>
+          <img src="/5moviestransparent.png" className="logo" alt="logo"></img>
         </Link>
         <nav className="nav-items">
           <Link to="/">Home</Link>
@@ -43,35 +59,36 @@ export default function Header() {
           placeholder="Search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="p-2 rounded text-black w-64"
         ></input>
         <Link to="/login">
-          <img class="user-icon" src="./user.png"></img>
+          <img class="user-icon" src="/user.png"></img>
         </Link>
 
         {results.length > 0 && (
-          <ul className="absolute right-0 top-12 bg-white text-black w-64 max-h-96 overflow-y-auto rounded shadow-lg z-50">
+          <ul className="dropdown-menu">
             {results.map((item) => (
-              <li
-                key={item.id}
-                className="p-2 border-b hover:bg-gray-200 flex items-center gap-3"
-              >
-                {item.poster_path ? (
-                  <img
-                    src={`https://image.tmdb.org/t/p/w92${item.poster_path}`}
-                    alt={item.title || item.name}
-                  />
-                ) : (
-                  <div
-                    style={{
-                      width: "32px",
-                      height: "48px",
-                      backgroundColor: "#ccc",
-                      borderRadius: "4px",
-                    }}
-                  />
-                )}
-                <span>{item.title || item.name}</span>
+              <li key={item.id} className="dropdown-item">
+                <Link
+                  to={`/${item.media_type}/${item.id}`}
+                  reloadDocument={true}
+                >
+                  {item.poster_path ? (
+                    <img
+                      src={`https://image.tmdb.org/t/p/w92${item.poster_path}`}
+                      alt={item.title || item.name}
+                    />
+                  ) : (
+                    <div
+                      style={{
+                        width: "40px",
+                        height: "80px",
+                        backgroundColor: "#00000000",
+                        borderRadius: "4px",
+                      }}
+                    />
+                  )}
+                  <span>{item.title || item.name}</span>
+                </Link>
               </li>
             ))}
           </ul>
