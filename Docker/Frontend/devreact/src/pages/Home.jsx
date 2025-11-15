@@ -56,13 +56,15 @@ export default function Home() {
         <div className="media-row">
           {movies
             .filter((movie, index) => index < 4)
-            .map((movie) => (
-              <div key={movie.id} className="card">
-                <img
-                  src={`https://image.tmdb.org/t/p/w500${movie.backdrop_path}`}
-                  alt={movie.title}
-                />
-                <span>{movie.title}</span>
+            .map((item) => (
+              <div key={item.id} className="card">
+                <Link to={`/movie/${item.id}`} reloadDocument={true}>
+                  <img
+                    src={`https://image.tmdb.org/t/p/w500${item.backdrop_path}`}
+                    alt={item.title}
+                  />
+                  <span>{item.title}</span>
+                </Link>
               </div>
             ))}
         </div>
@@ -73,13 +75,15 @@ export default function Home() {
         <div className="media-row">
           {series
             .filter((movie, index) => index < 4)
-            .map((movie) => (
-              <div key={movie.id} className="card">
-                <img
-                  src={`https://image.tmdb.org/t/p/w500${movie.backdrop_path}`}
-                  alt={movie.name}
-                />
-                <span>{movie.name}</span>
+            .map((item) => (
+              <div key={item.id} className="card">
+                <Link to={`/tv/${item.id}`} reloadDocument={true}>
+                  <img
+                    src={`https://image.tmdb.org/t/p/w500${item.backdrop_path}`}
+                    alt={item.name}
+                  />
+                  <span>{item.name}</span>
+                </Link>
               </div>
             ))}
           <div class="slider-title">
