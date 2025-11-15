@@ -3,22 +3,20 @@ import { useParams, useLocation } from "react-router";
 import fetchItemData from "../utilities/fetchItemData";
 
 export default function Info() {
-  const [details, setDetails] = useState(null);
+  const [info, setInfo] = useState(null);
   const params = useParams();
   const type = useLocation().pathname.slice(0, 3);
 
   useEffect(() => {
-    async function loadData() {
+    (async () => {
       const data = await fetchItemData(type, params.id);
       console.log(data);
 
-      if (data) setDetails(data);
-    }
+      if (data) setInfo(data);
+    })();
+  }, [params.id, type]);
 
-    loadData();
-  }, []);
-
-  if (!details) {
+  if (!info) {
     return;
   }
 
@@ -27,36 +25,38 @@ export default function Info() {
       <div id="movieCard">
         <div id="movieText">
           <div id="movieHeader">
-            <h2>{details.title}</h2>
-            <p>{details.release_date}</p>
+            <a href={info.homepage} target="_blank">
+              <h2>{`${type === "/mo" ? info.title : info.name}`}</h2>
+            </a>
+            <p>
+              {(type === "/mo" ? info.release_date : info.first_air_date).slice(
+                0,
+                4
+              )}
+            </p>
+            {type === "/mo" ? (
+              <p>{info.runtime} min</p>
+            ) : (
+              <>
+                <p>{info.number_of_seasons} seasons</p>
+                <p>{info.number_of_episodes} episodes</p>
+              </>
+            )}
+            <p>{Number(info.vote_average.toFixed(2))} / 10</p>
+            {<p>[{info.genres.map((genre) => ` ${genre.name} `)}]</p>}
           </div>
-          <p>{details.overview}</p>
+          <p>{info.overview}</p>
         </div>
-        <img
-          src={`https://image.tmdb.org/t/p/w400${details.poster_path}`}
-          alt="Movie poster"
-        />
+        <a
+          href={`https://image.tmdb.org/t/p/original${info.poster_path}`}
+          target="_blank"
+        >
+          <img
+            src={`https://image.tmdb.org/t/p/w400${info.poster_path}`}
+            alt={`${type === "/mo" ? info.title : info.name} poster`}
+          />
+        </a>
       </div>
     </main>
   );
 }
-
-/*
-
-
-  useEffect(() => {
-    async function loadMovie() {
-      const data = await fetchMovieData(params.id);
-      console.log(data);
-
-      if (data) setMovieInfo(data);
-    }
-
-    loadMovie();
-  }, []);
-
-  if (!movieInfo) {
-    return;
-  }
-}
- */
