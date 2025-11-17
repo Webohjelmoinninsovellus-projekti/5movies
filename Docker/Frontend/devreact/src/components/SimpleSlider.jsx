@@ -1,4 +1,5 @@
 import { useState, useEffect, React } from "react";
+import { Link } from "react-router-dom";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -30,12 +31,14 @@ function SimpleSlider() {
   return (
     <div class="theater-slider">
       <Slider {...settings}>
-        {populars.map((object) => (
+        {populars.map((item) => (
           <div class="slide">
-            <h2>{object.title}</h2>
-            <img
-              src={`https://image.tmdb.org/t/p/original${object.backdrop_path}`}
-            ></img>
+            <Link to={`/movie/${item.id}`} reloadDocument={true}>
+              <h2>{item.title}</h2>
+              <img
+                src={`https://image.tmdb.org/t/p/original${item.backdrop_path}`}
+              ></img>
+            </Link>
           </div>
         ))}
       </Slider>
