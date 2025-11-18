@@ -1,16 +1,36 @@
 import { Link } from "react-router-dom";
+import { useParams } from "react-router";
+
+import getProfile from "../utilities/getProfile";
 
 export default function Profile() {
+  const [info, setInfo] = useState(null);
+  const params = useParams();
+
+  useEffect(() => {
+    (async () => {
+      const data = await getProfile(params.username);
+      console.log(data);
+
+      if (data) setInfo(data);
+    })();
+  }, [params.username]);
+
   return (
     <main>
       <div class="container">
-
         <section class="profile-section">
-          <div class="avatar"><img src="./ville.jpg"></img></div>
+          <div class="avatar">
+            <img src="./ville.jpg"></img>
+          </div>
           <div class="profile-info">
-            <h2>Rytkön Ville</h2>
+            <h2>{info.username}</h2>
             <p>@RytkönVille69 · Liittynyt: 12/2024 · Haapavesi, Suomi</p>
-            <p>Elokuvaharrastaja. Kuuluisa sanoistaana "Sinut pittää nyt tappaa". Hirvidokkarit on parasta. Rakastaa kivääreitä ja 80-luvun kulttiklassikoita. </p>
+            <p>
+              Elokuvaharrastaja. Kuuluisa sanoistaana "Sinut pittää nyt tappaa".
+              Hirvidokkarit on parasta. Rakastaa kivääreitä ja 80-luvun
+              kulttiklassikoita.{" "}
+            </p>
           </div>
         </section>
 
@@ -36,8 +56,7 @@ export default function Profile() {
           <li>Lisäsi suosikkeihin: Terminator</li>
           <li>Kommentoi ryhmässä: "Tää pitää nähdä uudestaan!"</li>
         </ul>
-
       </div>
     </main>
-  )
+  );
 }

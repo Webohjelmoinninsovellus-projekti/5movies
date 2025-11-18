@@ -1,4 +1,4 @@
-import { useState, useEffect, React } from "react";
+/*import { useState, useEffect, React } from "react";
 import { Link } from "react-router-dom";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
@@ -13,7 +13,7 @@ function InTheatersSlider() {
     slidesToScroll: 1, // Siirretään yksi dia kerrallaan
     autoplay: true, // Käynnistää automaattisen liikkeen
     speed: 12000, // Siirtymän (animaation) kesto millisekunneissa – hidas ja pehmeä liike
-    autoplayspeed: 0, // Ei taukoa liikkeiden välissä (jatkuva liike)
+    autoplaySpeed: 0, // Ei taukoa liikkeiden välissä (jatkuva liike)
     cssEase: "linear", // Tasainen nopeus koko animaation ajan (ei kiihdytystä tai hidastusta)
     pauseOnHover: false, // Ei pysäytä liikkumista, vaikka hiiri viedään karusellin päälle
     pauseOnFocus: false, // Ei pysäytä liikkumista, vaikka elementti saa fokuksen (esim. tabilla)
@@ -47,6 +47,45 @@ function InTheatersSlider() {
           </div>
         ))}
       </Slider>
+    </div>
+  );
+}
+
+export default InTheatersSlider;*/
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { inTheatersData } from "../utilities/inTheatersData";
+import "../styles/InTheatersSlider.css";
+
+function InTheatersSlider() {
+  const [movies, setMovies] = useState([]);
+
+  useEffect(() => {
+    async function load() {
+      const results = await inTheatersData();
+      setMovies(results);
+    }
+    load();
+  }, []);
+
+  return (
+    <div className="marquee">
+      <div className="marquee-content">
+        {movies.concat(movies).map((item, index) => (
+          <Link
+            key={index}
+            to={`/movie/${item.id}`}
+            reloadDocument={true}
+            className="marquee-item"
+          >
+            <img
+              src={`https://image.tmdb.org/t/p/original${item.backdrop_path}`}
+              alt={item.title}
+            />
+            <h2>{item.title}</h2>
+          </Link>
+        ))}
+      </div>
     </div>
   );
 }

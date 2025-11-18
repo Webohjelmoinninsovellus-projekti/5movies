@@ -1,0 +1,83 @@
+/* Ulkokuori */
+.marquee {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  padding: 0;
+  margin: 0;
+}
+
+/* Liikkuva sisältö */
+.marquee-content {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  animation: marqueeScroll 100s linear infinite;
+}
+
+/* Yksittäinen itemi */
+.marquee-item {
+  position: relative;
+  flex: none;
+  margin-right: 20px;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: white;
+}
+
+/* Kuvan tyyli */
+.marquee-item img {
+  width: 100vw; /* Vie koko viewport-leveyden */
+  height: 55vh; /* Sopiva hero-bannerikoko */
+  object-fit: cover;
+  /*border-radius: 10px;*/
+}
+
+/* Teksti kuvan päällä */
+.marquee-item h2 {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  margin: 0;
+  padding: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+  color: white;
+}
+
+/* Animaatio */
+@keyframes marqueeScroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Responsiivisuus */
+@media (max-width: 768px) {
+  .marquee-item img {
+    height: 40vh;
+  }
+
+  .marquee-item h2 {
+    font-size: 1.4rem;
+    bottom: 15px;
+    left: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .marquee-item img {
+    height: 35vh;
+  }
+
+  .marquee-item h2 {
+    font-size: 1.1rem;
+    bottom: 10px;
+    left: 10px;
+  }
+}

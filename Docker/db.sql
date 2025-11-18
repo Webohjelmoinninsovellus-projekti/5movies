@@ -10,126 +10,105 @@ create table "group"
 alter table "group"
     owner to test;
 
-create table movies_series
-(
-    id        integer  not null
-        constraint moviesseries_id_pk
-            primary key,
-    name      char(64) not null,
-    year      char(16),
-    length    time,
-    rating    char(16),
-    "desc"    char(128),
-    genre     char(32),
-    image_url char(64),
-    imdb_id   integer
-);
-
-alter table movies_series
-    owner to test;
-
-create table groupuser
+create table group_user
 (
     id      integer               not null
         constraint usergroup_id_pk
             primary key,
     groupid integer               not null
-        constraint groupuser_group_id_fk
+        constraint group_user_group_id_fk
             references "group",
     active  boolean default false not null,
     owner   boolean default false
 );
 
-alter table groupuser
+alter table group_user
     owner to test;
 
-create table users
+create table "user"
 (
-    username    name    not null,
-    password    varchar not null,
-    userid      integer not null
+    username    varchar(32) not null,
+    password    varchar(32) not null,
+    userid      integer     not null
         constraint userid_pk
             primary key,
     groupid     integer
-        constraint users_groupuser_id_fk
-            references groupuser
+        constraint user_groupuser_id_fk
+            references group_user
             on delete set null,
     datecreated date,
     avatar_url  char(64)
 );
 
-alter table users
+alter table "user"
     owner to test;
 
 create table user_review
 (
-    reviewid      integer not null
+    reviewid    integer                       not null
         constraint user_review_id_pk
             primary key,
-    userid        integer not null
+    userid      integer                       not null
         constraint user_review_users_userid_fk
-            references users,
-    comment       char(128),
-    movieseriesid integer
-        constraint user_review_movies_series_id_fk
-            references movies_series,
-    rating        char(16),
-    date          date
+            references "user",
+    comment     char(128),
+    movieshowid integer default '-1'::integer not null,
+    rating      char(16),
+    date        date,
+    ismovie     boolean default true          not null
 );
 
 alter table user_review
     owner to test;
 
-create table userfavourite
+create table user_favourite
 (
-    id               integer not null
+    id          integer              not null
         constraint favouriteid
             primary key,
-    movies_series_id integer not null
-        constraint userfavourite_movies_series_id_fk
-            references movies_series,
-    user_id          integer not null
+    movieshowid integer              not null,
+    user_id     integer              not null
         constraint userfavourite_users_userid_fk
-            references users,
-    date             date
+            references "user",
+    date        date,
+    ismovie     boolean default true not null
 );
 
-alter table userfavourite
+alter table user_favourite
     owner to test;
 
-create table groupmovies_series
+create table group_movieshow
 (
-    id               integer not null
-        constraint groupmovies_series_pk
+    id          integer              not null
+        constraint group_movieshow_pk
             primary key,
-    movies_series_id integer not null
-        constraint groupmovies_series_movies_series_id_fk
-            references movies_series,
-    groupid          integer not null
-        constraint groupmovies_series_group_id_fk
+    movieshowid integer              not null,
+    groupid     integer              not null
+        constraint group_movieshow_group_id_fk
             references "group",
-    date             date
+    date        date,
+    ismovie     boolean default true not null
 );
 
-alter table groupmovies_series
+alter table group_movieshow
     owner to test;
 
-create table groupcomment
+create table group_comment
 (
     id      integer not null
-        constraint groupcomment_pk
+        constraint group_comment_pk
             primary key,
     comment char(128),
     groupid integer not null
-        constraint groupcomment_group_id_fk
+        constraint group_comment_group_id_fk
             references "group",
     userid  integer
         constraint groupcomment_users_userid_fk
-            references users,
+            references "user",
     title   char(64)
 );
 
-alter table groupcomment
+alter table group_comment
     owner to test;
 
 

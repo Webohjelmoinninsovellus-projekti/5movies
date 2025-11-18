@@ -1,14 +1,38 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import login from "../utilities/loginManager";
 
 export default function Login() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
   return (
     <main>
       <div className="login-wrapper">
         <h2>LOG IN</h2>
         <div className="login-box">
-          <input type="text" placeholder="Username" />
-          <input type="password" placeholder="Password" />
-          <Link to="/profile"><button>Login</button></Link>
+          <input
+            type="text"
+            placeholder="Username"
+            onChange={(e) => {
+              setUsername(e.target.value);
+            }}
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            onChange={(e) => {
+              setPassword(e.target.value);
+            }}
+          />
+
+          <button
+            onClick={() => {
+              login(username, password);
+            }}
+          >
+            Login
+          </button>
         </div>
       </div>
 
@@ -22,16 +46,16 @@ export default function Login() {
         <div className="info-card">
           <h3>FOLLOW US</h3>
           <div className="social-icons">
-            <img src="#" alt="Instagram" />
-            <img src="#" alt="TikTok" />
-            <img src="#" alt="X" />
+            <img src="./ig.png" alt="Instagram" />
+            <img src="./tiktok.png" alt="TikTok" />
+            <img src="./yt.png" alt="YouTube" />
           </div>
         </div>
 
         <div className="info-card">
           <h3>DOWNLOAD APP</h3>
           <div className="qr">
-            <img src="#" alt="QR" />
+            <img src="./qr.png" alt="QR" />
           </div>
         </div>
       </div>
