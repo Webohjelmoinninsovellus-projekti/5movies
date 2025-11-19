@@ -33,19 +33,19 @@ export default function Home() {
         <h2 class="section-title">Categories</h2>
         <div class="category-row">
           <div class="card">
-            <img src="./scream.png"></img>
+            <img src="/scream.png"></img>
             <span>HORROR</span>
           </div>
           <div class="card">
-            <img src="JimiKarri.jpg"></img>
+            <img src="/JimiKarri.jpg"></img>
             <span>COMEDY</span>
           </div>
           <div class="card">
-            <img src="draamaLeo.jpg"></img>
+            <img src="/draamaLeo.jpg"></img>
             <span>DRAMA</span>
           </div>
           <div class="card">
-            <img src="rambo.jpg"></img>
+            <img src="/rambo.jpg"></img>
             <span>ACTION</span>
           </div>
         </div>

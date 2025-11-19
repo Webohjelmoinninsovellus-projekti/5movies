@@ -1,4 +1,5 @@
 import axios from "axios";
+import { Navigate } from "react-router-dom";
 
 export default async function login(usernameInput, passwordInput) {
   try {
@@ -9,9 +10,13 @@ export default async function login(usernameInput, passwordInput) {
 
     if (response) {
       console.log(response);
+      //setToken(response.data.usertoken);
+      localStorage.setItem("JWT", response.data.usertoken);
       return response.data;
     }
   } catch (error) {
+    //setToken(null);
+    localStorage.removeItem("JWT");
     console.error("Error logging in:", error);
     return null;
   }

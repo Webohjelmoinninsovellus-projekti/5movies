@@ -1,10 +1,15 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+
 import login from "../utilities/loginManager";
 
 export default function Login() {
   const [username, setUsername] = useState("");
+
   const [password, setPassword] = useState("");
+  /*   const [navigate, setNavigate] = useState(false); */
+
+  const navigate = useNavigate();
 
   return (
     <main>
@@ -27,8 +32,13 @@ export default function Login() {
           />
 
           <button
-            onClick={() => {
-              login(username, password);
+            onClick={async () => {
+              const data = await login(username, password);
+              console.log(data);
+
+              if (data) {
+                navigate(`/profile/${data.username}`);
+              }
             }}
           >
             Login
@@ -46,16 +56,16 @@ export default function Login() {
         <div className="info-card">
           <h3>FOLLOW US</h3>
           <div className="social-icons">
-            <img src="./ig.png" alt="Instagram" />
-            <img src="./tiktok.png" alt="TikTok" />
-            <img src="./yt.png" alt="YouTube" />
+            <img src="/social/ig.png" alt="Instagram" />
+            <img src="/social/tiktok.png" alt="TikTok" />
+            <img src="/social/yt.png" alt="YouTube" />
           </div>
         </div>
 
         <div className="info-card">
           <h3>DOWNLOAD APP</h3>
           <div className="qr">
-            <img src="./qr.png" alt="QR" />
+            <img src="/social/qr.png" alt="QR" />
           </div>
         </div>
       </div>
