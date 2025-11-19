@@ -61,7 +61,7 @@ export default function Header() {
           onChange={(e) => setQuery(e.target.value)}
         ></input>
         <Link to="/login">
-          <img class="user-icon" src="/user.png"></img>
+          <img class="user-icon" src="/avatars/user.png"></img>
         </Link>
 
         {results.length > 0 && (
