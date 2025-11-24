@@ -1,11 +1,12 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { AuthContext } from "../components/AuthContext";
 
 import login from "../utilities/loginManager";
 
 export default function Login() {
   const [username, setUsername] = useState("");
-
+  const { loadUser } = useContext(AuthContext);
   const [password, setPassword] = useState("");
   /*   const [navigate, setNavigate] = useState(false); */
 
@@ -37,6 +38,7 @@ export default function Login() {
               console.log(data);
 
               if (data) {
+                await loadUser();
                 navigate(`/profile/${data.username}`);
               }
             }}

@@ -1,22 +1,23 @@
 import axios from "axios";
+import { useContext } from "react";
 import { Navigate } from "react-router-dom";
+import { AuthContext } from "../components/AuthContext";
 
 export default async function login(usernameInput, passwordInput) {
   try {
     const inputUser = { username: usernameInput, password: passwordInput };
-    const response = await axios.post(`http://localhost:5555/user/login`, {
-      user: inputUser,
-    });
+    const response = await axios.post(
+      `http://localhost:5555/user/login`,
+      {
+        user: inputUser,
+      },
+      { withCredentials: true }
+    );
 
     if (response) {
-      console.log(response);
-      //setToken(response.data.usertoken);
-      localStorage.setItem("JWT", response.data.usertoken);
       return response.data;
     }
   } catch (error) {
-    //setToken(null);
-    localStorage.removeItem("JWT");
     console.error("Error logging in:", error);
     return null;
   }

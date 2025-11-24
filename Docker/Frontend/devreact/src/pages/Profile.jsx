@@ -1,24 +1,38 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { AuthContext } from "../components/AuthContext";
 import { useParams } from "react-router";
 
 import getProfile from "../utilities/getProfile";
 
 export default function Profile() {
+  const { user, loadUser, logout } = useContext(AuthContext);
   const [info, setInfo] = useState([]);
+  const [owner, setOwner] = useState(false);
   const params = useParams();
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     (async () => {
       const data = await getProfile(params.username);
-      console.log(data);
 
-      if (data) setInfo(data);
+      if (data) {
+        setInfo(data);
+      }
     })();
   }, [params.username]);
 
+  useEffect(() => {
+    if (user && info) {
+      setOwner(user.username === info.username);
+    }
+  }, [user, info]);
+
   if (!info.username) return <h2>User not found</h2>;
+
+  console.log("This profile's owner: ", owner);
 
   return (
     <main>
@@ -32,19 +46,30 @@ export default function Profile() {
             <p>Joined: {info.datecreated.split("T")[0]}</p>
             <p>{info.desc ? info.desc : ""}</p>
           </div>
+          {owner && (
+            <>
+              <div>
+                <button>✏️</button>
+              </div>
+              <div>
+                <button
+                  onClick={async () => {
+                    const data = await logout();
+                    navigate("/");
+                  }}
+                >
+                  Logout
+                </button>
+              </div>
+            </>
+          )}
         </section>
-        <h2 class="section-title">Omat ryhmät</h2>
-        <div class="card-grid">
-          <div class="card">5 Movies Testiryhmä</div>
-          <div class="card">Ystäväporukan katselulista</div>
-          <div class="card">Klassikkojen kerho</div>
-        </div>
-        <h2 class="section-title">Suosikkielokuvat</h2>
+        <h2 class="section-title">Favorites</h2>
         <div class="movie-grid">
-          <div class="movie-card">Terminator</div>
-          <div class="movie-card">Star Wars</div>
-          <div class="movie-card">Matrix</div>
-          <div class="movie-card">Eraserhead</div>
+          <div class="movie-card"></div>
+          <div class="movie-card"></div>
+          <div class="movie-card"></div>
+          <div class="movie-card"></div>
         </div>
         <h2 class="section-title">Viimeisin aktiivisuus</h2>
         <ul class="activity-list">

@@ -1,11 +1,23 @@
 import { useState, useEffect } from "react";
 import { useParams, useLocation } from "react-router";
 import fetchItemData from "../utilities/fetchItemData";
+import reviewSender from "../utilities/reviewSender";
+import { useNavigate } from "react-router";
 
 export default function Info() {
   const [info, setInfo] = useState(null);
   const params = useParams();
   const type = useLocation().pathname.slice(0, 3);
+  const [rating, setRating] = useState(0);
+  const [hover, setHover] = useState(0);
+  const [comment, setComment] = useState("");
+
+  const totalStars = 5;
+
+  const handleClick = async (value) => {
+    setRating(value);
+    if (onRate) onRate(value);
+  };
 
   useEffect(() => {
     (async () => {
@@ -46,7 +58,52 @@ export default function Info() {
             {<p>[{info.genres.map((genre) => ` ${genre.name} `)}]</p>}
           </div>
           <p>{info.overview}</p>
+          <div
+            style={{
+              display: "flex",
+              cursor: "pointer",
+              gap: "5px",
+              fontSize: "32px",
+            }}
+          >
+            {Array.from({ length: totalStars }, (_, i) => {
+              const value = i + 1;
+              return (
+                <span
+                  key={value}
+                  onClick={() => handleClick(value)}
+                  onMouseEnter={() => setHover(value)}
+                  onMouseLeave={() => setHover(0)}
+                  style={{
+                    color: value <= (hover || rating) ? "#eb1919ff" : "#ccc",
+                    transition: "0.2s",
+                  }}
+                >
+                  ★
+                </span>
+              );
+            })}
+          </div>
+          <input
+            type="text"
+            placeholder="Write your review here..."
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+          />
+          <button
+            onClick={async () => {
+              const data = await reviewSender(comment);
+              console.log(data);
+
+              if (data) {
+                navigate(`/Info/${data.comment}`);
+              }
+            }}
+          >
+            Submit Review
+          </button>
         </div>
+
         <a
           href={`https://image.tmdb.org/t/p/original${info.poster_path}`}
           target="_blank"

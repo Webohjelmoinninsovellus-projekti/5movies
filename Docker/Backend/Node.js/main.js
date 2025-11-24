@@ -1,17 +1,21 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
 
 import userRouter from "./routers/userRouter.js";
+import reviewRouter from "./routers/reviewRouter.js";
 
 dotenv.config();
 
 const app = express();
-app.use(cors());
+app.use(cors({ credentials: true, origin: "http://localhost:5556" }));
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use("/user", userRouter);
+app.use("/review", reviewRouter);
 
 const port = process.env.BACKEND_PORT || 5555;
 

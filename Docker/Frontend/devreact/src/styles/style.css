@@ -588,3 +588,6 @@ footer a {
     font-size: 28px;
   }
 }
+#story {
+  resize: none;
+}
