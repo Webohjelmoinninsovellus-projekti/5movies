@@ -13,6 +13,9 @@ export default async function favoriteSender(
       {
         ismovie,
         movieshowid,
+        title,
+        poster_path,
+        release_year,
       },
       { withCredentials: true }
     );

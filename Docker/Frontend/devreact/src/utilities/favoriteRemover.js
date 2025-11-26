@@ -1,6 +1,6 @@
 import axios from "axios";
 
-async function favoriteRemover(movieshowid) {
+export default async function favoriteRemover(movieshowid) {
   try {
     const response = await axios({
       method: "delete",
@@ -15,5 +15,3 @@ async function favoriteRemover(movieshowid) {
     throw error;
   }
 }
-
-export default favoriteRemover;

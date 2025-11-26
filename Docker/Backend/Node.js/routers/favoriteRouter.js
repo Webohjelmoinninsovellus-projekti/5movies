@@ -49,7 +49,37 @@ favoriteRouter.post("/add", verifyToken, async (req, res) => {
     ]);
     res.status(201).json({
       message: "favorite added successfully",
-      reviewId: rows[0].reviewid,
+      favoriteId: rows[0].id,
+    });
+  } catch (error) {
+    console.error("Error while saving favorite:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+favoriteRouter.delete("/remove/:movieshowid", verifyToken, async (req, res) => {
+  try {
+    const { movieshowid } = req.params;
+    const userid = req.user.userid;
+    
+    console.log("Removing favorite:", { userid, movieshowid });
+    
+    const query = `
+      DELETE FROM user_favourite 
+      WHERE user_id = $1 AND movieshowid = $2
+      RETURNING *`;
+
+    const { rows } = await pool.query(query, [userid, parseInt(movieshowid)]);
+    
+    if (rows.length === 0) {
+      return res.status(404).json({ 
+        message: "Favorite not found" 
+      });
+    }
+    
+    res.status(200).json({
+      message: "favorite removed successfully",
+      favoriteId: rows[0].id,
     });
   } catch (error) {
     console.error("Error while removing favorite:", error);
