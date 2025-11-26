@@ -62,12 +62,16 @@ export default function Header() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         ></input>
-        {!user ? (
-          <Link to="/login">
-            <img class="user-icon" src="/avatars/user.png"></img>
+        {user ? (
+          <Link to={`/profile/${user.username}`}>
+            {user.avatar ? (
+              <img class="user-icon" src={`${user.avatar}`}></img>
+            ) : (
+              <img class="user-icon" src="/avatars/user.png"></img>
+            )}
           </Link>
         ) : (
-          <Link to={`/profile/${user.username}`}>
+          <Link to="/login">
             <img class="user-icon" src="/avatars/user.png"></img>
           </Link>
         )}

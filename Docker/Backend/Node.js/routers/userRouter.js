@@ -15,6 +15,7 @@ userRouter.get("/me", verifyToken, (req, res, next) => {
     console.log("Profile requested for user:" + req.user);
     res.status(200).json({
       username: req.user.username,
+      avatar: req.user.avatar,
     });
   } else res.status(200);
 });
@@ -30,9 +31,8 @@ userRouter.get("/:username", (req, res, next) => {
     `SELECT * FROM "user" WHERE username = ($1) AND active = true`,
     [username],
     (err, result) => {
-      if (err) {
-        res.status(500).json({ error: err.message });
-      } else res.status(200).json(result.rows[0]);
+      if (err) res.status(500).json({ error: err.message });
+      else res.status(200).json(result.rows[0]);
     }
   );
 });
@@ -103,7 +103,11 @@ userRouter.post("/login", (req, res, next) => {
           return next(error);
         } else {
           const accessToken = jwt.sign(
-            { username: dbUser.username },
+            {
+              username: dbUser.username,
+              userid: dbUser.userid,
+              avatar: dbUser.avatar_url,
+            },
             SECRET_KEY,
             { expiresIn: "30m" }
           );
@@ -119,7 +123,7 @@ userRouter.post("/login", (req, res, next) => {
             res.status(200).json({
               username: dbUser.username,
             });
-          } else return next(error);
+          } else return next(err);
         }
       });
     }

@@ -53,6 +53,10 @@ nav a {
   font-size: 11pt;
 }
 
+nav a:hover {
+  background: rgba(208, 0, 0, 0.547);
+}
+
 .nav-items {
   text-align: center;
   align-items: center;
@@ -97,11 +101,26 @@ nav a {
 .user-icon {
   width: 35px;
   height: 35px;
+  border-radius: 50%;
 }
 
 .user-icon:hover {
   border-radius: 50%;
   border: 1px solid #b30000;
+}
+
+.red-button {
+  background: #b30000;
+  padding: 6px 18px;
+  border-radius: 20px;
+  color: white;
+  text-decoration: none;
+  font-size: 11pt;
+  border-style: none;
+}
+
+.red-button:hover {
+  background: rgba(208, 0, 0, 0.547);
 }
 
 .flag {
@@ -522,9 +541,7 @@ a:active {
   justify-content: space-between;
   gap: 1rem;
   margin: 1rem;
-  padding: 1.4rem;
-  border: 1px #b30000 solid;
-  border-radius: 10px;
+  padding: 0.6rem;
 }
 
 #movieHeader {

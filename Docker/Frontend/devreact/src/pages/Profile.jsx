@@ -1,26 +1,34 @@
 import { useState, useEffect, useContext } from "react";
-import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../components/AuthContext";
-import { useParams } from "react-router";
+import { useParams, useLocation } from "react-router";
 
 import getProfile from "../utilities/getProfile";
+import fetchFavorite from "../utilities/fetchFavorite";
 
 export default function Profile() {
-  const { user, loadUser, logout } = useContext(AuthContext);
   const [info, setInfo] = useState([]);
+  const [favorites, setFavorites] = useState([]);
   const [owner, setOwner] = useState(false);
+
   const params = useParams();
+
+  const { user, logout } = useContext(AuthContext);
 
   const navigate = useNavigate();
 
   useEffect(() => {
     (async () => {
-      const data = await getProfile(params.username);
+      const username = params.username;
+      const profileData = await getProfile(username);
 
-      if (data) {
-        setInfo(data);
+      if (profileData) {
+        setInfo(profileData);
+        console.log(profileData);
       }
+
+      const favoritesData = await fetchFavorite(params.username);
+      if (favoritesData) setFavorites(favoritesData);
     })();
   }, [params.username]);
 
@@ -39,44 +47,68 @@ export default function Profile() {
       <div class="container">
         <section class="profile-section">
           <div class="avatar">
-            <img src={info.avatar_url}></img>
+            {info.avatar_url ? (
+              <img src={info.avatar_url}></img>
+            ) : (
+              <img src="/avatars/user.png"></img>
+            )}
           </div>
           <div class="profile-info">
             <h2>{info.username}</h2>
             <p>Joined: {info.datecreated.split("T")[0]}</p>
             <p>{info.desc ? info.desc : ""}</p>
+            {owner && (
+              <>
+                <nav className="nav-items">
+                  <div>
+                    <button className="red-button">✏️</button>
+                  </div>
+                  <div>
+                    <button
+                      className="red-button"
+                      onClick={async () => {
+                        const data = await logout();
+                        navigate("/");
+                      }}
+                    >
+                      Logout
+                    </button>
+                  </div>
+                </nav>
+              </>
+            )}
           </div>
-          {owner && (
-            <>
-              <div>
-                <button>✏️</button>
-              </div>
-              <div>
-                <button
-                  onClick={async () => {
-                    const data = await logout();
-                    navigate("/");
-                  }}
-                >
-                  Logout
-                </button>
-              </div>
-            </>
-          )}
         </section>
         <h2 class="section-title">Favorites</h2>
         <div class="movie-grid">
-          <div class="movie-card"></div>
-          <div class="movie-card"></div>
-          <div class="movie-card"></div>
-          <div class="movie-card"></div>
+          {info.favorites && info.favorites.length > 0 ? (
+            info.favorites.map((item) => (
+              <Link
+                to={`/${item.type === "movie" ? "mo" : "tv"}/${item.tmdb_id}`}
+                key={item.tmdb_id}
+                class="movie-card"
+              >
+                {item.poster_url ? (
+                  <img src={item.poster_url} alt={item.title} />
+                ) : (
+                  <div class="no-poster">No Poster</div>
+                )}
+                <div class="movie-info">
+                  <h3 class="movie-title">{item.title}</h3>
+                  <p class="movie-year">{item.release_year}</p>
+                </div>
+              </Link>
+            ))
+          ) : (
+            <p>No favorites added yet.</p>
+          )}
         </div>
-        <h2 class="section-title">Viimeisin aktiivisuus</h2>
+        <h2 class="section-title">Latest activity</h2>
         <ul class="activity-list">
-          <li>Arvosteli: Star Wars (5/5)</li>
-          <li>Liittyi ryhmään: Klassikkojen kerho</li>
-          <li>Lisäsi suosikkeihin: Terminator</li>
-          <li>Kommentoi ryhmässä: "Tää pitää nähdä uudestaan!"</li>
+          <li>Arvosteli: star wurs (5/5)</li>
+          <li>Liittyi ryhmään: doghouse</li>
+          <li>Lisäsi suosikkeihin: </li>
+          <li>Kommentoi ryhmässä: "natsaa!"</li>
         </ul>
       </div>
     </main>

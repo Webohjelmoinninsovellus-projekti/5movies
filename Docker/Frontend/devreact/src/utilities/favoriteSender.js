@@ -1,19 +1,12 @@
 import axios from "axios";
 
-export default async function reviewSender(
-  ismovie,
-  comment,
-  movieshowid,
-  rating
-) {
+export default async function favoriteSender(ismovie, movieshowid) {
   try {
     const response = await axios.post(
-      "http://localhost:5555/review/add",
+      "http://localhost:5555/favorite/add",
       {
         ismovie,
-        comment,
         movieshowid,
-        rating,
       },
       { withCredentials: true }
     );
