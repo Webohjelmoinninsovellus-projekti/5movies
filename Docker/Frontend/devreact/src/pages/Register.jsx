@@ -35,7 +35,12 @@ export default function Register() {
             onClick={async () => {
               setMessage("");
 
+              const usernameRegex = /^[a-zA-Z0-9]{1,30}$/;
               const passwordRegex = /^(?=.*[A-Z])(?=.*\d)/;
+
+              if (!usernameRegex.test(username)) {
+                setMessage("Username can only contain letters and numbers");
+              }
 
               if (
                 password === verifyPassword &&

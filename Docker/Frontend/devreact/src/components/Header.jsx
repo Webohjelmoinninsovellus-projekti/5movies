@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import axios from "axios";
+import { AuthContext } from "./AuthContext";
 
 export default function Header() {
+  const { user } = useContext(AuthContext);
   const apiKey = import.meta.env.VITE_API_KEY;
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
@@ -60,9 +62,19 @@ export default function Header() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         ></input>
-        <Link to="/login">
-          <img class="user-icon" src="/avatars/user.png"></img>
-        </Link>
+        {user ? (
+          <Link to={`/profile/${user.username}`}>
+            {user.avatar ? (
+              <img class="user-icon" src={`${user.avatar}`}></img>
+            ) : (
+              <img class="user-icon" src="/avatars/user.png"></img>
+            )}
+          </Link>
+        ) : (
+          <Link to="/login">
+            <img class="user-icon" src="/avatars/user.png"></img>
+          </Link>
+        )}
 
         {results.length > 0 && (
           <ul className="dropdown-menu">

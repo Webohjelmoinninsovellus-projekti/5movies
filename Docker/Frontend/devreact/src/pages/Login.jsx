@@ -1,12 +1,15 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { AuthContext } from "../components/AuthContext";
 
 import login from "../utilities/loginManager";
 
 export default function Login() {
   const [username, setUsername] = useState("");
-
+  const { loadUser } = useContext(AuthContext);
   const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
+
   /*   const [navigate, setNavigate] = useState(false); */
 
   const navigate = useNavigate();
@@ -21,6 +24,7 @@ export default function Login() {
             placeholder="Username"
             onChange={(e) => {
               setUsername(e.target.value);
+              //setUsername(value);
             }}
           />
           <input
@@ -30,28 +34,30 @@ export default function Login() {
               setPassword(e.target.value);
             }}
           />
-
           <button
             onClick={async () => {
+              setMessage("");
               const data = await login(username, password);
               console.log(data);
 
               if (data) {
+                await loadUser();
                 navigate(`/profile/${data.username}`);
+              } else {
+                setMessage("Invalid username or password");
               }
             }}
           >
             Login
           </button>
+          <p>{message}</p>
         </div>
       </div>
-
       <div className="login-extra">
         Do not have an account?
         <br />
         <Link to="/register">Create account</Link>
       </div>
-
       <div className="info-section">
         <div className="info-card">
           <h3>FOLLOW US</h3>
