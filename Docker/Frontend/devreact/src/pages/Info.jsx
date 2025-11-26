@@ -8,6 +8,7 @@ import fetchItemData from "../utilities/fetchItemData";
 import fetchReviews from "../utilities/fetchReviews";
 import reviewSender from "../utilities/reviewSender";
 import favoriteSender from "../utilities/favoriteSender";
+import favoriteRemover from "../utilities/favoriteRemover";
 
 export default function Info() {
   const [loading, setLoading] = useState(true);
@@ -19,6 +20,9 @@ export default function Info() {
   const [comment, setComment] = useState("");
 
   const [reviews, setReviews] = useState([]);
+  const [favoriteAdded, setFavoriteAdded] = useState(false);
+  const [favoriteError, setFavoriteError] = useState("");
+  const [favoriteRemoved, setFavoriteRemoved] = useState(false);
 
   const { user } = useContext(AuthContext);
 
@@ -143,20 +147,54 @@ export default function Info() {
                 <button
                   className="red-button"
                   onClick={async () => {
-                    await favoriteSender(
-                      type === "/mo" ? true : false,
-                      info.id
-                    );
-                    if (
-                      location.pathname.includes(`/profile/${user.username}`)
-                    ) {
-                      const updated = await getProfile(user.username);
-                      setInfo(updated);
+                    if (favoriteAdded) return;
+                    
+                    try {
+                      await favoriteSender(
+                        type === "/mo" ? true : false,
+                        info.id,
+                        type === "/mo" ? info.title : info.name,
+                        info.poster_path,
+                        parseInt((type === "/mo" ? info.release_date : info.first_air_date).slice(0, 4))
+                      );
+                      setFavoriteAdded(true);
+                      setFavoriteRemoved(false);
+                      setFavoriteError("");
+                    } catch (error) {
+                      console.error("Failed to add favorite:", error);
+                      if (error.response?.status === 409 || error.response?.data?.message?.includes("duplicate")) {
+                        setFavoriteError("Already added to favorites!");
+                      } else {
+                        setFavoriteError("Failed to add to favorites. Please try again.");
+                      }
+                      setTimeout(() => setFavoriteError(""), 3000);
                     }
                   }}
+                  disabled={favoriteAdded}
+                  style={{
+                    opacity: favoriteAdded ? 0.6 : 1,
+                    cursor: favoriteAdded ? "not-allowed" : "pointer",
+                    marginRight: "10px"
+                  }}
                 >
-                  add your favorites
+                  {favoriteAdded ? "✓ Added to favorites" : "Add to favorites"}
                 </button>
+                
+                {favoriteAdded && !favoriteRemoved && (
+                  <p style={{ color: "#4CAF50", marginTop: "10px", fontWeight: "bold" }}>
+                    ✓ Successfully added to your favorites!
+                  </p>
+                )}
+                {favoriteRemoved && (
+                  <p style={{ color: "#ff9800", marginTop: "10px", fontWeight: "bold" }}>
+                    ✓ Removed from your favorites!
+                  </p>
+                )}
+                {favoriteError && (
+                  <p style={{ color: "#ff6b6b", marginTop: "10px", fontWeight: "bold" }}>
+                    {favoriteError}
+                  </p>
+                )}
               </>
             )}
             <div>

@@ -5,6 +5,7 @@ import { useParams, useLocation } from "react-router";
 
 import getProfile from "../utilities/getProfile";
 import fetchFavorite from "../utilities/fetchFavorite";
+import favoriteRemover from "../utilities/favoriteRemover";
 
 export default function Profile() {
   const [info, setInfo] = useState([]);
@@ -81,23 +82,49 @@ export default function Profile() {
         </section>
         <h2 class="section-title">Favorites</h2>
         <div class="movie-grid">
-          {info.favorites && info.favorites.length > 0 ? (
-            info.favorites.map((item) => (
-              <Link
-                to={`/${item.type === "movie" ? "mo" : "tv"}/${item.tmdb_id}`}
-                key={item.tmdb_id}
+          {favorites && favorites.length > 0 ? (
+            favorites.map((item) => (
+              <div
+                key={item.movieshowid}
                 class="movie-card"
               >
-                {item.poster_url ? (
-                  <img src={item.poster_url} alt={item.title} />
-                ) : (
-                  <div class="no-poster">No Poster</div>
+                <Link
+                  to={`/${item.ismovie ? "mo" : "tv"}/${item.movieshowid}`}
+                  className="movie-card-link"
+                >
+                  {item.poster_path ? (
+                    <img src={`https://image.tmdb.org/t/p/w400${item.poster_path}`} alt={item.title} />
+                  ) : (
+                    <div class="no-poster">No Poster</div>
+                  )}
+                  <div class="movie-info">
+                    <h3 class="movie-title">{item.title}</h3>
+                    <p class="movie-year">{item.release_year}</p>
+                  </div>
+                </Link>
+                {owner && (
+                  <button
+                    className="favorite-remove-btn"
+                    onClick={async (e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      {
+                        try {
+                          await favoriteRemover(item.movieshowid);
+                          const updatedFavorites = await fetchFavorite(params.username);
+                          if (updatedFavorites) setFavorites(updatedFavorites);
+                          console.log("Removed favorite:", item.title);
+                        } catch (error) {
+                          console.error("Failed to remove favorite:", error);
+                          alert("Failed to remove from favorites.");
+                        }
+                      }
+                    }}
+                  >
+                    ✕ Remove
+                  </button>
                 )}
-                <div class="movie-info">
-                  <h3 class="movie-title">{item.title}</h3>
-                  <p class="movie-year">{item.release_year}</p>
-                </div>
-              </Link>
+              </div>
             ))
           ) : (
             <p>No favorites added yet.</p>
