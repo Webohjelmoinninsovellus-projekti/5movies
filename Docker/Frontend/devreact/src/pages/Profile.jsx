@@ -3,11 +3,14 @@ import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../components/AuthContext";
 import { useParams, useLocation } from "react-router";
 
+import LoadingElement from "../components/LoadingElement";
+
 import getProfile from "../utilities/getProfile";
 import fetchFavorite from "../utilities/fetchFavorite";
 import favoriteRemover from "../utilities/favoriteRemover";
 
 export default function Profile() {
+  const [loading, setLoading] = useState(true);
   const [info, setInfo] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const [owner, setOwner] = useState(false);
@@ -20,6 +23,7 @@ export default function Profile() {
 
   useEffect(() => {
     (async () => {
+      setLoading(true);
       const username = params.username;
       const profileData = await getProfile(username);
 
@@ -30,12 +34,15 @@ export default function Profile() {
 
       const favoritesData = await fetchFavorite(params.username);
       if (favoritesData) setFavorites(favoritesData);
+      setLoading(false);
     })();
   }, [params.username]);
 
   useEffect(() => {
     if (user && info) {
+      setLoading(true);
       setOwner(user.username === info.username);
+      setLoading(true);
     }
   }, [user, info]);
 
@@ -45,6 +52,7 @@ export default function Profile() {
 
   return (
     <main>
+      {}
       <div class="container">
         <section class="profile-section">
           <div class="avatar">
@@ -84,16 +92,16 @@ export default function Profile() {
         <div class="movie-grid">
           {favorites && favorites.length > 0 ? (
             favorites.map((item) => (
-              <div
-                key={item.movieshowid}
-                class="movie-card"
-              >
+              <div key={item.movieshowid} class="movie-card">
                 <Link
                   to={`/${item.ismovie ? "mo" : "tv"}/${item.movieshowid}`}
                   className="movie-card-link"
                 >
                   {item.poster_path ? (
-                    <img src={`https://image.tmdb.org/t/p/w400${item.poster_path}`} alt={item.title} />
+                    <img
+                      src={`https://image.tmdb.org/t/p/w400${item.poster_path}`}
+                      alt={item.title}
+                    />
                   ) : (
                     <div class="no-poster">No Poster</div>
                   )}
@@ -111,7 +119,9 @@ export default function Profile() {
                       {
                         try {
                           await favoriteRemover(item.movieshowid);
-                          const updatedFavorites = await fetchFavorite(params.username);
+                          const updatedFavorites = await fetchFavorite(
+                            params.username
+                          );
                           if (updatedFavorites) setFavorites(updatedFavorites);
                           console.log("Removed favorite:", item.title);
                         } catch (error) {

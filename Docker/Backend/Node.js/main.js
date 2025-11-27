@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 
+import infoRouter from "./routers/infoRouter.js";
 import userRouter from "./routers/userRouter.js";
 import reviewRouter from "./routers/reviewRouter.js";
 import favoriteRouter from "./routers/favoriteRouter.js";
@@ -15,6 +16,7 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+app.use("/info", infoRouter);
 app.use("/user", userRouter);
 app.use("/review", reviewRouter);
 app.use("/favorite", favoriteRouter);

@@ -1,5 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { useParams, useLocation } from "react-router";
+import { Link } from "react-router-dom";
 
 import { AuthContext } from "../components/AuthContext";
 import LoadingElement from "../components/LoadingElement";
@@ -148,24 +149,34 @@ export default function Info() {
                   className="red-button"
                   onClick={async () => {
                     if (favoriteAdded) return;
-                    
+
                     try {
                       await favoriteSender(
                         type === "/mo" ? true : false,
                         info.id,
                         type === "/mo" ? info.title : info.name,
                         info.poster_path,
-                        parseInt((type === "/mo" ? info.release_date : info.first_air_date).slice(0, 4))
+                        parseInt(
+                          (type === "/mo"
+                            ? info.release_date
+                            : info.first_air_date
+                          ).slice(0, 4)
+                        )
                       );
                       setFavoriteAdded(true);
                       setFavoriteRemoved(false);
                       setFavoriteError("");
                     } catch (error) {
                       console.error("Failed to add favorite:", error);
-                      if (error.response?.status === 409 || error.response?.data?.message?.includes("duplicate")) {
+                      if (
+                        error.response?.status === 409 ||
+                        error.response?.data?.message?.includes("duplicate")
+                      ) {
                         setFavoriteError("Already added to favorites!");
                       } else {
-                        setFavoriteError("Failed to add to favorites. Please try again.");
+                        setFavoriteError(
+                          "Failed to add to favorites. Please try again."
+                        );
                       }
                       setTimeout(() => setFavoriteError(""), 3000);
                     }
@@ -174,24 +185,41 @@ export default function Info() {
                   style={{
                     opacity: favoriteAdded ? 0.6 : 1,
                     cursor: favoriteAdded ? "not-allowed" : "pointer",
-                    marginRight: "10px"
+                    marginRight: "10px",
                   }}
                 >
                   {favoriteAdded ? "✓ Added to favorites" : "Add to favorites"}
                 </button>
-                
                 {favoriteAdded && !favoriteRemoved && (
-                  <p style={{ color: "#4CAF50", marginTop: "10px", fontWeight: "bold" }}>
+                  <p
+                    style={{
+                      color: "#4CAF50",
+                      marginTop: "10px",
+                      fontWeight: "bold",
+                    }}
+                  >
                     ✓ Successfully added to your favorites!
                   </p>
                 )}
                 {favoriteRemoved && (
-                  <p style={{ color: "#ff9800", marginTop: "10px", fontWeight: "bold" }}>
+                  <p
+                    style={{
+                      color: "#ff9800",
+                      marginTop: "10px",
+                      fontWeight: "bold",
+                    }}
+                  >
                     ✓ Removed from your favorites!
                   </p>
                 )}
                 {favoriteError && (
-                  <p style={{ color: "#ff6b6b", marginTop: "10px", fontWeight: "bold" }}>
+                  <p
+                    style={{
+                      color: "#ff6b6b",
+                      marginTop: "10px",
+                      fontWeight: "bold",
+                    }}
+                  >
                     {favoriteError}
                   </p>
                 )}
@@ -218,7 +246,10 @@ export default function Info() {
                         borderRadius: "10px",
                       }}
                     >
-                      <h2>{item.rating}/5</h2>
+                      <Link to={`/profile/${item.username}`}>
+                        <h2>{item.username}</h2>
+                      </Link>
+                      <h3>{item.rating}/5</h3>
                       <p>{item.comment}</p>
                       <p>{item.date.slice(0, 10)}</p>
                     </div>

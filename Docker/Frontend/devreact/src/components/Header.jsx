@@ -3,6 +3,20 @@ import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from "./AuthContext";
 
+function handleKeyDown(e) {
+  const { cursor, result } = this.state;
+  // arrow up/down button should select next/previous list element
+  if (e.keyCode === 38 && cursor > 0) {
+    this.setState((prevState) => ({
+      cursor: prevState.cursor - 1,
+    }));
+  } else if (e.keyCode === 40 && cursor < result.length - 1) {
+    this.setState((prevState) => ({
+      cursor: prevState.cursor + 1,
+    }));
+  }
+}
+
 export default function Header() {
   const { user } = useContext(AuthContext);
   const apiKey = import.meta.env.VITE_API_KEY;

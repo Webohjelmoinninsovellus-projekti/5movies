@@ -40,6 +40,7 @@ export default function Register() {
 
               if (!usernameRegex.test(username)) {
                 setMessage("Username can only contain letters and numbers");
+                return;
               }
 
               if (
