@@ -9,6 +9,7 @@ import Register from "./pages/Register";
 import Profile from "./pages/Profile";
 import Info from "./pages/Info";
 import Groups from "./pages/Groups";
+import Group from "./pages/Group";
 import Series from "./pages/Series";
 import Movies from "./pages/Movies";
 
@@ -31,18 +32,22 @@ export default function App() {
       ></link>
 
       <Header />
-      <Wrapper>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/profile/:username" element={<Profile />} />
-          <Route path="/movie/:id" element={<Info />} />
-          <Route path="/tv/:id" element={<Info />} />
-          <Route path="/groups" element={<Groups />} />
-          <Route path="/movies" element={<Movies />} />
-        </Routes>
-      </Wrapper>
+      <div className="page-wrapper">
+        <Wrapper>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/profile/:username" element={<Profile />} />
+            <Route path="/movie/:id" element={<Info />} />
+            <Route path="/tv/:id" element={<Info />} />
+            <Route path="/groups" element={<Groups />} />
+            <Route path="/group/:name" element={<Group />} />
+            <Route path="/movies" element={<Movies />} />
+            <Route path="/series" element={<Series />} />
+          </Routes>
+        </Wrapper>
+      </div>
       <Footer />
     </>
   );

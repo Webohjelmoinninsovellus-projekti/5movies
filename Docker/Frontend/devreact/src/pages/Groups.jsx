@@ -1,58 +1,75 @@
+import { useState, useEffect, useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { AuthContext } from "../components/AuthContext";
+import { useParams, useLocation } from "react-router";
+
+import LoadingElement from "../components/LoadingElement";
+import getGroups from "../utilities/getGroups";
 
 export default function Groups() {
-    return (
-<div class="container">
+  const [loading, setLoading] = useState(true);
+  const [info, setInfo] = useState([]);
+  const [search, setSearch] = useState("");
 
-<div class="group-layout">
+  const { user, logout } = useContext(AuthContext);
 
-    <div>
-        <div class="group-img">kuva</div>
-        <button class="btn-red">Poistu ryhmästä</button>
-    </div>
+  const navigate = useNavigate();
 
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      const groupData = await getGroups();
 
-    <div class="group-info">
-        <h2>5 MOVIES TESTIRYHMÄ</h2>
-        <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla quam velit, vulputate eu pharetra nec, mattis ac neque. 
-            Duis vulputate commodo lectus, ac blandit elit tincidunt id. Sed rhoncus, tortor sed eleifend tristique, tortor mauris 
-            molestie elit, et lacinia ipsum quam nec dui. Quisque nec mauris sit amet elit iaculis pretium sit amet quis magna. 
-            Aenean velit odio, elementum in tempus ut, vehicula eu diam.
-        </p>
+      if (groupData) {
+        setInfo(groupData);
+        console.log(groupData);
+      }
+      setLoading(false);
+    })();
+  }, []);
 
-        <h3 class="section-title">Lisätyt elokuvat</h3>
-        <div class="card-row">
-            <div class="card">kuva</div>
-            <div class="card">kuva</div>
-            <div class="card">kuva</div>
+  if (loading) return <LoadingElement />;
+
+  return (
+    <div className="groups-wrapper">
+      <h2>Create new group</h2>
+      <form>
+        <div className="login-box">
+          <label>Group name:</label>
+          <input type="text" placeholder="Enter group name" />
         </div>
-
-        <h3 class="section-title">Keskustelualue</h3>
-        <button class="add-btn">Lisää uusi keskustelu</button>
-        <div class="discussion-box"></div>
-    </div>
-
-
-    <div>
-        <div class="member-block">
-            <h3>Ryhmän omistaja</h3>
-            <div class="member">
-                <img src="https://via.placeholder.com/60"/>
-                <span class="member-name">Rytkön Ville</span>
-            </div>
+        <div className="login-box">
+          <label>Description:</label>
+          <input type="text" placeholder="Enter group description" />
         </div>
-
-        <div class="member-block">
-            <h3>Jäsenet</h3>
-            <div class="member">
-                <img src="https://via.placeholder.com/60"/>
-                <span class="member-name">Jari</span>
-            </div>
+        <button type="submit" className="red-button">
+          Create group
+        </button>
+      </form>
+      <div className="groups-search">
+        <h2>Groups</h2>
+        <div className="login-box">
+          <input
+            type="text"
+            placeholder="Search group"
+            onChange={(e) => {
+              setSearch(e.target.value);
+            }}
+          />
         </div>
+        <div className="groups-info">
+          {info
+            .filter((info) =>
+              info.name.toLowerCase().includes(search.toLowerCase())
+            )
+            //.filter((info, index) => index < 1)
+            .map((group) => (
+              <Link to={`/group/${group.name}`}>
+                <button className="red-button">{group.name}</button>
+              </Link>
+            ))}
+        </div>
+      </div>
     </div>
-
-</div>
-
-</div>
-    );
+  );
 }

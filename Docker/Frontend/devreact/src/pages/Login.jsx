@@ -33,6 +33,19 @@ export default function Login() {
             onChange={(e) => {
               setPassword(e.target.value);
             }}
+            onKeyPress={async (e) => {
+              if (e.key === "Enter") {
+                const data = await login(username, password);
+                console.log(data);
+
+                if (data) {
+                  await loadUser();
+                  navigate(`/profile/${data.username}`);
+                } else {
+                  setMessage("Invalid username or password");
+                }
+              }
+            }}
           />
           <button
             onClick={async () => {
@@ -53,6 +66,7 @@ export default function Login() {
           <p>{message}</p>
         </div>
       </div>
+
       <div className="login-extra">
         Do not have an account?
         <br />

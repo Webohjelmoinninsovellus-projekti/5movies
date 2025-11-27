@@ -7,6 +7,7 @@ import infoRouter from "./routers/infoRouter.js";
 import userRouter from "./routers/userRouter.js";
 import reviewRouter from "./routers/reviewRouter.js";
 import favoriteRouter from "./routers/favoriteRouter.js";
+import groupRouter from "./routers/groupRouter.js";
 
 dotenv.config();
 
@@ -20,6 +21,7 @@ app.use("/info", infoRouter);
 app.use("/user", userRouter);
 app.use("/review", reviewRouter);
 app.use("/favorite", favoriteRouter);
+app.use("/group", groupRouter);
 
 const port = process.env.BACKEND_PORT || 5555;
 

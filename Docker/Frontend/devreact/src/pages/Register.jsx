@@ -1,12 +1,18 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import register from "../utilities/registerUser.js";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../components/AuthContext";
+
+import login from "../utilities/loginManager";
 
 export default function Register() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [verifyPassword, setVerifyPassword] = useState("");
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
+  const { loadUser } = useContext(AuthContext);
 
   return (
     <main>
@@ -31,6 +37,11 @@ export default function Register() {
             value={verifyPassword}
             onChange={(e) => setVerifyPassword(e.target.value)}
           />
+          <div className="login-extra">
+            Password must be at least 8 characters long, contain at least one
+            uppercase letter and one number.
+          </div>
+          <br />
           <button
             onClick={async () => {
               setMessage("");
@@ -53,7 +64,15 @@ export default function Register() {
 
                 switch (result.status) {
                   case 201:
-                    setMessage("Registration successful! You can now log in.");
+                    const data = await login(username, password);
+
+                    if (data) {
+                      setMessage(
+                        "Registration successful! You can now log in."
+                      );
+                      await loadUser();
+                      navigate("/profile/" + username);
+                    }
 
                     break;
                   case 409:
@@ -70,6 +89,7 @@ export default function Register() {
           >
             Sign Up
           </button>
+
           <p>{message}</p>
         </div>
       </div>
@@ -79,7 +99,6 @@ export default function Register() {
         <br />
         <Link to="/login">Log in</Link>
       </div>
-
       <div className="info-section">
         <div className="info-card">
           <h3>FOLLOW US</h3>
