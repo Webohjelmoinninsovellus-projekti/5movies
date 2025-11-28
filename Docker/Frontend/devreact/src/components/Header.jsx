@@ -3,25 +3,12 @@ import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from "./AuthContext";
 
-function handleKeyDown(e) {
-  const { cursor, result } = this.state;
-  // arrow up/down button should select next/previous list element
-  if (e.keyCode === 38 && cursor > 0) {
-    this.setState((prevState) => ({
-      cursor: prevState.cursor - 1,
-    }));
-  } else if (e.keyCode === 40 && cursor < result.length - 1) {
-    this.setState((prevState) => ({
-      cursor: prevState.cursor + 1,
-    }));
-  }
-}
-
 export default function Header() {
   const { user } = useContext(AuthContext);
   const apiKey = import.meta.env.VITE_API_KEY;
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
+  const [cursor, setCursor] = useState(0);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -56,6 +43,29 @@ export default function Header() {
     return () => clearTimeout(timeout);
   }, [query, apiKey]);
 
+  useEffect(() => {
+    setCursor(0);
+  }, [results]);
+
+  useEffect(() => {
+    const scrollfollower = document.querySelector(".dropdown-item.active");
+    scrollfollower?.scrollIntoView({ block: "nearest" });
+  }, [cursor]);
+
+  const handleKeyDown = (e) => {
+    if (e.key === "ArrowUp") {
+      setCursor((c) => Math.max(0, c - 1));
+    } else if (e.key === "ArrowDown") {
+      setCursor((c) => Math.min(results.length - 1, c + 1));
+    } else if (e.key === "Enter") {
+      const item = results[cursor];
+      if (item) {
+        window.location.href = `/${item.media_type}/${item.id}`;
+      }
+    }
+    if (e.keyCode === 9) e.preventDefault();
+  };
+
   return (
     <header>
       <div>
@@ -71,11 +81,14 @@ export default function Header() {
       </div>
       <div class="search-box">
         <input
+          // tabIndex="-1"
           type="text"
           placeholder="Search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={handleKeyDown}
         ></input>
+
         {user ? (
           <Link to={`/profile/${user.username}`}>
             {user.avatar ? (
@@ -92,8 +105,13 @@ export default function Header() {
 
         {results.length > 0 && (
           <ul className="dropdown-menu">
-            {results.map((item) => (
-              <li key={item.id} className="dropdown-item">
+            {results.map((item, index) => (
+              <li
+                key={item.id}
+                className={
+                  cursor === index ? "dropdown-item active" : "dropdown-item"
+                }
+              >
                 <Link
                   to={`/${item.media_type}/${item.id}`}
                   reloadDocument={true}

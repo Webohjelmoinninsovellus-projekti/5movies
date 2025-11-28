@@ -134,6 +134,11 @@ export default function Info() {
                       info.id,
                       rating
                     );
+                    const reviewsData = await fetchReviews(type, params.id);
+                    if (reviewsData) setReviews(reviewsData);
+
+                    setComment("");
+                    setRating(0);
 
                     /* if (data) {
                     navigate(`/Info/${data.comment}`);
