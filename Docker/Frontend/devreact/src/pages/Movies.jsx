@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import fetchDiscovery from "../utilities/fetchDiscovery";
+import { fetchDiscovery } from "../utilities/tmdbFetcher";
 
 import LoadingElement from "../components/LoadingElement";
 

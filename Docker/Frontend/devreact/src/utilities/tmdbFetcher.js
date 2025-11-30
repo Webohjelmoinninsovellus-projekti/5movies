@@ -1,0 +1,61 @@
+import axios from "axios";
+
+async function fetchItemData(type, id) {
+  try {
+    const mediaType = type === "/mo" ? "movie" : "tv";
+
+    const response = await axios({
+      method: "get",
+      url: `http://localhost:5555/tmdb/info/${mediaType}/${id}`,
+    });
+
+    if (response) return response.data;
+  } catch (error) {
+    console.error("Error fetching movie:", error);
+    return null;
+  }
+}
+
+async function fetchDiscovery(type, pageId) {
+  try {
+    const response = await axios({
+      method: "get",
+      url: `http://localhost:5555/tmdb/discovery/${type}/${pageId}`,
+    });
+
+    return response.data.results;
+  } catch (error) {
+    console.error("Error fetching movies:", error);
+    return null;
+  }
+}
+
+async function fetchPopular() {
+  try {
+    const response = await axios({
+      method: "get",
+      url: "http://localhost:5555/tmdb/popular",
+    });
+
+    if (response) return response.data.results;
+  } catch (error) {
+    console.error("Error fetching movie:", error);
+    return null;
+  }
+}
+
+async function inTheatersData() {
+  try {
+    const response = await axios({
+      method: "get",
+      url: "http://localhost:5555/tmdb/intheaters",
+    });
+
+    return response.data.results;
+  } catch (error) {
+    console.error("Error fetching movies:", error);
+    return null;
+  }
+}
+
+export { fetchItemData, fetchDiscovery, fetchPopular, inTheatersData };
