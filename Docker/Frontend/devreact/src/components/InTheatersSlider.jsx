@@ -54,7 +54,8 @@ function InTheatersSlider() {
 export default InTheatersSlider;*/
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { inTheatersData } from "../utilities/inTheatersData";
+
+import { inTheatersData } from "../utilities/tmdbFetcher";
 import "../styles/InTheatersSlider.css";
 
 function InTheatersSlider() {

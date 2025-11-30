@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 
-import fetchDiscovery from "../utilities/fetchDiscovery";
+import { fetchDiscovery } from "../utilities/tmdbFetcher";
 import SimpleSlider from "../components/SimpleSlider";
 import InTheatersSlider from "../components/InTheatersSlider";
 

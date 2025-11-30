@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { AuthContext } from "../components/AuthContext";
 import LoadingElement from "../components/LoadingElement";
 
-import fetchItemData from "../utilities/fetchItemData";
+import { fetchItemData } from "../utilities/tmdbFetcher";
 import fetchReviews from "../utilities/fetchReviews";
 import reviewSender from "../utilities/reviewSender";
 import favoriteSender from "../utilities/favoriteSender";

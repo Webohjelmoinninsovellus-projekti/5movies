@@ -19,7 +19,6 @@ function handleKeyDown(e) {
 
 export default function Header() {
   const { user } = useContext(AuthContext);
-  const apiKey = import.meta.env.VITE_API_KEY;
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
 
@@ -27,21 +26,7 @@ export default function Header() {
     const timeout = setTimeout(() => {
       if (query.length > 2) {
         axios
-          .get(
-            "https://api.themoviedb.org/3/search/multi?include_adult=false",
-            {
-              headers: {
-                Accept: "application/json",
-                Authorization: `Bearer ${import.meta.env.VITE_API_KEY}`,
-              },
-
-              params: {
-                query: query,
-                language: "en-US",
-                page: 1,
-              },
-            }
-          )
+          .get(`http://localhost:5555/tmdb/search/${query}`)
           .then((response) => {
             setResults(response.data.results.slice(0, 5));
           })
@@ -54,7 +39,7 @@ export default function Header() {
       }
     }, 300);
     return () => clearTimeout(timeout);
-  }, [query, apiKey]);
+  }, [query]);
 
   return (
     <header>
