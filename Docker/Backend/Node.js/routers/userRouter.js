@@ -10,14 +10,27 @@ dotenv.config();
 const SECRET_KEY = process.env.BACKEND_SECRET_KEY;
 const userRouter = Router();
 
-userRouter.get("/me", verifyToken, (req, res, next) => {
+userRouter.get("/me", verifyToken, (req, res) => {
   if (req.user) {
-    console.log("Profile requested for user:" + req.user);
-    res.status(200).json({
-      username: req.user.username,
-      avatar: req.user.avatar,
-    });
-  } else res.status(200);
+    console.log("Profile requested for user:" + req.user.username);
+
+    pool.query(
+      `SELECT avatar_url FROM "user" WHERE username = $1`,
+      [req.user.username],
+      (err, result) => {
+        if (err) {
+          res.status(500).json({ message: "Error retrieving profile data." });
+        }
+
+        res.status(200).json({
+          username: req.user.username,
+          avatar: result.rows[0].avatar_url,
+        });
+      }
+    );
+  } else {
+    res.status(401).json({ message: "Not authenticated" });
+  }
 });
 
 userRouter.get("/:username", (req, res, next) => {
@@ -106,7 +119,6 @@ userRouter.post("/login", (req, res, next) => {
             {
               username: dbUser.username,
               userid: dbUser.userid,
-              avatar: dbUser.avatar_url,
             },
             SECRET_KEY,
             { expiresIn: "30m" }
@@ -120,10 +132,61 @@ userRouter.post("/login", (req, res, next) => {
               maxAge: 1000 * 60 * 30, // 30 minutes
             });
 
+            if (dbUser.active == false) {
+              pool.query(
+                `UPDATE "user" SET active = true WHERE active = false AND username = $1 AND password = $2`
+              ),
+                [dbUser.username, dbUser.password],
+                (err, result) => {
+                  if (err) return next(err);
+                };
+            }
             res.status(200).json({
               username: dbUser.username,
             });
-          } else return next(err);
+          }
+        }
+      });
+    }
+  );
+});
+
+userRouter.post("/deactivate", (req, res, next) => {
+  const { user } = req.body;
+  if (!user || !user.username || !user.password) {
+    const error = new Error("Username and password are required");
+    error.status = 401;
+    return next(error);
+  }
+
+  pool.query(
+    `SELECT * FROM "user" WHERE username = $1`,
+    [user.username],
+    (err, result) => {
+      if (err) return next(err);
+      if (result.rows.length === 0) {
+        const error = new Error("User not found");
+        error.status = 404;
+        return next(error);
+      }
+
+      const dbUser = result.rows[0];
+
+      compare(user.password, dbUser.password, (err, isMatch) => {
+        if (err) return next(err);
+        else if (!isMatch) {
+          const error = new Error("Invalid password");
+          error.status = 401;
+          return next(error);
+        } else {
+          pool.query(
+            `UPDATE "user" SET active = false WHERE active = true AND username = $1 AND password = $2`
+          ),
+            [user.username, dbUser.password],
+            (err, result) => {
+              if (err) return next(err);
+              else res.status(200).json(result);
+            };
         }
       });
     }

@@ -5,7 +5,7 @@ import { useParams, useLocation } from "react-router";
 
 import LoadingElement from "../components/LoadingElement";
 
-import getGroup from "../utilities/getGroup";
+import { getGroups, addItem, removeItem } from "../utilities/groupManager";
 
 export default function Group() {
   const [loading, setLoading] = useState(true);
@@ -50,12 +50,55 @@ export default function Group() {
           <h2>{info.name}</h2>
           <p>{info.desc}</p>
 
-          <h3 class="section-title">Lisätyt elokuvat</h3>
-          <div class="card-row">
-            <div class="card">kuva</div>
-            <div class="card">kuva</div>
-            <div class="card">kuva</div>
-          </div>
+          <h3 class="section-title">Added movies</h3>
+          <div class="card-row"></div>
+          {addItem && addItem.length > 0 ? (
+            addItem.map((item) => (
+              <div key={item.movieshowid} class="movie-card">
+                <Link
+                  to={`/${item.ismovie ? "movie" : "tv"}/${item.movieshowid}`}
+                  className="movie-card-link"
+                >
+                  {item.poster_path ? (
+                    <img
+                      src={`https://image.tmdb.org/t/p/w400${item.poster_path}`}
+                      alt={item.title}
+                    />
+                  ) : (
+                    <div class="no-poster">No Poster</div>
+                  )}
+                  <div class="movie-info">
+                    <h3 class="movie-title">{item.title}</h3>
+                    <p class="movie-year">{item.release_year}</p>
+                  </div>
+                </Link>
+                {owner && (
+                  <button
+                    className="favorite-remove-btn"
+                    onClick={async (e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      {
+                        try {
+                          await removeItem(item.movieshowid);
+                          const updatedGroup = await fetchFavorite();
+                          if (updatedFavorites) setFavorites(updatedFavorites);
+                          console.log("Removed favorite:", item.title);
+                        } catch (error) {
+                          console.error("Failed to remove favorite:", error);
+                          alert("Failed to remove from favorites.");
+                        }
+                      }
+                    }}
+                  >
+                    ✕ Remove
+                  </button>
+                )}
+              </div>
+            ))
+          ) : (
+            <p>No movies added yet.</p>
+          )}
 
           <h3 class="section-title">Keskustelualue</h3>
           <button class="add-btn">Lisää uusi keskustelu</button>

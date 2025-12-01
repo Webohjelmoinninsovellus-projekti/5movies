@@ -4,14 +4,6 @@ import { verifyToken } from "../middleware/auth.js";
 
 const reviewRouter = Router();
 
-/* reviewRouter.get("/", async (req, res) => {
-  pool.query("SELECT * FROM user_review"),
-    (err, result) => {
-      if (err) res.status(500).json({ error: err.message });
-      else res.status(200).json(result.rows[0]);
-    };
-}); */
-
 reviewRouter.get("/:type/:id", async (req, res) => {
   const { type, id } = req.params;
   if (!type || !id) return new Error("Type or ID is not defined");
@@ -20,7 +12,7 @@ reviewRouter.get("/:type/:id", async (req, res) => {
       `SELECT user_review.userid, user_review.date, user_review.comment, user_review.rating, public.user.username
       FROM user_review
       INNER JOIN public.user ON user_review.userid = public.user.userid
-      WHERE user_review.ismovie = $1 AND user_review.movieshowid = $2
+      WHERE public.user.active = true AND user_review.ismovie = $1 AND user_review.movieshowid = $2
       ORDER BY user_review.reviewid DESC LIMIT 5;`,
       [type === "movie" ? true : false, id],
       (err, result) => {

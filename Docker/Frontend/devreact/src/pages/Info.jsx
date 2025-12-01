@@ -6,10 +6,9 @@ import { AuthContext } from "../components/AuthContext";
 import LoadingElement from "../components/LoadingElement";
 
 import { fetchItemData } from "../utilities/tmdbFetcher";
-import fetchReviews from "../utilities/fetchReviews";
-import reviewSender from "../utilities/reviewSender";
-import favoriteSender from "../utilities/favoriteSender";
-import favoriteRemover from "../utilities/favoriteRemover";
+import { fetchReviews, sendReview } from "../utilities/reviewManager";
+import { favoriteSender } from "../utilities/favoriteManager";
+import { addItem, removeItem, getGroups } from "../utilities/groupManager";
 
 export default function Info() {
   const [loading, setLoading] = useState(true);
@@ -33,6 +32,10 @@ export default function Info() {
   const location = useLocation();
 
   const totalStars = 5;
+  const [groupName, setGroupName] = useState("");
+  const [groupError, setGroupError] = useState("");
+  const [movieAdded, setMovieAdded] = useState(false);
+  const [movieRemoved, setMovieRemoved] = useState(false);
 
   const handleClick = async (value) => {
     setRating(value);
@@ -128,7 +131,7 @@ export default function Info() {
                 <button
                   className="red-button"
                   onClick={async () => {
-                    await reviewSender(
+                    await sendReview(
                       type === "/mo" ? true : false,
                       comment,
                       info.id,
@@ -194,6 +197,33 @@ export default function Info() {
                   }}
                 >
                   {favoriteAdded ? "✓ Added to favorites" : "Add to favorites"}
+                </button>
+                <button
+                  className="red-button"
+                  onClick={async () => {
+                    const groups = await getGroups();
+                    try {
+                      await addItem(
+                        type === "/mo" ? true : false,
+                        info.id,
+                        type === "/mo" ? info.title : info.name,
+                        info.poster_path,
+                        parseInt(
+                          (type === "/mo"
+                            ? info.release_date
+                            : info.first_air_date
+                          ).slice(0, 4)
+                        )
+                      );
+                      setMovieRemoved(true);
+                      setMovieAdded(false);
+                      setGroupError("");
+                    } catch (error) {
+                      console.error("Failed to add to group:", error);
+                    }
+                  }}
+                >
+                  add to your group
                 </button>
                 {favoriteAdded && !favoriteRemoved && (
                   <p

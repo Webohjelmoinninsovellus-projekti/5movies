@@ -1,17 +1,23 @@
-import { Link } from "react-router-dom";
 import { useState, useEffect, useContext } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import { AuthContext } from "./AuthContext";
+
+import LoadingElement from "../components/LoadingElement";
 
 export default function Header() {
   const { user } = useContext(AuthContext);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [cursor, setCursor] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  const avatar = "http://localhost:5555/uploads/";
 
   useEffect(() => {
+    setLoading(true);
     const timeout = setTimeout(() => {
-      if (query.length > 2) {
+      if (query.length > 0) {
         axios
           .get(`http://localhost:5555/tmdb/search/${query}`)
           .then((response) => {
@@ -24,6 +30,7 @@ export default function Header() {
       } else {
         setResults([]);
       }
+      setLoading(false);
     }, 300);
     return () => clearTimeout(timeout);
   }, [query]);
@@ -73,11 +80,10 @@ export default function Header() {
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
         ></input>
-
         {user ? (
           <Link to={`/profile/${user.username}`}>
             {user.avatar ? (
-              <img class="user-icon" src={`${user.avatar}`}></img>
+              <img class="user-icon" src={`${avatar + user.avatar}`}></img>
             ) : (
               <img class="user-icon" src="/avatars/user.png"></img>
             )}
@@ -88,38 +94,45 @@ export default function Header() {
           </Link>
         )}
 
-        {results.length > 0 && (
+        {results.length > -1 && (
           <ul className="dropdown-menu">
-            {results.map((item, index) => (
-              <li
-                key={item.id}
-                className={
-                  cursor === index ? "dropdown-item active" : "dropdown-item"
-                }
-              >
-                <Link
-                  to={`/${item.media_type}/${item.id}`}
-                  reloadDocument={true}
-                >
-                  {item.poster_path ? (
-                    <img
-                      src={`https://image.tmdb.org/t/p/w92${item.poster_path}`}
-                      alt={item.title || item.name}
-                    />
-                  ) : (
-                    <div
-                      style={{
-                        width: "40px",
-                        height: "80px",
-                        backgroundColor: "#00000000",
-                        borderRadius: "4px",
-                      }}
-                    />
-                  )}
-                  <span>{item.title || item.name}</span>
-                </Link>
+            {loading && (
+              <li>
+                <LoadingElement />
               </li>
-            ))}
+            )}
+
+            {!loading &&
+              results.map((item, index) => (
+                <li
+                  key={item.id}
+                  className={
+                    cursor === index ? "dropdown-item active" : "dropdown-item"
+                  }
+                >
+                  <Link
+                    to={`/${item.media_type}/${item.id}`}
+                    reloadDocument={true}
+                  >
+                    {item.poster_path ? (
+                      <img
+                        src={`https://image.tmdb.org/t/p/w92${item.poster_path}`}
+                        alt={item.title || item.name}
+                      />
+                    ) : (
+                      <div
+                        style={{
+                          width: "40px",
+                          height: "80px",
+                          backgroundColor: "#00000000",
+                          borderRadius: "4px",
+                        }}
+                      />
+                    )}
+                    <span>{item.title || item.name}</span>
+                  </Link>
+                </li>
+              ))}
           </ul>
         )}
       </div>

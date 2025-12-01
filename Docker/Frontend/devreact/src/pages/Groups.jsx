@@ -4,12 +4,14 @@ import { AuthContext } from "../components/AuthContext";
 import { useParams, useLocation } from "react-router";
 
 import LoadingElement from "../components/LoadingElement";
-import getGroups from "../utilities/getGroups";
+import { getGroups } from "../utilities/groupManager";
 
 export default function Groups() {
   const [loading, setLoading] = useState(true);
   const [info, setInfo] = useState([]);
   const [search, setSearch] = useState("");
+  const [groupName, setGroupName] = useState("");
+  const [groupDescription, setGroupDescription] = useState("");
 
   const { user, logout } = useContext(AuthContext);
 
@@ -36,13 +38,31 @@ export default function Groups() {
       <form>
         <div className="login-box">
           <label>Group name:</label>
-          <input type="text" placeholder="Enter group name" />
+          <input
+            type="text"
+            placeholder="Enter group name"
+            value={groupName}
+            onChange={(e) => setGroupName(e.target.value)}
+          />
         </div>
         <div className="login-box">
           <label>Description:</label>
-          <input type="text" placeholder="Enter group description" />
+          <input
+            type="text"
+            placeholder="Enter group description"
+            value={groupDescription}
+            onChange={(e) => setGroupDescription(e.target.value)}
+          />
         </div>
-        <button type="submit" className="red-button">
+        <button
+          onClick={async () => {
+            const data = await getGroups({
+              name: groupName,
+            });
+          }}
+          type="submit"
+          className="red-button"
+        >
           Create group
         </button>
       </form>
@@ -65,7 +85,7 @@ export default function Groups() {
             //.filter((info, index) => index < 1)
             .map((group) => (
               <Link to={`/group/${group.name}`}>
-                <button className="red-button">{group.name}</button>
+                <button className="group-card">{group.name}</button>
               </Link>
             ))}
         </div>
