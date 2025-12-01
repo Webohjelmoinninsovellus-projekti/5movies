@@ -7,16 +7,10 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
 
   async function loadUser() {
-    if (user !== null) {
-      console.log("Cached logged in user:", user);
-      return;
-    }
-
     try {
       const response = await axios.get("http://localhost:5555/user/me", {
         withCredentials: true,
       });
-
       setUser(response.data);
       console.log("Logged in user:", response.data);
     } catch {

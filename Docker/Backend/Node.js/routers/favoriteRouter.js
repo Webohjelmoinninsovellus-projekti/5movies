@@ -8,7 +8,10 @@ favoriteRouter.get("/:username", async (req, res) => {
   const { username } = req.params;
 
   pool.query(
-    'SELECT user_favourite.movieshowid, user_favourite.ismovie, user_favourite.title, user_favourite.poster_path, user_favourite.release_year, user_favourite.date FROM user_favourite INNER JOIN "user" ON user_favourite.user_id = "user".userid WHERE "user".username = $1 ORDER BY date DESC',
+    `SELECT user_favourite.movieshowid, user_favourite.ismovie, user_favourite.title, user_favourite.poster_path, user_favourite.release_year, user_favourite.date
+    FROM user_favourite
+    INNER JOIN "user" ON user_favourite.user_id = "user".userid
+    WHERE "user".username = $1 AND "user".active = true ORDER BY date DESC`,
     [username],
     (err, result) => {
       if (err) res.status(500).json({ error: err.message });
@@ -61,22 +64,22 @@ favoriteRouter.delete("/remove/:movieshowid", verifyToken, async (req, res) => {
   try {
     const { movieshowid } = req.params;
     const userid = req.user.userid;
-    
+
     console.log("Removing favorite:", { userid, movieshowid });
-    
+
     const query = `
       DELETE FROM user_favourite 
       WHERE user_id = $1 AND movieshowid = $2
       RETURNING *`;
 
     const { rows } = await pool.query(query, [userid, parseInt(movieshowid)]);
-    
+
     if (rows.length === 0) {
-      return res.status(404).json({ 
-        message: "Favorite not found" 
+      return res.status(404).json({
+        message: "Favorite not found",
       });
     }
-    
+
     res.status(200).json({
       message: "favorite removed successfully",
       favoriteId: rows[0].id,

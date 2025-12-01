@@ -1,10 +1,9 @@
 import { Link } from "react-router-dom";
 import { useState, useContext } from "react";
-import register from "../utilities/registerUser.js";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../components/AuthContext";
 
-import login from "../utilities/loginManager";
+import { login, register } from "../utilities/userManager.js";
 
 export default function Register() {
   const [username, setUsername] = useState("");

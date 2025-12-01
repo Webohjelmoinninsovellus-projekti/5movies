@@ -6,18 +6,22 @@ import { useParams, useLocation } from "react-router";
 import LoadingElement from "../components/LoadingElement";
 
 import getProfile from "../utilities/getProfile";
-import fetchFavorite from "../utilities/fetchFavorite";
-import favoriteRemover from "../utilities/favoriteRemover";
+import uploadAvatar from "../utilities/avatarManager";
+import { fetchFavorite, favoriteRemover } from "../utilities/favoriteManager";
+import { deactivate } from "../utilities/userManager";
 
 export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [info, setInfo] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const [owner, setOwner] = useState(false);
+  const [deactivationPassword, setDeactivationPassword] = useState("");
 
   const params = useParams();
 
-  const { user, logout } = useContext(AuthContext);
+  const avatar = "http://localhost:5555/uploads/" + info.avatar_url;
+
+  const { user, logout, loadUser } = useContext(AuthContext);
 
   const navigate = useNavigate();
 
@@ -38,11 +42,20 @@ export default function Profile() {
     })();
   }, [params.username]);
 
+  const changeAvatar = async (e) => {
+    e.preventDefault();
+
+    const avatar = new FormData();
+    avatar.append("avatar", e.target.files[0]);
+    const avatarData = await uploadAvatar(avatar);
+    if (avatarData) window.location.reload();
+  };
+
   useEffect(() => {
     if (user && info) {
       setLoading(true);
       setOwner(user.username === info.username);
-      setLoading(true);
+      setLoading(false);
     }
   }, [user, info]);
 
@@ -63,8 +76,8 @@ export default function Profile() {
         <div class="container">
           <section class="profile-section">
             <div class="avatar">
-              {info.avatar_url ? (
-                <img src={info.avatar_url}></img>
+              {avatar ? (
+                <img src={avatar}></img>
               ) : (
                 <img src="/avatars/user.png"></img>
               )}
@@ -77,7 +90,23 @@ export default function Profile() {
                 <>
                   <nav className="nav-items">
                     <div>
-                      <button className="red-button">✏️</button>
+                      <form>
+                        <input
+                          className="avatar-upload-form"
+                          id="avatar-upload"
+                          type="file"
+                          name="avatar"
+                          accept="image/*"
+                          onChange={changeAvatar}
+                        />
+                        <label
+                          type="button"
+                          htmlFor="avatar-upload"
+                          className="red-button"
+                        >
+                          Change Avatar
+                        </label>
+                      </form>
                     </div>
                     <div>
                       <button
@@ -155,6 +184,32 @@ export default function Profile() {
             <li>Lisäsi suosikkeihin: </li>
             <li>Kommentoi ryhmässä: "natsaa!"</li>
           </ul>
+          {owner && (
+            <div>
+              <button
+                onClick={async (e) => {
+                  const result = await deactivate(
+                    params.username,
+                    deactivationPassword
+                  );
+                  if (result) {
+                    await logout();
+                    navigate("/login");
+                  }
+                }}
+              >
+                DEACTIVATE
+              </button>
+              <input
+                type="password"
+                onChange={(e) => {
+                  setDeactivationPassword(e.target.value);
+                  v.t;
+                  v.t;
+                }}
+              />
+            </div>
+          )}
         </div>
       ) : (
         <LoadingElement />

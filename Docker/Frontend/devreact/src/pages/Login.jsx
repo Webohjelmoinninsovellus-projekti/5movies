@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState, useContext } from "react";
 import { AuthContext } from "../components/AuthContext";
 
-import login from "../utilities/loginManager";
+import { login } from "../utilities/userManager";
 
 export default function Login() {
   const [username, setUsername] = useState("");
