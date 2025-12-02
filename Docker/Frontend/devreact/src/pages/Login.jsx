@@ -33,7 +33,7 @@ export default function Login() {
             onChange={(e) => {
               setPassword(e.target.value);
             }}
-            onKeyPress={async (e) => {
+            onKeyDown={async (e) => {
               if (e.key === "Enter") {
                 const data = await login(username, password);
                 console.log(data);

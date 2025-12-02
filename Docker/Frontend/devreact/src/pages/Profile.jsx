@@ -15,6 +15,7 @@ export default function Profile() {
   const [info, setInfo] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const [owner, setOwner] = useState(false);
+  const [deactivationInputActive, setDeactivationInputActive] = useState(false);
   const [deactivationPassword, setDeactivationPassword] = useState("");
 
   const params = useParams();
@@ -49,6 +50,20 @@ export default function Profile() {
     avatar.append("avatar", e.target.files[0]);
     const avatarData = await uploadAvatar(avatar);
     if (avatarData) window.location.reload();
+  };
+
+  const deactivateAccount = async () => {
+    const result = await deactivate(params.username, deactivationPassword);
+
+    if (result.status === 200) {
+      alert(
+        "Your account is now deactivated. Your account and all associated data will be deleted after 30 days. You can reactivate your account by logging back in within the 30 days."
+      );
+      await logout();
+      navigate("/login");
+    } else {
+      alert("Incorrect password.");
+    }
   };
 
   useEffect(() => {
@@ -119,6 +134,54 @@ export default function Profile() {
                         Logout
                       </button>
                     </div>
+                    <button
+                      className="red-button"
+                      onClick={async (e) => {
+                        if (deactivationPassword === "") {
+                          if (!deactivationInputActive) {
+                            setDeactivationInputActive(true);
+
+                            setTimeout(() => {
+                              const inputField =
+                                document.getElementsByName(
+                                  "deactivationInput"
+                                )[0];
+
+                              if (inputField !== null) {
+                                inputField.focus();
+                              }
+                            }, 8);
+                          } else {
+                            const inputField =
+                              document.getElementsByName(
+                                "deactivationInput"
+                              )[0];
+
+                            if (inputField !== null) {
+                              inputField.focus();
+                            }
+                          }
+                        } else {
+                          deactivateAccount();
+                        }
+                      }}
+                    >
+                      Deactivate account
+                    </button>
+                    {deactivationInputActive && (
+                      <input
+                        className="red-button"
+                        placeholder="Insert password"
+                        name="deactivationInput"
+                        type="password"
+                        onChange={(e) => {
+                          setDeactivationPassword(e.target.value);
+                        }}
+                        onKeyDown={async (e) => {
+                          if (e.key === "Enter") deactivateAccount();
+                        }}
+                      />
+                    )}
                   </nav>
                 </>
               )}
@@ -184,32 +247,6 @@ export default function Profile() {
             <li>Lisäsi suosikkeihin: </li>
             <li>Kommentoi ryhmässä: "natsaa!"</li>
           </ul>
-          {owner && (
-            <div>
-              <button
-                onClick={async (e) => {
-                  const result = await deactivate(
-                    params.username,
-                    deactivationPassword
-                  );
-                  if (result) {
-                    await logout();
-                    navigate("/login");
-                  }
-                }}
-              >
-                DEACTIVATE
-              </button>
-              <input
-                type="password"
-                onChange={(e) => {
-                  setDeactivationPassword(e.target.value);
-                  v.t;
-                  v.t;
-                }}
-              />
-            </div>
-          )}
         </div>
       ) : (
         <LoadingElement />
