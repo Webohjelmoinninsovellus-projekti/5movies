@@ -33,6 +33,26 @@ userRouter.get("/me", verifyToken, (req, res) => {
   }
 });
 
+userRouter.get("/:username/groups", (req, res) => {
+  const { username } = req.params;
+  if (!username) {
+    const error = new Error("Username is required");
+    return next(error);
+  }
+  pool.query(
+    `SELECT "group".name, "group".groupid
+     FROM user_group
+     INNER JOIN "user" ON user_group.user_id = "user".userid
+     INNER JOIN "group" ON user_group.group_id = "group".groupid
+     WHERE "user".username = $1`,
+    [username],
+    (err, result) => {
+      if (err) res.status(500).json({ error: err.message });
+      else res.status(200).json(result.rows);
+    }
+  );
+});
+
 userRouter.get("/:username", (req, res, next) => {
   const username = req.params.username;
   if (!username) {

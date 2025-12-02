@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../components/AuthContext";
+import confetti from "https://cdn.skypack.dev/canvas-confetti";
 
 import { login, register } from "../utilities/userManager.js";
 
@@ -12,6 +13,8 @@ export default function Register() {
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
   const { loadUser } = useContext(AuthContext);
+  const lostAudio = new Audio("/sounds/public_sounds_lost.wav");
+  const wonAudio = new Audio("/sounds/public_sounds_won.wav");
 
   return (
     <main>
@@ -70,6 +73,8 @@ export default function Register() {
                         "Registration successful! You can now log in."
                       );
                       await loadUser();
+                      confetti();
+                      wonAudio.play();
                       navigate("/profile/" + username);
                     }
 
@@ -80,6 +85,7 @@ export default function Register() {
                     break;
                 }
               } else {
+                lostAudio.play();
                 setMessage(
                   "Password must be at least 8 characters long and contain atleast one uppercase and one number."
                 );

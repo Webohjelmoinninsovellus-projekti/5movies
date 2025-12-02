@@ -57,14 +57,18 @@ import { Link } from "react-router-dom";
 
 import { inTheatersData } from "../utilities/tmdbFetcher";
 import "../styles/InTheatersSlider.css";
+import LoadingElement from "../components/LoadingElement";
 
 function InTheatersSlider() {
   const [movies, setMovies] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
+      setLoading(true);
       const results = await inTheatersData();
       setMovies(results);
+      setLoading(false);
     }
     load();
   }, []);
@@ -72,6 +76,7 @@ function InTheatersSlider() {
   return (
     <div className="marquee">
       <div className="marquee-content">
+        {loading && <LoadingElement />}
         {movies.concat(movies).map((item, index) => (
           <Link
             key={index}

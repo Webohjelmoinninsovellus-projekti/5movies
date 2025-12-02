@@ -6,6 +6,7 @@ import { useParams, useLocation } from "react-router";
 import LoadingElement from "../components/LoadingElement";
 
 import getProfile from "../utilities/getProfile";
+import { getUserGroups } from "../utilities/groupManager";
 import uploadAvatar from "../utilities/avatarManager";
 import { fetchFavorite, favoriteRemover } from "../utilities/favoriteManager";
 import { deactivate } from "../utilities/userManager";
@@ -16,6 +17,8 @@ export default function Profile() {
   const [favorites, setFavorites] = useState([]);
   const [owner, setOwner] = useState(false);
   const [deactivationPassword, setDeactivationPassword] = useState("");
+  const profileAudio = new Audio("/sounds/notification-bell.mp3");
+  const [groups, setGroups] = useState([]);
 
   const params = useParams();
 
@@ -38,13 +41,16 @@ export default function Profile() {
 
       const favoritesData = await fetchFavorite(params.username);
       if (favoritesData) setFavorites(favoritesData);
+
+      const groupsData = await getUserGroups(params.username);
+      if (groupsData) setGroups(groupsData);
+      console.log(groupsData);
       setLoading(false);
     })();
   }, [params.username]);
 
   const changeAvatar = async (e) => {
     e.preventDefault();
-
     const avatar = new FormData();
     avatar.append("avatar", e.target.files[0]);
     const avatarData = await uploadAvatar(avatar);
@@ -146,7 +152,7 @@ export default function Profile() {
                       <p class="movie-year">{item.release_year}</p>
                     </div>
                   </Link>
-                  {owner && (
+                  {owner && ( //asdsadasdsadasdaasdsadasdasd
                     <button
                       className="favorite-remove-btn"
                       onClick={async (e) => {
@@ -166,7 +172,7 @@ export default function Profile() {
                             alert("Failed to remove from favorites.");
                           }
                         }
-                      }}
+                      }} //asdddddddddddddddadasdsad
                     >
                       ✕ Remove
                     </button>
@@ -177,13 +183,35 @@ export default function Profile() {
               <p>No favorites added yet.</p>
             )}
           </div>
-          <h2 class="section-title">Latest activity</h2>
-          <ul class="activity-list">
-            <li>Arvosteli: star wurs (5/5)</li>
-            <li>Liittyi ryhmään: doghouse</li>
-            <li>Lisäsi suosikkeihin: </li>
-            <li>Kommentoi ryhmässä: "natsaa!"</li>
-          </ul>
+          <h2 class="section-title">Groups</h2>
+          <div class="movie-grid">
+            {groups && groups.length > 0 ? (
+              groups.map((group) => (
+                <div key={group.groupid} class="movie-card">
+                  <Link to={`/group/${group.name}`} className="movie-card-link">
+                    <div class="group-poster">
+                      {group.avatar_url ? (
+                        <img
+                          src={`http://localhost:5555/uploads/${group.avatar_url}`}
+                          alt={group.name}
+                        />
+                      ) : (
+                        <div class="no-poster">{group.name}</div>
+                      )}
+                    </div>
+                    <div class="movie-info">
+                      <h3 class="movie-title">{group.name}</h3>
+                      <p class="movie-year">
+                        {group.member_count || 0} members
+                      </p>
+                    </div>
+                  </Link>
+                </div>
+              ))
+            ) : (
+              <p>No groups joined yet.</p>
+            )}
+          </div>
           {owner && (
             <div>
               <button
@@ -204,8 +232,6 @@ export default function Profile() {
                 type="password"
                 onChange={(e) => {
                   setDeactivationPassword(e.target.value);
-                  v.t;
-                  v.t;
                 }}
               />
             </div>
