@@ -34,23 +34,18 @@ reviewRouter.post("/add", verifyToken, async (req, res) => {
     if (rating > 5 || rating < 0)
       throw new Error("Rating is outside of allowed range.");
     else {
-      const query = `
-        INSERT INTO user_review (ismovie, comment, movieshowid, userid, rating)
-        VALUES ($1, $2, $3, $4, $5)
-        RETURNING reviewid
-      `;
-
-      const { rows } = await pool.query(query, [
-        ismovie,
-        comment,
-        movieshowid,
-        userid,
-        rating,
-      ]);
-      res.status(201).json({
-        message: "Review saved successfully",
-        reviewId: rows[0].reviewid,
-      });
+      pool.query(
+        `INSERT INTO user_review (ismovie, comment, movieshowid, userid, rating)
+        SELECT $1, $2, $3, $4, $5
+        WHERE NOT EXISTS (SELECT 1 FROM user_review WHERE ismovie = $1 AND movieshowid = $3 AND userid = $4);`,
+        [ismovie, comment, movieshowid, userid, rating],
+        (err, result) => {
+          res.status(201).json({
+            message: "Review saved successfully",
+            /* reviewId: result.rows[0].reviewid, */
+          });
+        }
+      );
     }
   } catch (error) {
     console.error("Error while saving review:", error);

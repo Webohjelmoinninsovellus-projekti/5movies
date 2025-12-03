@@ -1,5 +1,6 @@
 import { useLayoutEffect } from "react";
 import { Routes, Route, useParams, useLocation } from "react-router-dom";
+import Snowfall from "react-snowfall";
 
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -31,6 +32,15 @@ export default function App() {
         rel="stylesheet"
       ></link>
 
+      <Snowfall
+        color="white"
+        style={{
+          position: "fixed",
+          width: "100vw",
+          height: "100vh",
+        }}
+        snowflakeCount={75}
+      />
       <Header />
       <div className="page-wrapper">
         <Wrapper>

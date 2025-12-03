@@ -10,8 +10,10 @@ export default function Login() {
   const { loadUser } = useContext(AuthContext);
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
-  const lostAudio = new Audio("/sounds/public_sounds_lost.wav");
-  lostAudio.volume = 0.3;
+  //const lostAudio = new Audio("/sounds/public_sounds_lost.wav");
+  //lostAudio.volume = 0.3;
+  const errorAudio = new Audio("/sounds/notification-error.wav");
+  errorAudio.volume = 0.3;
   const wonAudio = new Audio("/sounds/public_sounds_won.wav");
   wonAudio.volume = 0.3;
 
@@ -29,8 +31,8 @@ export default function Login() {
       await loadUser();
       navigate(`/profile/${data.username}`);
     } else {
-      setMessage("Invalid username or password❌");
-      lostAudio.play();
+      setMessage("❌ Invalid username or password");
+      errorAudio.play();
     }
   };
 
@@ -53,7 +55,7 @@ export default function Login() {
             onChange={(e) => {
               setPassword(e.target.value);
             }}
-            onKeyDown={async (e) => {
+            onKeyPress={async (e) => {
               if (e.key === "Enter") {
                 loginTest();
               }
