@@ -154,12 +154,13 @@ userRouter.post("/login", (req, res, next) => {
 
             if (dbUser.active == false) {
               pool.query(
-                `UPDATE "user" SET active = true WHERE active = false AND username = $1 AND password = $2`
-              ),
+                "UPDATE public.user SET active = true, deactivation_date = null WHERE active = false AND username = $1 AND password = $2",
                 [dbUser.username, dbUser.password],
+
                 (err, result) => {
                   if (err) return next(err);
-                };
+                }
+              );
             }
             res.status(200).json({
               username: dbUser.username,
@@ -171,7 +172,7 @@ userRouter.post("/login", (req, res, next) => {
   );
 });
 
-userRouter.post("/deactivate", (req, res, next) => {
+userRouter.put("/deactivate", (req, res, next) => {
   const { user } = req.body;
   if (!user || !user.username || !user.password) {
     const error = new Error("Username and password are required");
@@ -180,7 +181,7 @@ userRouter.post("/deactivate", (req, res, next) => {
   }
 
   pool.query(
-    `SELECT * FROM "user" WHERE username = $1`,
+    "SELECT * FROM public.user WHERE username = $1",
     [user.username],
     (err, result) => {
       if (err) return next(err);
@@ -188,27 +189,28 @@ userRouter.post("/deactivate", (req, res, next) => {
         const error = new Error("User not found");
         error.status = 404;
         return next(error);
+      } else {
+        const dbUser = result.rows[0];
+
+        compare(user.password, dbUser.password, (err, isMatch) => {
+          if (err) return next(err);
+          else if (!isMatch) {
+            const error = new Error("Invalid password");
+            error.status = 401;
+            return next(error);
+          } else {
+            pool.query(
+              "UPDATE public.user SET active = false, deactivation_date = CURRENT_DATE WHERE active = true AND username = $1 AND password = $2",
+              [user.username, dbUser.password],
+
+              (err, result) => {
+                if (err) return next(err);
+                else res.status(200).json();
+              }
+            );
+          }
+        });
       }
-
-      const dbUser = result.rows[0];
-
-      compare(user.password, dbUser.password, (err, isMatch) => {
-        if (err) return next(err);
-        else if (!isMatch) {
-          const error = new Error("Invalid password");
-          error.status = 401;
-          return next(error);
-        } else {
-          pool.query(
-            `UPDATE "user" SET active = false WHERE active = true AND username = $1 AND password = $2`
-          ),
-            [user.username, dbUser.password],
-            (err, result) => {
-              if (err) return next(err);
-              else res.status(200).json(result);
-            };
-        }
-      });
     }
   );
 });

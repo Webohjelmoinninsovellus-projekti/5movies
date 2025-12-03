@@ -43,7 +43,8 @@ async function register(usernameInput, passwordInput) {
 async function deactivate(username, password) {
   try {
     const user = { username: username, password: password };
-    const response = await axios.post("http://localhost:5555/user/deactivate", {
+
+    const response = await axios.put("http://localhost:5555/user/deactivate", {
       user: user,
     });
 
