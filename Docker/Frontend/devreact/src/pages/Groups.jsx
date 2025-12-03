@@ -4,7 +4,7 @@ import { AuthContext } from "../components/AuthContext";
 import { useParams, useLocation } from "react-router";
 
 import LoadingElement from "../components/LoadingElement";
-import { getGroups } from "../utilities/groupManager";
+import { getGroups, createGroup } from "../utilities/groupManager";
 
 export default function Groups() {
   const [loading, setLoading] = useState(true);
@@ -55,12 +55,34 @@ export default function Groups() {
           />
         </div>
         <button
-          onClick={async () => {
-            const data = await getGroups({
-              name: groupName,
-            });
+          onClick={async (e) => {
+            e.preventDefault();
+
+            if (!groupName.trim()) {
+              alert("Group name cannot be empty");
+              return;
+            }
+
+            try {
+              await createGroup(groupName, groupDescription);
+
+              const updatedGroups = await getGroups();
+              if (updatedGroups) {
+                setInfo(updatedGroups);
+              }
+
+              setGroupName("");
+              setGroupDescription("");
+            } catch (error) {
+              console.error("Error creating group:", error);
+              if (error.response?.status === 409) {
+                <p>group name already exist</p>;
+              } else if (error.response?.status === 403) {
+                alert("You do not have permission to create a group.");
+              }
+            }
           }}
-          type="submit"
+          type="button"
           className="red-button"
         >
           Create group

@@ -10,10 +10,13 @@ body {
   font-family: Arial, sans-serif;
 }
 
-h2,
-h3 {
+h2 {
   font-family: "Anton", sans-serif;
   letter-spacing: 2px;
+}
+
+h3 {
+  font-size: 12pt;
 }
 
 .container {
@@ -291,10 +294,6 @@ a:active {
   padding: 25px;
   border-radius: 12px;
   text-align: center;
-}
-.info-card h3 {
-  font-size: 28px;
-  margin-bottom: 15px;
 }
 .social-icons img {
   width: 60px;
@@ -662,7 +661,7 @@ a:active {
   display: flex;
   flex-direction: column;
   align-items: start;
-  gap: 8px;
+  gap: 2rem;
 }
 
 #movieCard img {

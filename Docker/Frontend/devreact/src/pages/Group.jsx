@@ -8,16 +8,26 @@ import LoadingElement from "../components/LoadingElement";
 import {
   getGroups,
   getGroup,
+  getGroupMembers,
   addItem,
   removeItem,
+  uploadGroupAvatar,
+  leaveGroup,
+  deleteGroup,
+  sendJoinRequest,
 } from "../utilities/groupManager";
+
+import getProfile from "../utilities/getProfile";
 
 export default function Group() {
   const [loading, setLoading] = useState(true);
   const [info, setInfo] = useState([]);
+  const [members, setMembers] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const [owner, setOwner] = useState(false);
+  const [isMember, setIsMember] = useState(false);
   const [Items, setItems] = useState([]);
+  const [message, setMessage] = useState("");
 
   const params = useParams();
 
@@ -25,39 +35,134 @@ export default function Group() {
 
   const navigate = useNavigate();
 
+  const changeGroupAvatar = async (e) => {
+    e.preventDefault();
+    const avatar = new FormData();
+    avatar.append("avatar", e.target.files[0]);
+
+    try {
+      const avatarData = await uploadGroupAvatar(info.name, avatar);
+      if (avatarData) {
+        const updatedGroup = await getGroup(params.name);
+        if (updatedGroup) setInfo(updatedGroup);
+      }
+    } catch (error) {}
+  };
+
+  const handleLeaveGroup = async () => {
+    try {
+      await leaveGroup(info.name);
+      setMessage("You have left the group.");
+      navigate("/groups");
+    } catch (error) {
+      console.error("Failed to leave group:", error);
+      if (error.response?.status === 403) {
+        setMessage("Group owners cannot leave their own group.");
+      } else {
+        setMessage("Failed to leave group. Please try again.");
+      }
+    }
+  };
+
+  const handleDeleteGroup = async () => {
+    try {
+      await deleteGroup(info.name);
+      setMessage("Group deleted successfully.");
+      navigate("/groups");
+    } catch (error) {
+      console.error("Failed to delete group:", error);
+      setMessage("Error deleting group. Please try again.");
+    }
+  };
+
   useEffect(() => {
     (async () => {
       setLoading(true);
       const name = params.name;
       const groupData = await getGroup(name);
+      const membersData = await getGroupMembers(name);
 
-      if (groupData) {
+      if (groupData && membersData) {
         setInfo(groupData);
+        setMembers(membersData);
+        console.log(membersData);
         setItems(groupData.items || []);
+        if (user && membersData[0].username === user.username) {
+          setOwner(true);
+          setIsMember(true);
+        } else if (
+          user &&
+          membersData.some((member) => member.username === user.username)
+        ) {
+          setIsMember(true);
+        }
       }
+
       setLoading(false);
     })();
-  }, [params.name]);
+  }, [params.name, user]);
 
   if (loading) return <LoadingElement />;
 
   if (!info.name) return <h2>Group not found</h2>;
 
-  //console.log("This group's owner: ", owner);
-
   return (
     <div class="container">
       <div class="group-layout">
         <div>
-          <div class="group-img">kuva</div>
-          <button class="btn-red">Poistu ryhmästä</button>
+          <div class="group-img">
+            {info.avatar_url ? (
+              <img
+                src={`http://localhost:5555/uploads/${info.avatar_url}`}
+                alt={info.name}
+                style={{ width: "200px", height: "200px", objectFit: "cover" }}
+              />
+            ) : (
+              <div>No Image</div>
+            )}
+          </div>
+
+          {owner && (
+            <>
+              <input
+                id="avatar-upload-form"
+                type="file"
+                name="avatar"
+                accept="image/*"
+                onChange={changeGroupAvatar}
+                style={{ display: "none" }}
+              />
+              <label htmlFor="avatar-upload-form" className="btn-red">
+                Change Image
+              </label>
+            </>
+          )}
+
+          {owner && (
+            <button className="btn-red" onClick={handleDeleteGroup}>
+              Delete Group
+            </button>
+          )}
+
+          {isMember ? (
+            <button className="btn-red" onClick={handleLeaveGroup}>
+              Leave Group
+            </button>
+          ) : (
+            <button
+              className="btn-red"
+              onClick={() => sendJoinRequest(params.name)}
+            >
+              Join Group
+            </button>
+          )}
         </div>
 
         <div class="group-info">
           <h2>{info.name}</h2>
           <p>{info.desc}</p>
 
-          <h3 class="section-title">Added movies</h3>
+          <h3 class="section-title">Added movies/series</h3>
           <div class="card-row"></div>
           {Items && Items.length > 0 ? (
             Items.map((item) => (
@@ -85,16 +190,16 @@ export default function Group() {
                     onClick={async (e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      {
-                        try {
-                          await removeItem(info.name, item.movieshowid);
-                          const updatedGroup = await fetchFavorite();
-                          if (updatedFavorites) setFavorites(updatedFavorites);
-                          console.log("Removed favorite:", item.title);
-                        } catch (error) {
-                          console.error("Failed to remove favorite:", error);
-                          alert("Failed to remove from favorites.");
-                        }
+
+                      try {
+                        await removeItem(info.name, item.movieshowid);
+                        const updatedGroup = await getGroup(params.name);
+                        if (updatedGroup) setInfo(updatedGroup);
+                        setItems(updatedGroup.items || []);
+                        console.log("Removed item:", item.title);
+                      } catch (error) {
+                        console.error("Failed to remove item:", error);
+                        alert("Error removing item. Please try again.");
                       }
                     }}
                   >
@@ -106,26 +211,33 @@ export default function Group() {
           ) : (
             <p>No movies added yet.</p>
           )}
-
-          <h3 class="section-title">Keskustelualue</h3>
-          <button class="add-btn">Lisää uusi keskustelu</button>
-          <div class="discussion-box"></div>
         </div>
 
         <div>
           <div class="member-block">
-            <h3>Ryhmän omistaja</h3>
+            <h3>Group owner</h3>
             <div class="member">
-              <img src="#" />
-              <span class="member-name">Rytkön Ville</span>
+              <img
+                className="review-avatar"
+                src={"http://localhost:5555/uploads/" + members[0].avatar_url}
+              />
+              <span class="member-name">{members[0].username}</span>
             </div>
           </div>
-
           <div class="member-block">
-            <h3>Jäsenet</h3>
+            <h3>Members</h3>
             <div class="member">
-              <img src="#" />
-              <span class="member-name">Jari</span>
+              {members
+                .filter((member, index) => index > 0)
+                .map((member) => (
+                  <div>
+                    <img
+                      className="review-avatar"
+                      src={"http://localhost:5555/uploads/" + member.avatar_url}
+                    ></img>
+                    <span class="member-name">{member.username}</span>
+                  </div>
+                ))}
             </div>
           </div>
         </div>
