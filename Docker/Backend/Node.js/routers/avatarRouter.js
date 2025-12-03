@@ -9,7 +9,6 @@ import { verifyToken } from "../middleware/auth.js";
 
 dotenv.config();
 
-const SECRET_KEY = process.env.BACKEND_SECRET_KEY;
 const avatarRouter = Router();
 
 const whitelist = ["image/png", "image/jpeg", "image/jpg", "image/webp"];

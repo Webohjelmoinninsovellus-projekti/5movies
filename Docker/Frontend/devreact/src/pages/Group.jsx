@@ -5,13 +5,19 @@ import { useParams, useLocation } from "react-router";
 
 import LoadingElement from "../components/LoadingElement";
 
-import { getGroups, addItem, removeItem } from "../utilities/groupManager";
+import {
+  getGroups,
+  getGroup,
+  addItem,
+  removeItem,
+} from "../utilities/groupManager";
 
 export default function Group() {
   const [loading, setLoading] = useState(true);
   const [info, setInfo] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const [owner, setOwner] = useState(false);
+  const [Items, setItems] = useState([]);
 
   const params = useParams();
 
@@ -27,6 +33,7 @@ export default function Group() {
 
       if (groupData) {
         setInfo(groupData);
+        setItems(groupData.items || []);
       }
       setLoading(false);
     })();
@@ -52,8 +59,8 @@ export default function Group() {
 
           <h3 class="section-title">Added movies</h3>
           <div class="card-row"></div>
-          {addItem && addItem.length > 0 ? (
-            addItem.map((item) => (
+          {Items && Items.length > 0 ? (
+            Items.map((item) => (
               <div key={item.movieshowid} class="movie-card">
                 <Link
                   to={`/${item.ismovie ? "movie" : "tv"}/${item.movieshowid}`}
@@ -80,7 +87,7 @@ export default function Group() {
                       e.stopPropagation();
                       {
                         try {
-                          await removeItem(item.movieshowid);
+                          await removeItem(info.name, item.movieshowid);
                           const updatedGroup = await fetchFavorite();
                           if (updatedFavorites) setFavorites(updatedFavorites);
                           console.log("Removed favorite:", item.title);

@@ -9,7 +9,7 @@ reviewRouter.get("/:type/:id", async (req, res) => {
   if (!type || !id) return new Error("Type or ID is not defined");
   else {
     pool.query(
-      `SELECT user_review.userid, user_review.date, user_review.comment, user_review.rating, public.user.username
+      `SELECT user_review.userid, user_review.date, user_review.comment, user_review.rating, public.user.username, public.user.avatar_url
       FROM user_review
       INNER JOIN public.user ON user_review.userid = public.user.userid
       WHERE public.user.active = true AND user_review.ismovie = $1 AND user_review.movieshowid = $2

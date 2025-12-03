@@ -36,6 +36,8 @@ export default function Info() {
   const [groupError, setGroupError] = useState("");
   const [movieAdded, setMovieAdded] = useState(false);
   const [movieRemoved, setMovieRemoved] = useState(false);
+  const [groups, setGroups] = useState([]);
+  const [selectedGroup, setSelectedGroup] = useState("");
 
   const handleClick = async (value) => {
     setRating(value);
@@ -52,9 +54,14 @@ export default function Info() {
       const reviewsData = await fetchReviews(type, params.id);
       if (reviewsData) setReviews(reviewsData);
 
+      if (user) {
+        const userGroups = await getGroups();
+        if (userGroups) setGroups(userGroups);
+      }
+
       setLoading(false);
     })();
-  }, [params.id, type]);
+  }, [params.id, type, user]);
 
   if (!info) {
     return;
@@ -198,33 +205,72 @@ export default function Info() {
                 >
                   {favoriteAdded ? "✓ Added to favorites" : "Add to favorites"}
                 </button>
-                <button
-                  className="red-button"
-                  onClick={async () => {
-                    const groups = await getGroups();
-                    try {
-                      await addItem(
-                        type === "/mo" ? true : false,
-                        info.id,
-                        type === "/mo" ? info.title : info.name,
-                        info.poster_path,
-                        parseInt(
-                          (type === "/mo"
-                            ? info.release_date
-                            : info.first_air_date
-                          ).slice(0, 4)
-                        )
-                      );
-                      setMovieRemoved(true);
-                      setMovieAdded(false);
-                      setGroupError("");
-                    } catch (error) {
-                      console.error("Failed to add to group:", error);
-                    }
-                  }}
-                >
-                  add to your group
-                </button>
+
+                <div>
+                  <select
+                    className="red-button"
+                    value={selectedGroup}
+                    onChange={(e) => setSelectedGroup(e.target.value)}
+                  >
+                    <option value="">Select a group</option>
+                    {groups.map((group) => (
+                      <option key={group.groupid} value={group.name}>
+                        {group.name}
+                      </option>
+                    ))}
+                  </select>
+
+                  <button
+                    className="red-button"
+                    onClick={async () => {
+                      if (!selectedGroup) {
+                        setGroupError("Please select a group first!");
+                        setTimeout(() => setGroupError(""), 3000);
+                        return;
+                      }
+
+                      try {
+                        await addItem(selectedGroup, {
+                          movieshowid: info.id,
+                          ismovie: type === "/mo" ? true : false,
+                          title: type === "/mo" ? info.title : info.name,
+                          poster_path: info.poster_path,
+                          release_year: parseInt(
+                            (type === "/mo"
+                              ? info.release_date
+                              : info.first_air_date
+                            ).slice(0, 4)
+                          ),
+                        });
+
+                        setMovieAdded(true);
+                        setMovieRemoved(false);
+                        setGroupError("");
+
+                        setTimeout(() => setMovieAdded(false), 3000);
+                      } catch (error) {
+                        console.error("Failed to add to group:", error);
+
+                        if (error.response?.status === 409) {
+                          setGroupError("Already added to this group!");
+                        } else {
+                          setGroupError(
+                            "Failed to add to group. Please try again."
+                          );
+                        }
+                        setTimeout(() => setGroupError(""), 3000);
+                      }
+                    }}
+                    disabled={!selectedGroup}
+                    style={{
+                      opacity: !selectedGroup ? 0.6 : 1,
+                      cursor: !selectedGroup ? "not-allowed" : "pointer",
+                    }}
+                  >
+                    Add to group
+                  </button>
+                </div>
+
                 {favoriteAdded && !favoriteRemoved && (
                   <p
                     style={{
@@ -282,6 +328,19 @@ export default function Info() {
                       }}
                     >
                       <Link to={`/profile/${item.username}`}>
+                        {item.avatar_url ? (
+                          <img
+                            className="review-avatar"
+                            src={
+                              "http://localhost:5555/uploads/" + item.avatar_url
+                            }
+                          ></img>
+                        ) : (
+                          <img
+                            className="review-avatar"
+                            src={"/avatars/user.png"}
+                          ></img>
+                        )}
                         <h2>{item.username}</h2>
                       </Link>
                       <h3>{item.rating}/5</h3>

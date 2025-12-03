@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useContext } from "react";
 import { AuthContext } from "../components/AuthContext";
+import confetti from "https://cdn.skypack.dev/canvas-confetti";
 
 import { login } from "../utilities/userManager";
 
@@ -9,10 +10,29 @@ export default function Login() {
   const { loadUser } = useContext(AuthContext);
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const lostAudio = new Audio("/sounds/public_sounds_lost.wav");
+  lostAudio.volume = 0.3;
+  const wonAudio = new Audio("/sounds/public_sounds_won.wav");
+  wonAudio.volume = 0.3;
 
   /*   const [navigate, setNavigate] = useState(false); */
 
   const navigate = useNavigate();
+
+  const loginTest = async () => {
+    const data = await login(username, password);
+    console.log(data);
+    if (data) {
+      confetti();
+      wonAudio.play();
+
+      await loadUser();
+      navigate(`/profile/${data.username}`);
+    } else {
+      setMessage("Invalid username or password❌");
+      lostAudio.play();
+    }
+  };
 
   return (
     <main>
@@ -35,30 +55,13 @@ export default function Login() {
             }}
             onKeyDown={async (e) => {
               if (e.key === "Enter") {
-                const data = await login(username, password);
-                console.log(data);
-
-                if (data) {
-                  await loadUser();
-                  navigate(`/profile/${data.username}`);
-                } else {
-                  setMessage("Invalid username or password");
-                }
+                loginTest();
               }
             }}
           />
           <button
             onClick={async () => {
-              setMessage("");
-              const data = await login(username, password);
-              console.log(data);
-
-              if (data) {
-                await loadUser();
-                navigate(`/profile/${data.username}`);
-              } else {
-                setMessage("Invalid username or password");
-              }
+              loginTest();
             }}
           >
             Login
