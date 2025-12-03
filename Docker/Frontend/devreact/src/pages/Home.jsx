@@ -30,26 +30,6 @@ export default function Home() {
       </section>
 
       <div class="container">
-        <h2 class="section-title">Categories</h2>
-        <div class="category-row">
-          <div class="card">
-            <img src="/scream.png"></img>
-            <span>HORROR</span>
-          </div>
-          <div class="card">
-            <img src="/JimiKarri.jpg"></img>
-            <span>COMEDY</span>
-          </div>
-          <div class="card">
-            <img src="/draamaLeo.jpg"></img>
-            <span>DRAMA</span>
-          </div>
-          <div class="card">
-            <img src="/rambo.jpg"></img>
-            <span>ACTION</span>
-          </div>
-        </div>
-
         <Link to="/movies">
           <h2 className="section-title">Movies</h2>
         </Link>

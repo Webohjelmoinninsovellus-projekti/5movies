@@ -11,9 +11,10 @@ export default function Movies() {
   useEffect(() => {
     async function loadMovies() {
       setLoading(true);
-      const results = await fetchDiscovery("movie", 1);
-      //console.log("Fetched movies:", results);
-      setMovies(results);
+      const page1 = await fetchDiscovery("movie", 1);
+      const page2 = await fetchDiscovery("movie", 2);
+      const merged = page1.concat(page2);
+      setMovies(merged);
       setLoading(false);
     }
     loadMovies();

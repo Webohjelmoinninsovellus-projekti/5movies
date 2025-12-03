@@ -10,11 +10,16 @@ export default function Header() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [cursor, setCursor] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const avatar = "http://localhost:5555/uploads/";
 
   useEffect(() => {
+    if (query.length === 0) {
+      setResults([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     const timeout = setTimeout(() => {
       if (query.length > 0) {

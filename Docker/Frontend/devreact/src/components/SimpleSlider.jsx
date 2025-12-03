@@ -4,6 +4,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { fetchPopular } from "../utilities/tmdbFetcher";
+import LoadingElement from "../components/LoadingElement";
 
 function SimpleSlider() {
   const settings = {
@@ -17,12 +18,15 @@ function SimpleSlider() {
   };
 
   const [populars, setPopulars] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
+      setLoading(true);
       const results = await fetchPopular();
       setPopulars(results);
       console.log(results);
+      setLoading(false);
     }
 
     load();
@@ -30,6 +34,7 @@ function SimpleSlider() {
 
   return (
     <div class="theater-slider">
+      {loading && <LoadingElement />}
       <Slider {...settings}>
         {populars.map((item) => (
           <div class="slide">

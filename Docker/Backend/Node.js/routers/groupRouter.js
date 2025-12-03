@@ -11,21 +11,39 @@ groupRouter.get("/", (req, res, next) => {
   });
 });
 
-groupRouter.get("/:name", (req, res, next) => {
+groupRouter.get("/:name", async (req, res, next) => {
   const name = req.params.name;
   if (!name) {
     const error = new Error("Group name is required");
     return next(error);
   }
 
-  pool.query(
-    `SELECT * FROM "group" WHERE name = ($1)`,
-    [name],
-    (err, result) => {
-      if (err) res.status(500).json({ error: err.message });
-      else res.status(200).json(result.rows[0]);
+  try {
+    const groupResult = await pool.query(
+      `SELECT * FROM "group" WHERE name = $1`,
+      [name]
+    );
+
+    if (groupResult.rows.length === 0) {
+      return res.status(404).json({ message: "Group not found" });
     }
-  );
+
+    const group = groupResult.rows[0];
+
+    const itemsResult = await pool.query(
+      `SELECT * FROM group_item WHERE groupid = $1 ORDER BY dateadded DESC`,
+      [group.groupid]
+    );
+
+    const groupWithItems = {
+      ...group,
+      items: itemsResult.rows,
+    };
+
+    res.status(200).json(groupWithItems);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 groupRouter.post("/create", verifyToken, async (req, res) => {
@@ -62,7 +80,7 @@ groupRouter.post("/:name/additem", verifyToken, async (req, res) => {
 
     const exists = await pool.query(
       `SELECT * FROM group_item WHERE groupid=$1 AND movieshowid=$2`,
-      [groupname, movieshowid]
+      [groupid, movieshowid]
     );
     if (exists.rows.length > 0) {
       return res.status(409).json({ message: "Item already in group" });
@@ -70,18 +88,10 @@ groupRouter.post("/:name/additem", verifyToken, async (req, res) => {
 
     const result = await pool.query(
       `INSERT INTO group_item 
-       (groupid, movieshowid, ismovie, title, poster_path, release_year, added_by)
-       VALUES ($1,$2,$3,$4,$5,$6,$7)
+       (groupid, movieshowid, ismovie, title, poster_path, release_year)
+       VALUES ($1,$2,$3,$4,$5,$6)
        RETURNING *`,
-      [
-        groupname,
-        movieshowid,
-        ismovie,
-        title,
-        poster_path,
-        release_year,
-        username,
-      ]
+      [groupid, movieshowid, ismovie, title, poster_path, release_year]
     );
 
     res.status(201).json(result.rows[0]);
