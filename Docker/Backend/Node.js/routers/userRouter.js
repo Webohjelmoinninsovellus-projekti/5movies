@@ -1,14 +1,26 @@
 import { Router } from "express";
-import { pool } from "../helper/db.js";
 import { hash, compare } from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import cron from "node-cron";
+
+import { pool } from "../helper/db.js";
 import { verifyToken } from "../middleware/auth.js";
 
 dotenv.config();
 
 const SECRET_KEY = process.env.BACKEND_SECRET_KEY;
 const userRouter = Router();
+
+cron.schedule("* 14 * * *", async () => {
+  pool.query(
+    "DELETE FROM public.user WHERE active = false AND CURRENT_DATE - deactivation_date >= 1",
+    (err, result) => {
+      if (err) console.log(err);
+      else console.log(result);
+    }
+  );
+});
 
 userRouter.get("/me", verifyToken, (req, res) => {
   if (req.user) {
@@ -40,7 +52,9 @@ userRouter.get("/:username/groups", (req, res) => {
     return next(error);
   }
   pool.query(
-    `SELECT "group".name, "group".id_group
+    `SELECT "group".name, "group".id_group, (
+    SELECT COUNT("user_group".user_id) FROM "user_group" WHERE "user_group".group_id = "group".id_group
+    )
      FROM "group"
      INNER JOIN user_group ON "group".id_group = user_group.group_id
      INNER JOIN "user" ON user_group.user_id = "user".id_user
@@ -216,5 +230,7 @@ userRouter.put("/deactivate", (req, res, next) => {
     }
   );
 });
+
+userRouter.delete("/delete", (req, res, next) => {});
 
 export default userRouter;

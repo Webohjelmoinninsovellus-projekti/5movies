@@ -22,21 +22,19 @@ export default function Header() {
     }
     setLoading(true);
     const timeout = setTimeout(() => {
-      if (query.length > 0) {
-        axios
-          .get(`http://localhost:5555/tmdb/search/${query}`)
-          .then((response) => {
-            setResults(response.data.results.slice(0, 5));
-          })
-          .catch((error) => {
-            console.error("Error fetching search results:", error);
-            setResults([]);
-          });
-      } else {
-        setResults([]);
-      }
-      setLoading(false);
-    }, 300);
+      axios
+        .get(`http://localhost:5555/tmdb/search/${query}`)
+        .then((response) => {
+          setResults(response.data.results.slice(0, 5));
+        })
+        .catch((error) => {
+          console.error("Error fetching search results:", error);
+          setResults([]);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }, 200);
     return () => clearTimeout(timeout);
   }, [query]);
 

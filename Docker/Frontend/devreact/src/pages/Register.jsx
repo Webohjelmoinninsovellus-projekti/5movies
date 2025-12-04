@@ -15,7 +15,8 @@ export default function Register() {
   const { loadUser } = useContext(AuthContext);
   const lostAudio = new Audio("/sounds/public_sounds_lost.wav");
   const wonAudio = new Audio("/sounds/public_sounds_won.wav");
-
+  lostAudio.volume = 0.3;
+  wonAudio.volume = 0.3;
   return (
     <main>
       <div className="login-wrapper">

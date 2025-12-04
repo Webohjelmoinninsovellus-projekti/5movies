@@ -13,7 +13,7 @@ reviewRouter.get("/:type/:id", async (req, res) => {
       FROM user_review
       INNER JOIN "user" ON user_review.user_id = "user".id_user
       WHERE "user".deactivation_date IS NULL AND user_review.is_movie = $1 AND user_review.item_id = $2
-      ORDER BY user_review.id_review DESC LIMIT 6;`,
+      ORDER BY user_review.id_review DESC LIMIT 6`,
       [type === "movie" ? true : false, id],
       (err, result) => {
         console.log(result);
@@ -36,14 +36,13 @@ reviewRouter.post("/add", verifyToken, async (req, res) => {
     else {
       const { rows } = await pool.query(
         `INSERT INTO user_review (is_movie, item_id, rating, comment, user_id)
-        VALUES ($1, $2, $3, $4, $5)
-        RETURNING id_review
+        SELECT $1, $2, $3, $4, $5
+        WHERE NOT EXISTS (SELECT 1 FROM user_review WHERE is_movie = $1 AND item_id = $2 AND user_id = $5)
       `,
         [isMovie, itemId, rating, comment, userId]
       );
       res.status(201).json({
-        message: "Review saved successfully",
-        reviewId: rows[0].id_review,
+        message: "Review saved successfully.",
       });
     }
   } catch (error) {

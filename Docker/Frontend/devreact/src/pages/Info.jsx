@@ -271,6 +271,30 @@ export default function Info() {
                   </button>
                 </div>
 
+                {movieAdded && !movieRemoved && (
+                  <p
+                    style={{
+                      color: "#4CAF50",
+                      marginTop: "10px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    ✓ Successfully added to the group!
+                  </p>
+                )}
+
+                {groupError && (
+                  <p
+                    style={{
+                      color: "#ff6b6b",
+                      marginTop: "10px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {groupError}
+                  </p>
+                )}
+
                 {favoriteAdded && !favoriteRemoved && (
                   <p
                     style={{
@@ -325,23 +349,35 @@ export default function Info() {
                         padding: "0.6rem",
                         border: "0.1rem solid red",
                         borderRadius: "10px",
+                        width: "33%",
+                        flexWrap: "wrap",
                       }}
                     >
                       <Link to={`/profile/${item.username}`}>
-                        {item.avatar_url ? (
-                          <img
-                            className="review-avatar"
-                            src={
-                              "http://localhost:5555/uploads/" + item.avatar_url
-                            }
-                          ></img>
-                        ) : (
-                          <img
-                            className="review-avatar"
-                            src={"/avatars/user.png"}
-                          ></img>
-                        )}
-                        <h2>{item.username}</h2>
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "row",
+                            alignItems: "center",
+                            gap: "8px",
+                          }}
+                        >
+                          {item.avatar_url ? (
+                            <img
+                              className="review-avatar"
+                              src={
+                                "http://localhost:5555/uploads/" +
+                                item.avatar_url
+                              }
+                            ></img>
+                          ) : (
+                            <img
+                              className="review-avatar"
+                              src={"/avatars/user.png"}
+                            ></img>
+                          )}
+                          <h3>{item.username}</h3>
+                        </div>
                       </Link>
                       <h3>{item.rating}/5</h3>
                       <p>{item.comment}</p>

@@ -214,7 +214,7 @@ export default function Profile() {
                       <p class="movie-year">{item.release_year}</p>
                     </div>
                   </Link>
-                  {owner && ( //asdsadasdsadasdaasdsadasdasd
+                  {owner && (
                     <button
                       className="favorite-remove-btn"
                       onClick={async (e) => {
@@ -263,9 +263,7 @@ export default function Profile() {
                     </div>
                     <div class="movie-info">
                       <h3 class="movie-title">{group.name}</h3>
-                      <p class="movie-year">
-                        {group.member_count || 0} members
-                      </p>
+                      <p class="movie-year">{group.count || 0} members</p>
                     </div>
                   </Link>
                 </div>
@@ -274,30 +272,6 @@ export default function Profile() {
               <p>No groups joined yet.</p>
             )}
           </div>
-          {owner && (
-            <div>
-              <button
-                onClick={async (e) => {
-                  const result = await deactivate(
-                    params.username,
-                    deactivationPassword
-                  );
-                  if (result) {
-                    await logout();
-                    navigate("/login");
-                  }
-                }}
-              >
-                DEACTIVATE
-              </button>
-              <input
-                type="password"
-                onChange={(e) => {
-                  setDeactivationPassword(e.target.value);
-                }}
-              />
-            </div>
-          )}
         </div>
       ) : (
         <LoadingElement />
