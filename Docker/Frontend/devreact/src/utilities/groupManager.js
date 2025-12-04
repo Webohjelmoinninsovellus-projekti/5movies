@@ -1,8 +1,11 @@
 import axios from "axios";
 
-async function getGroups() {
+async function getGroups(myGroups = false) {
   try {
-    const response = await axios.get(`http://localhost:5555/group`);
+    const url = myGroups
+      ? `http://localhost:5555/group?my=true`
+      : `http://localhost:5555/group`;
+    const response = await axios.get(url, { withCredentials: true });
     if (response) return response.data;
   } catch (error) {
     console.error("Error fetching group profile:", error);
@@ -135,15 +138,17 @@ async function deleteGroup(groupname) {
   }
 }
 
-async function sendJoinRequest(name) {
+async function sendJoinRequest(groupid) {
   try {
     const res = await axios.post(
-      `http://localhost:5555/group/${name}/request`,
+      `http://localhost:5555/group/join/${groupid}`,
       {},
       { withCredentials: true }
     );
+    return res.data;
   } catch (error) {
     console.error("Join request failed:", error);
+    throw error;
   }
 }
 

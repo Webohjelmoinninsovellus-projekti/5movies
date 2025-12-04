@@ -3,14 +3,41 @@ import { pool } from "../helper/db.js";
 import { verifyToken } from "../middleware/auth.js";
 import multer from "multer";
 import path from "path";
+import fs from "fs";
 
 const groupRouter = Router();
 
-groupRouter.get("/", (req, res, next) => {
-  pool.query(`SELECT * FROM "group"`, (err, result) => {
-    if (err) res.status(500).json({ error: err.message });
-    else res.status(200).json(result.rows);
-  });
+// Varmista että uploads-kansio on olemassa
+const uploadsDir = "uploads";
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+groupRouter.get("/", verifyToken, (req, res, next) => {
+  const { my } = req.query;
+
+  // Jos ?my=true, palauta käyttäjän ryhmät JA ryhmät joissa omistaja
+  if (my === "true") {
+    const userid = req.user.userid;
+    pool.query(
+      `SELECT DISTINCT "group".* FROM "group"
+       LEFT JOIN "user_group" ON "group".groupid = "user_group".group_id
+       WHERE ("user_group".user_id = $1 AND "user_group".active = true)
+          OR "group".owner_id = $1
+       ORDER BY "group".name`,
+      [userid],
+      (err, result) => {
+        if (err) res.status(500).json({ error: err.message });
+        else res.status(200).json(result.rows);
+      }
+    );
+  } else {
+    // Muuten palauta kaikki ryhmät
+    pool.query(`SELECT * FROM "group"`, (err, result) => {
+      if (err) res.status(500).json({ error: err.message });
+      else res.status(200).json(result.rows);
+    });
+  }
 });
 
 groupRouter.get("/members/:name", (req, res) => {
@@ -326,14 +353,14 @@ groupRouter.delete("/:name", verifyToken, async (req, res) => {
       });
     }
 
-    await pool.query(`DELETE FROM group_item WHERE groupid = $1`, [
-      group.groupid,
-    ]);
-    await pool.query(`DELETE FROM user_group WHERE group_id = $1`, [
-      group.groupid,
-    ]);
-
-    await pool.query(`DELETE FROM "group" WHERE groupid = $1`, [group.groupid]);
+    // Delete group and all related records in one transaction
+    await pool.query(
+      `WITH deleted_items AS (DELETE FROM group_item WHERE groupid = $1),
+           deleted_members AS (DELETE FROM user_group WHERE group_id = $1),
+           deleted_requests AS (DELETE FROM group_join_request WHERE group_id = $1)
+       DELETE FROM "group" WHERE groupid = $1`,
+      [group.groupid]
+    );
 
     res.status(200).json({ message: "Group deleted successfully" });
   } catch (error) {
@@ -342,99 +369,200 @@ groupRouter.delete("/:name", verifyToken, async (req, res) => {
   }
 });
 
-groupRouter.post("/group/:groupId/request", async (req, res) => {
-  const userId = req.user.id;
-  const groupId = req.params.groupId;
-
-  const [existing] = await db.query(
-    "SELECT * FROM user_group WHERE user_id = ? AND group_id = ?",
-    [userId, groupId]
-  );
-
-  if (rows.length > 0) {
-    if (rows[0].active === 1) {
-      return res.json({ message: "already_member" });
-    } else {
-      return res.json({ message: "already_requested" });
-    }
-  }
-
-  await db.query(
-    "INSERT INTO user_group (user_id, group_id, active) VALUES (?, ?, false)",
-    [userId, groupId]
-  );
-
-  res.json({ message: "request_sent" });
-});
-
-groupRouter.post("/group/:groupId/approve/:userId", async (req, res) => {
-  const groupId = req.params.groupId;
-  const userId = req.params.userId;
-
-  await db.query(
-    "UPDATE user_group SET active = true WHERE user_id = ? AND group_id = ?",
-    [userId, groupId]
-  );
-
-  res.json({ message: "approved" });
-});
-
-groupRouter.get("/group/:groupId/requests", async (req, res) => {
-  const groupId = req.params.groupId;
-
-  const requests = await db.query(
-    `
-    SELECT user_group.user_id, users.username
-    FROM user_group
-    JOIN users ON users.id = user_group.user_id
-    WHERE user_group.group_id = ? AND user_group.active = false
-  `,
-    [groupId]
-  );
-
-  res.json(requests);
-});
-
-// Lisää ENNEN "export default groupRouter;"
-groupRouter.post("/:name/request", verifyToken, async (req, res) => {
+// 1. LÄHETÄ LIITTYMISPYYNTÖ
+groupRouter.post("/join/:groupid", verifyToken, async (req, res) => {
   try {
-    const { name } = req.params;
+    const groupid = parseInt(req.params.groupid);
     const userid = req.user.userid;
 
-    const groupResult = await pool.query(
-      `SELECT * FROM "group" WHERE name = $1`,
-      [name]
+    // Tarkista ryhmä, jäsenyys ja aiemmat pyynnöt yhdellä kyselyllä
+    const check = await pool.query(
+      `SELECT 
+        g.groupid,
+        (SELECT COUNT(*) FROM user_group WHERE user_id = $2 AND group_id = $1) as is_member,
+        (SELECT COUNT(*) FROM group_join_request WHERE user_id = $2 AND group_id = $1 AND status = 'pending') as has_request
+      FROM "group" g WHERE g.groupid = $1`,
+      [groupid, userid]
     );
 
-    if (groupResult.rows.length === 0) {
+    if (check.rows.length === 0) {
       return res.status(404).json({ message: "Group not found" });
     }
 
-    const group = groupResult.rows[0];
-
-    // Tarkista onko käyttäjä jo ryhmässä tai pyytänyt
-    const existing = await pool.query(
-      `SELECT * FROM user_group WHERE user_id = $1 AND group_id = $2`,
-      [userid, group.groupid]
-    );
-
-    if (existing.rows.length > 0) {
-      if (existing.rows[0].active === true) {
-        return res.status(409).json({ message: "You are already a member" });
-      } else {
-        return res.status(409).json({ message: "Request already sent" });
-      }
+    if (check.rows[0].is_member > 0) {
+      return res.status(409).json({ message: "Already a member" });
     }
 
-    // Luo uusi liittymispyyntö (active = false)
-    await pool.query(
-      `INSERT INTO user_group (user_id, group_id, active) VALUES ($1, $2, false)`,
-      [userid, group.groupid]
+    if (check.rows[0].has_request > 0) {
+      return res.status(409).json({ message: "Request already sent" });
+    }
+
+    // Luo pyyntö
+    const result = await pool.query(
+      "INSERT INTO group_join_request (user_id, group_id, status) VALUES ($1, $2, $3) RETURNING *",
+      [userid, groupid, "pending"]
     );
 
-    res.status(201).json({ message: "Join request sent successfully" });
+    res.status(201).json({
+      message: "Join request sent successfully",
+      request: result.rows[0],
+    });
   } catch (error) {
-    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 2. HAE RYHMÄN PYYNNÖT (vain omistaja)
+groupRouter.get("/requests/:groupid", verifyToken, async (req, res) => {
+  try {
+    const groupid = parseInt(req.params.groupid);
+    const userid = req.user.userid;
+
+    // Tarkista että käyttäjä on ryhmän omistaja
+    const ownerCheck = await pool.query(
+      'SELECT * FROM "group" WHERE groupid = $1 AND owner_id = $2',
+      [groupid, userid]
+    );
+    if (ownerCheck.rows.length === 0) {
+      return res
+        .status(403)
+        .json({ message: "Only group owner can view requests" });
+    }
+
+    // Hae odottavat pyynnöt
+    const result = await pool.query(
+      `SELECT 
+        gjr.requestid,
+        gjr.user_id,
+        gjr.group_id,
+        gjr.status,
+        gjr.request_date,
+        u.username,
+        u.avatar_url
+      FROM group_join_request gjr
+      JOIN "user" u ON u.userid = gjr.user_id
+      WHERE gjr.group_id = $1 AND gjr.status = 'pending'
+      ORDER BY gjr.request_date DESC`,
+      [groupid]
+    );
+
+    res.status(200).json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 3. HYVÄKSY PYYNTÖ
+groupRouter.post("/accept/:requestid", verifyToken, async (req, res) => {
+  try {
+    const requestid = parseInt(req.params.requestid);
+    const userid = req.user.userid;
+
+    // Hae pyyntö ja tarkista omistajuus
+    const requestData = await pool.query(
+      `SELECT gjr.*, g.owner_id 
+       FROM group_join_request gjr
+       JOIN "group" g ON g.groupid = gjr.group_id
+       WHERE gjr.requestid = $1`,
+      [requestid]
+    );
+
+    if (requestData.rows.length === 0) {
+      return res.status(404).json({ message: "Request not found" });
+    }
+
+    const request = requestData.rows[0];
+
+    if (request.owner_id !== userid) {
+      return res
+        .status(403)
+        .json({ message: "Only group owner can accept requests" });
+    }
+
+    if (request.status !== "pending") {
+      return res.status(400).json({ message: "Request already processed" });
+    }
+
+    // Päivitä pyyntö ja lisää käyttäjä ryhmään yhdessä transaktiossa
+    await pool.query(
+      `WITH updated AS (
+        UPDATE group_join_request 
+        SET status = 'accepted', response_date = CURRENT_TIMESTAMP 
+        WHERE requestid = $1 RETURNING user_id, group_id
+      )
+      INSERT INTO user_group (user_id, group_id, active)
+      SELECT user_id, group_id, true FROM updated`,
+      [requestid]
+    );
+
+    res.status(200).json({ message: "Request accepted, user added to group" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 4. HYLKÄÄ PYYNTÖ
+groupRouter.post("/reject/:requestid", verifyToken, async (req, res) => {
+  try {
+    const requestid = parseInt(req.params.requestid);
+    const userid = req.user.userid;
+
+    // Hae pyyntö ja tarkista omistajuus
+    const requestData = await pool.query(
+      `SELECT gjr.*, g.owner_id 
+       FROM group_join_request gjr
+       JOIN "group" g ON g.groupid = gjr.group_id
+       WHERE gjr.requestid = $1`,
+      [requestid]
+    );
+
+    if (requestData.rows.length === 0) {
+      return res.status(404).json({ message: "Request not found" });
+    }
+
+    const request = requestData.rows[0];
+
+    if (request.owner_id !== userid) {
+      return res
+        .status(403)
+        .json({ message: "Only group owner can reject requests" });
+    }
+
+    if (request.status !== "pending") {
+      return res.status(400).json({ message: "Request already processed" });
+    }
+
+    // Päivitä pyyntö hylätyksi
+    await pool.query(
+      "UPDATE group_join_request SET status = $1, response_date = CURRENT_TIMESTAMP WHERE requestid = $2",
+      ["rejected", requestid]
+    );
+
+    res.status(200).json({ message: "Request rejected" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 5. HAE OMAT PYYNNÖT
+groupRouter.get("/my-requests", verifyToken, async (req, res) => {
+  try {
+    const userid = req.user.userid;
+
+    const result = await pool.query(
+      `SELECT 
+        gjr.*,
+        g.name as group_name,
+        g.avatar_url as group_avatar
+      FROM group_join_request gjr
+      JOIN "group" g ON g.groupid = gjr.group_id
+      WHERE gjr.user_id = $1
+      ORDER BY gjr.request_date DESC`,
+      [userid]
+    );
+
+    res.status(200).json(result.rows);
+  } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });

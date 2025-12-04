@@ -106,3 +106,23 @@ alter table user_group
     owner to test;
 
 
+CREATE TABLE group_join_request (
+    requestid    INTEGER GENERATED ALWAYS AS IDENTITY
+                 CONSTRAINT group_join_request_pk PRIMARY KEY,
+    user_id      INTEGER NOT NULL
+                 CONSTRAINT group_join_request_user_fk
+                 REFERENCES "user"(userid),
+    group_id     INTEGER NOT NULL
+                 CONSTRAINT group_join_request_group_fk
+                 REFERENCES "group"(groupid),
+    status       VARCHAR(20) DEFAULT 'pending' NOT NULL,
+    request_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    response_date TIMESTAMP
+);
+
+ALTER TABLE group_join_request OWNER TO test;
+
+-- Estä duplikaatti-pyynnöt samasta käyttäjästä samaan ryhmään
+CREATE UNIQUE INDEX group_join_request_unique
+ON group_join_request(user_id, group_id)
+WHERE status = 'pending';

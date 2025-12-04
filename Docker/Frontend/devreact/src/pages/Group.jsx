@@ -2,8 +2,9 @@ import { useState, useEffect, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../components/AuthContext";
 import { useParams, useLocation } from "react-router";
-
+import getProfile from "../utilities/getProfile";
 import LoadingElement from "../components/LoadingElement";
+import GroupRequests from "../components/GroupRequests";
 
 import {
   getGroups,
@@ -17,8 +18,6 @@ import {
   sendJoinRequest,
 } from "../utilities/groupManager";
 
-import getProfile from "../utilities/getProfile";
-
 export default function Group() {
   const [loading, setLoading] = useState(true);
   const [info, setInfo] = useState([]);
@@ -28,6 +27,7 @@ export default function Group() {
   const [isMember, setIsMember] = useState(false);
   const [Items, setItems] = useState([]);
   const [message, setMessage] = useState("");
+  const [joinStatus, setJoinStatus] = useState("");
 
   const params = useParams();
 
@@ -72,6 +72,19 @@ export default function Group() {
     } catch (error) {
       console.error("Failed to delete group:", error);
       setMessage("Error deleting group. Please try again.");
+    }
+  };
+
+  const handleJoinRequest = async () => {
+    try {
+      await sendJoinRequest(info.groupid);
+      setJoinStatus("Request sent! Waiting for owner approval.");
+    } catch (error) {
+      if (error.response?.status === 409) {
+        setJoinStatus(error.response.data.message);
+      } else {
+        setJoinStatus("Failed to send request. Please try again.");
+      }
     }
   };
 
@@ -144,23 +157,23 @@ export default function Group() {
             </button>
           )}
 
-          {isMember ? (
+          {isMember && !owner ? (
             <button className="btn-red" onClick={handleLeaveGroup}>
               Leave Group
             </button>
-          ) : (
-            <button
-              className="btn-red"
-              onClick={() => sendJoinRequest(params.name)}
-            >
+          ) : !isMember ? (
+            <button className="btn-red" onClick={handleJoinRequest}>
               Join Group
+              {joinStatus && <p>{joinStatus}</p>}
             </button>
-          )}
+          ) : null}
         </div>
 
         <div class="group-info">
           <h2>{info.name}</h2>
           <p>{info.desc}</p>
+
+          {owner && <GroupRequests groupid={info.groupid} />}
 
           <h3 class="section-title">Added movies/series</h3>
           <div class="card-row"></div>

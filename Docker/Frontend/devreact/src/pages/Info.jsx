@@ -55,7 +55,7 @@ export default function Info() {
       if (reviewsData) setReviews(reviewsData);
 
       if (user) {
-        const userGroups = await getGroups();
+        const userGroups = await getGroups(true);
         if (userGroups) setGroups(userGroups);
       }
 
@@ -380,7 +380,7 @@ export default function Info() {
                         </div>
                       </Link>
                       <h3>{item.rating}/5</h3>
-                      <p>{item.comment}</p>
+                      <p className="review-text">{item.comment}</p>
                       <p>{item.date.slice(0, 10)}</p>
                     </div>
                   ))}
