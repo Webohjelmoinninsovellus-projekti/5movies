@@ -1,17 +1,17 @@
 create table "user"
 (
-    groupid     integer,
-    datecreated date    default CURRENT_DATE not null,
-    username    varchar(32)                  not null
+    datecreated       date    default CURRENT_DATE not null,
+    username          varchar(32)                  not null
         constraint username_pk
             unique,
-    avatar_url  varchar(256),
-    userid      integer generated always as identity (minvalue 0 maxvalue 65500)
+    avatar_url        varchar(256),
+    userid            integer generated always as identity (minvalue 0 maxvalue 65500)
         constraint userid_pk
             primary key,
-    password    varchar(128)                 not null,
-    "desc"      varchar(256),
-    active      boolean default true         not null
+    password          varchar(128)                 not null,
+    "desc"            varchar(256),
+    active            boolean default true         not null,
+    deactivation_date date
 );
 
 alter table "user"
@@ -61,10 +61,48 @@ create table "group"
     name        varchar(32)                  not null,
     datecreated date    default CURRENT_DATE not null,
     active      boolean default true         not null,
-    "desc"      varchar(256)
+    "desc"      varchar(256),
+    owner_id    integer                      not null
+        constraint group_user_userid_fk
+            references "user"
 );
 
 alter table "group"
+    owner to test;
+
+create table group_item
+(
+    groupitemid  serial
+        primary key,
+    groupid      integer      not null
+        references "group"
+            on delete cascade,
+    movieshowid  integer      not null,
+    ismovie      boolean      not null,
+    title        varchar(256) not null,
+    poster_path  varchar(256),
+    release_year integer,
+    dateadded    timestamp default CURRENT_TIMESTAMP
+);
+
+alter table group_item
+    owner to test;
+
+create table user_group
+(
+    id       integer generated always as identity (minvalue 0)
+        constraint user_group_pk
+            primary key,
+    user_id  integer               not null
+        constraint user_group_user_userid_fk
+            references "user",
+    group_id integer               not null
+        constraint user_group_group_groupid_fk
+            references "group",
+    active   boolean default false not null
+);
+
+alter table user_group
     owner to test;
 
 
