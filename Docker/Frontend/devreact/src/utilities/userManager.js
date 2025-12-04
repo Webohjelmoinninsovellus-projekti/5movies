@@ -3,6 +3,23 @@ import { useContext } from "react";
 import { Navigate } from "react-router-dom";
 import { AuthContext } from "../components/AuthContext";
 
+async function register(usernameInput, passwordInput) {
+  try {
+    const inputUser = { username: usernameInput, password: passwordInput };
+    const response = await axios.post("http://localhost:5555/user/register", {
+      user: inputUser,
+    });
+
+    if (response) {
+      console.log(response);
+      return response;
+    }
+  } catch (error) {
+    console.error("Error registering:", error);
+    return error;
+  }
+}
+
 async function login(usernameInput, passwordInput) {
   try {
     const inputUser = { username: usernameInput, password: passwordInput };
@@ -23,20 +40,16 @@ async function login(usernameInput, passwordInput) {
   }
 }
 
-async function register(usernameInput, passwordInput) {
+async function getProfile(username) {
   try {
-    const inputUser = { username: usernameInput, password: passwordInput };
-    const response = await axios.post("http://localhost:5555/user/register", {
-      user: inputUser,
+    const response = await axios.get(`http://localhost:5555/user/${username}`, {
+      withCredentials: true,
     });
 
-    if (response) {
-      console.log(response);
-      return response;
-    }
+    if (response) return response.data;
   } catch (error) {
-    console.error("Error registering:", error);
-    return error;
+    console.error("Error fetching profile:", error);
+    return null;
   }
 }
 
@@ -58,4 +71,4 @@ async function deactivate(username, password) {
   }
 }
 
-export { login, register, deactivate };
+export { register, login, getProfile, deactivate };

@@ -19,15 +19,15 @@ async function fetchReviews(type, id) {
   }
 }
 
-async function sendReview(ismovie, comment, movieshowid, rating) {
+async function sendReview(isMovie, itemId, rating, comment) {
   try {
     const response = await axios.post(
       "http://localhost:5555/review/add",
       {
-        ismovie,
-        comment,
-        movieshowid,
+        isMovie,
+        itemId,
         rating,
+        comment,
       },
       { withCredentials: true }
     );

@@ -18,21 +18,21 @@ async function fetchFavorite(username) {
 }
 
 async function favoriteSender(
-  ismovie,
-  movieshowid,
-  title,
-  poster_path,
-  release_year
+  isMovie,
+  itemId,
+  itemTitle,
+  releaseYear,
+  posterPath
 ) {
   try {
     const response = await axios.post(
       "http://localhost:5555/favorite/add",
       {
-        ismovie,
-        movieshowid,
-        title,
-        poster_path,
-        release_year,
+        isMovie,
+        itemId,
+        itemTitle,
+        releaseYear,
+        posterPath,
       },
       { withCredentials: true }
     );
@@ -44,11 +44,11 @@ async function favoriteSender(
   }
 }
 
-async function favoriteRemover(movieshowid) {
+async function favoriteRemover(itemId) {
   try {
     const response = await axios({
       method: "delete",
-      url: `http://localhost:5555/favorite/remove/${movieshowid}`,
+      url: `http://localhost:5555/favorite/remove/${itemId}`,
       withCredentials: true,
     });
 

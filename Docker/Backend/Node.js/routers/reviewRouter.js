@@ -9,11 +9,11 @@ reviewRouter.get("/:type/:id", async (req, res) => {
   if (!type || !id) return new Error("Type or ID is not defined");
   else {
     pool.query(
-      `SELECT user_review.userid, user_review.date, user_review.comment, user_review.rating, public.user.username, public.user.avatar_url
+      `SELECT user_review.user_id, user_review.date_created, user_review.comment, user_review.rating, "user".username, "user".avatar_path
       FROM user_review
-      INNER JOIN public.user ON user_review.userid = public.user.userid
-      WHERE public.user.active = true AND user_review.ismovie = $1 AND user_review.movieshowid = $2
-      ORDER BY user_review.reviewid DESC LIMIT 5;`,
+      INNER JOIN "user" ON user_review.user_id = "user".id_user
+      WHERE "user".deactivation_date IS NULL AND user_review.is_movie = $1 AND user_review.item_id = $2
+      ORDER BY user_review.id_review DESC LIMIT 6;`,
       [type === "movie" ? true : false, id],
       (err, result) => {
         console.log(result);
@@ -28,28 +28,22 @@ reviewRouter.get("/:type/:id", async (req, res) => {
 reviewRouter.post("/add", verifyToken, async (req, res) => {
   try {
     console.log(req.user);
-    const { ismovie, comment, movieshowid, rating } = req.body;
-    const { userid } = req.user;
+    const { isMovie, itemId, rating, comment } = req.body;
+    const { userId } = req.user;
 
     if (rating > 5 || rating < 0)
       throw new Error("Rating is outside of allowed range.");
     else {
-      const query = `
-        INSERT INTO user_review (ismovie, comment, movieshowid, userid, rating)
+      const { rows } = await pool.query(
+        `INSERT INTO user_review (is_movie, item_id, rating, comment, user_id)
         VALUES ($1, $2, $3, $4, $5)
-        RETURNING reviewid
-      `;
-
-      const { rows } = await pool.query(query, [
-        ismovie,
-        comment,
-        movieshowid,
-        userid,
-        rating,
-      ]);
+        RETURNING id_review
+      `,
+        [isMovie, itemId, rating, comment, userId]
+      );
       res.status(201).json({
         message: "Review saved successfully",
-        reviewId: rows[0].reviewid,
+        reviewId: rows[0].id_review,
       });
     }
   } catch (error) {

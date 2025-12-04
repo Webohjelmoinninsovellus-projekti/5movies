@@ -48,7 +48,7 @@ async function inTheatersData() {
   try {
     const response = await axios({
       method: "get",
-      url: "http://localhost:5555/tmdb/intheaters",
+      url: "http://localhost:5555/tmdb/in_theaters",
     });
 
     return response.data.results;

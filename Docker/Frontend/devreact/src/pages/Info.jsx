@@ -140,9 +140,9 @@ export default function Info() {
                   onClick={async () => {
                     await sendReview(
                       type === "/mo" ? true : false,
-                      comment,
                       info.id,
-                      rating
+                      rating,
+                      comment
                     );
                     const reviewsData = await fetchReviews(type, params.id);
                     if (reviewsData) setReviews(reviewsData);
@@ -170,13 +170,13 @@ export default function Info() {
                         type === "/mo" ? true : false,
                         info.id,
                         type === "/mo" ? info.title : info.name,
-                        info.poster_path,
                         parseInt(
                           (type === "/mo"
                             ? info.release_date
                             : info.first_air_date
                           ).slice(0, 4)
-                        )
+                        ),
+                        info.poster_path
                       );
                       setFavoriteAdded(true);
                       setFavoriteRemoved(false);

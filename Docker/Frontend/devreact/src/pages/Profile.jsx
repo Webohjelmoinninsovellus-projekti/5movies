@@ -5,11 +5,10 @@ import { useParams, useLocation } from "react-router";
 
 import LoadingElement from "../components/LoadingElement";
 
-import getProfile from "../utilities/getProfile";
 import { getUserGroups } from "../utilities/groupManager";
 import uploadAvatar from "../utilities/avatarManager";
 import { fetchFavorite, favoriteRemover } from "../utilities/favoriteManager";
-import { deactivate } from "../utilities/userManager";
+import { getProfile, deactivate } from "../utilities/userManager";
 
 export default function Profile() {
   const [loading, setLoading] = useState(true);
@@ -105,7 +104,7 @@ export default function Profile() {
             </div>
             <div class="profile-info">
               <h2>{info.username}</h2>
-              <p>Joined: {info.datecreated.split("T")[0]}</p>
+              <p>Joined: {info.date_created.split("T")[0]}</p>
               <p>{info.desc ? info.desc : ""}</p>
               {owner && (
                 <>

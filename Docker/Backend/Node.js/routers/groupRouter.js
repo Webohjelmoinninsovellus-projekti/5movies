@@ -31,8 +31,10 @@ groupRouter.get("/:name", async (req, res, next) => {
     const group = groupResult.rows[0];
 
     const itemsResult = await pool.query(
-      `SELECT * FROM group_item WHERE groupid = $1 ORDER BY dateadded DESC`,
-      [group.groupid]
+      `SELECT * FROM group_item
+      WHERE group_id = $1
+      ORDER BY date_added DESC`,
+      [group.group_id]
     );
 
     const groupWithItems = {
@@ -48,11 +50,11 @@ groupRouter.get("/:name", async (req, res, next) => {
 
 groupRouter.post("/create", verifyToken, async (req, res) => {
   try {
-    const { name, desc } = req.body;
+    const { name, description } = req.body;
 
     const result = await pool.query(
-      'INSERT INTO "group" (name, "desc", datecreated, active) VALUES ($1, $2, CURRENT_DATE, true) RETURNING *',
-      [name, desc]
+      'INSERT INTO "group" (name, description) VALUES ($1, $2) RETURNING *',
+      [name, description]
     );
 
     res.status(201).json(result.rows[0]);
@@ -63,35 +65,35 @@ groupRouter.post("/create", verifyToken, async (req, res) => {
 
 groupRouter.post("/:name/additem", verifyToken, async (req, res) => {
   try {
-    const groupname = req.params.name;
-    const { movieshowid, ismovie, title, poster_path, release_year } = req.body;
-    const username = req.user.username;
+    const groupName = req.params.name;
+    const { isMovie, itemId, itemTitle, releaseYear, posterPath } = req.body;
 
     const groupResult = await pool.query(
-      `SELECT * FROM "group" WHERE name=$1`,
-      [groupname]
+      `SELECT * FROM "group" WHERE name = $1`,
+      [groupName]
     );
 
     if (groupResult.rows.length === 0) {
       return res.status(404).json({ message: "Group not found" });
     }
 
-    const groupid = groupResult.rows[0].groupid;
+    const groupId = groupResult.rows[0].group_id;
 
     const exists = await pool.query(
-      `SELECT * FROM group_item WHERE groupid=$1 AND movieshowid=$2`,
-      [groupid, movieshowid]
+      `SELECT * FROM group_item
+      WHERE item_id = $1 AND group_id = $2`,
+      [itemId, groupId]
     );
     if (exists.rows.length > 0) {
       return res.status(409).json({ message: "Item already in group" });
     }
 
     const result = await pool.query(
-      `INSERT INTO group_item 
-       (groupid, movieshowid, ismovie, title, poster_path, release_year)
-       VALUES ($1,$2,$3,$4,$5,$6)
+      `INSERT INTO group_item
+       (is_movie, item_id, item_title, poster_path, release_year, group_id)
+       VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING *`,
-      [groupid, movieshowid, ismovie, title, poster_path, release_year]
+      [isMovie, itemId, itemTitle, posterPath, releaseYear, groupId]
     );
 
     res.status(201).json(result.rows[0]);

@@ -8,10 +8,11 @@ favoriteRouter.get("/:username", async (req, res) => {
   const { username } = req.params;
 
   pool.query(
-    `SELECT user_favourite.movieshowid, user_favourite.ismovie, user_favourite.title, user_favourite.poster_path, user_favourite.release_year, user_favourite.date
+    `SELECT user_favourite.is_movie, user_favourite.item_id, user_favourite.item_title, user_favourite.date_added, user_favourite.release_year, user_favourite.poster_path
     FROM user_favourite
-    INNER JOIN "user" ON user_favourite.user_id = "user".userid
-    WHERE "user".username = $1 AND "user".active = true ORDER BY date DESC`,
+    INNER JOIN "user" ON user_favourite.user_id = "user".id_user
+    WHERE "user".username = $1 AND "user".deactivation_date IS NULL
+    ORDER BY user_favourite.id_favorite DESC LIMIT 10`,
     [username],
     (err, result) => {
       if (err) res.status(500).json({ error: err.message });
@@ -22,70 +23,65 @@ favoriteRouter.get("/:username", async (req, res) => {
 
 favoriteRouter.post("/add", verifyToken, async (req, res) => {
   try {
-    const { ismovie, movieshowid, title, poster_path, release_year } = req.body;
-    const userid = req.user.userid;
+    const { isMovie, itemId, itemTitle, releaseYear, posterPath } = req.body;
+    const userId = req.user.user_id;
 
-    // Check if already exists
-    const checkQuery = `
+    const existing = await pool.query(
+      `
       SELECT * FROM user_favourite
-      WHERE user_id = $1 AND movieshowid = $2`;
-
-    const existing = await pool.query(checkQuery, [userid, movieshowid]);
+      WHERE item_id = $1 AND user_id = $2`,
+      [itemId, userId]
+    );
 
     if (existing.rows.length > 0) {
       return res.status(409).json({
-        message: "This item is already in your favorites",
+        message: "This item is already in your favorites.",
       });
     }
-    const query = `
-      INSERT INTO user_favourite (user_id, ismovie, movieshowid, title, poster_path, release_year, date)
-      VALUES ($1, $2, $3, $4, $5, $6, CURRENT_DATE)
-        RETURNING *`;
 
-    const { rows } = await pool.query(query, [
-      userid,
-      ismovie,
-      movieshowid,
-      title,
-      poster_path,
-      release_year,
-    ]);
+    const { rows } = await pool.query(
+      `INSERT INTO user_favourite (is_movie, item_id, item_title, poster_path, release_year, user_id)
+      VALUES ($1, $2, $3, $4, $5, $6)
+        RETURNING *`,
+      [isMovie, itemId, itemTitle, posterPath, releaseYear, userId]
+    );
     res.status(201).json({
-      message: "favorite added successfully",
+      message: "Added item to favorites successfully.",
       favoriteId: rows[0].id,
     });
   } catch (error) {
-    console.error("Error while saving favorite:", error);
+    console.error("Error while adding to favorites:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
 
-favoriteRouter.delete("/remove/:movieshowid", verifyToken, async (req, res) => {
+favoriteRouter.delete("/remove/:item_id", verifyToken, async (req, res) => {
   try {
-    const { movieshowid } = req.params;
-    const userid = req.user.userid;
+    const { itemId } = req.params;
+    const userId = req.user.userid;
 
-    console.log("Removing favorite:", { userid, movieshowid });
+    console.log("Removing item from favorites:", { userId, itemId });
 
-    const query = `
-      DELETE FROM user_favourite 
-      WHERE user_id = $1 AND movieshowid = $2
-      RETURNING *`;
-
-    const { rows } = await pool.query(query, [userid, parseInt(movieshowid)]);
+    const { rows } = await pool.query(
+      `
+      DELETE FROM user_favourite
+      WHERE item_id = $1 AND user_id = $2
+      RETURNING *`,
+      [parseInt(itemId), userId]
+    );
 
     if (rows.length === 0) {
       return res.status(404).json({
-        message: "Favorite not found",
+        message: "Item not found in favorites.",
       });
     }
 
     res.status(200).json({
-      message: "favorite removed successfully",
+      message: "Item successfully removed from favorites.",
       favoriteId: rows[0].id,
     });
   } catch (error) {
-    console.error("Error while removing favorite:", error);
+    console.error("Error while removing item from favorites:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });

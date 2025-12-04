@@ -20,10 +20,10 @@ async function getGroup(name) {
   }
 }
 
-async function addItem(groupname, item) {
+async function addItem(groupName, item) {
   try {
     const res = await axios.post(
-      `http://localhost:5555/group/${groupname}/additem`,
+      `http://localhost:5555/group/${groupName}/additem`,
       item,
       { withCredentials: true }
     );
@@ -34,13 +34,14 @@ async function addItem(groupname, item) {
   }
 }
 
-async function removeItem(groupname, movieshowid) {
+async function removeItem(groupName, itemId) {
   try {
     const res = await axios.post(
-      `http://localhost:5555/group/${groupname}/removeitem`,
-      { movieshowid },
+      `http://localhost:5555/group/${groupName}/removeitem`,
+      { itemId },
       { withCredentials: true }
     );
+
     return res.data;
   } catch (err) {
     console.error("Error removing item from group:", err);

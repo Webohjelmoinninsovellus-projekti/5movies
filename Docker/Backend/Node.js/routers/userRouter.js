@@ -15,7 +15,7 @@ userRouter.get("/me", verifyToken, (req, res) => {
     console.log("Profile requested for user:" + req.user.username);
 
     pool.query(
-      `SELECT avatar_url FROM "user" WHERE username = $1`,
+      `SELECT avatar_path FROM "user" WHERE username = $1`,
       [req.user.username],
       (err, result) => {
         if (err) {
@@ -40,10 +40,10 @@ userRouter.get("/:username/groups", (req, res) => {
     return next(error);
   }
   pool.query(
-    `SELECT "group".name, "group".groupid
-     FROM user_group
-     INNER JOIN "user" ON user_group.user_id = "user".userid
-     INNER JOIN "group" ON user_group.group_id = "group".groupid
+    `SELECT "group".name, "group".id_group
+     FROM "group"
+     INNER JOIN user_group ON "group".id_group = user_group.group_id
+     INNER JOIN "user" ON user_group.user_id = "user".id_user
      WHERE "user".username = $1`,
     [username],
     (err, result) => {
@@ -61,7 +61,7 @@ userRouter.get("/:username", (req, res, next) => {
   }
 
   pool.query(
-    `SELECT * FROM "user" WHERE username = ($1) AND active = true`,
+    `SELECT username, bio, date_created FROM "user" WHERE username = ($1) AND deactivation_date IS NULL`,
     [username],
     (err, result) => {
       if (err) res.status(500).json({ error: err.message });
@@ -116,7 +116,7 @@ userRouter.post("/login", (req, res, next) => {
   }
 
   pool.query(
-    `SELECT * FROM "user" WHERE username = $1`,
+    `SELECT username, password, deactivation_date FROM "user" WHERE username = $1`,
     [user.username],
     (err, result) => {
       if (err) return next(err);
@@ -138,7 +138,7 @@ userRouter.post("/login", (req, res, next) => {
           const accessToken = jwt.sign(
             {
               username: dbUser.username,
-              userid: dbUser.userid,
+              id_user: dbUser.id_user,
             },
             SECRET_KEY,
             { expiresIn: "30m" }
@@ -152,9 +152,10 @@ userRouter.post("/login", (req, res, next) => {
               maxAge: 1000 * 60 * 30, // 30 minutes
             });
 
-            if (dbUser.active == false) {
+            if (dbUser.deactivation_date != null) {
               pool.query(
-                "UPDATE public.user SET active = true, deactivation_date = null WHERE active = false AND username = $1 AND password = $2",
+                `UPDATE "user" SET deactivation_date = NULL
+                WHERE deactivation_date IS NOT NULL AND username = $1 AND password = $2`,
                 [dbUser.username, dbUser.password],
 
                 (err, result) => {
@@ -181,7 +182,7 @@ userRouter.put("/deactivate", (req, res, next) => {
   }
 
   pool.query(
-    "SELECT * FROM public.user WHERE username = $1",
+    `SELECT username, password, deactivation_date FROM "user" WHERE username = $1`,
     [user.username],
     (err, result) => {
       if (err) return next(err);
@@ -200,8 +201,9 @@ userRouter.put("/deactivate", (req, res, next) => {
             return next(error);
           } else {
             pool.query(
-              "UPDATE public.user SET active = false, deactivation_date = CURRENT_DATE WHERE active = true AND username = $1 AND password = $2",
-              [user.username, dbUser.password],
+              `UPDATE "user" SET deactivation_date = CURRENT_DATE
+              WHERE deactivation_date IS NULL AND username = $1 AND password = $2`,
+              [dbUser.username, dbUser.password],
 
               (err, result) => {
                 if (err) return next(err);
