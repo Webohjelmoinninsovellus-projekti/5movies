@@ -88,7 +88,6 @@ export default function GroupRequests({ groupid }) {
               <button
                 className="red-button"
                 onClick={() => handleReject(req.requestid)}
-                style={{ background: "#ff0000ff" }}
               >
                 Reject
               </button>

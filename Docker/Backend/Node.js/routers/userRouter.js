@@ -52,7 +52,7 @@ userRouter.get("/:username/groups", (req, res) => {
     return next(error);
   }
   pool.query(
-    `SELECT "group".name, "group".groupid, (SELECT COUNT("user_group".user_id) FROM "user_group" WHERE "user_group".group_id = "group".groupid)
+    `SELECT "group".name, "group".groupid, "group".avatar_url, (SELECT COUNT("user_group".user_id) FROM "user_group" WHERE "user_group".group_id = "group".groupid)
      FROM user_group
      INNER JOIN "user" ON user_group.user_id = "user".userid
      INNER JOIN "group" ON user_group.group_id = "group".groupid

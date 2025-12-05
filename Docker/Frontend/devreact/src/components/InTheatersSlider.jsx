@@ -34,10 +34,10 @@ function InTheatersSlider() {
   }, []);
 
   return (
-    <div class="theater-slider">
+    <div className="theater-slider">
       <Slider {...settings}>
         {inTheaters.map((item) => (
-          <div class="slide">
+          <div className="slide">
             <Link to={`/movie/${item.id}`} reloadDocument={true}>
               <h2>{item.title}</h2>
               <img

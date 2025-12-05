@@ -17,7 +17,6 @@ export function verifyToken(req, res, next) {
 
     req.user = decoded;
 
-    if (token) console.log("Token owner:" + decoded.username);
-    next();
+    if (token) next();
   });
 }

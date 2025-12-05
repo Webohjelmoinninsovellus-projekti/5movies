@@ -41,7 +41,6 @@ export default function Info() {
 
   const handleClick = async (value) => {
     setRating(value);
-    if (onRate) onRate(value);
   };
 
   useEffect(() => {
@@ -149,13 +148,6 @@ export default function Info() {
 
                     setComment("");
                     setRating(0);
-
-                    /* if (data) {
-                    navigate(`/Info/${data.comment}`);
-                  } */
-
-                    // TODO : update reviews automatically after submitting review
-                    //setReviews(reviews + [])
                   }}
                 >
                   Submit Review
@@ -342,6 +334,7 @@ export default function Info() {
                 >
                   {reviews.map((item) => (
                     <div
+                      key={item.username}
                       style={{
                         display: "flex",
                         flexDirection: "column",
@@ -349,11 +342,14 @@ export default function Info() {
                         padding: "0.6rem",
                         border: "0.1rem solid red",
                         borderRadius: "10px",
-                        width: "33%",
+                        width: "100%",
                         flexWrap: "wrap",
                       }}
                     >
-                      <Link to={`/profile/${item.username}`}>
+                      <Link
+                        key={item.username}
+                        to={`/profile/${item.username}`}
+                      >
                         <div
                           style={{
                             display: "flex",

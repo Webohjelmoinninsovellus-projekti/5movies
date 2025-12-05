@@ -98,31 +98,36 @@ create table user_group
             references "user",
     group_id integer               not null
         constraint user_group_group_groupid_fk
-            references "group",
+            references "group"
+            on delete cascade,
     active   boolean default false not null
 );
 
 alter table user_group
     owner to test;
 
-
-CREATE TABLE group_join_request (
-    requestid    INTEGER GENERATED ALWAYS AS IDENTITY
-                 CONSTRAINT group_join_request_pk PRIMARY KEY,
-    user_id      INTEGER NOT NULL
-                 CONSTRAINT group_join_request_user_fk
-                 REFERENCES "user"(userid),
-    group_id     INTEGER NOT NULL
-                 CONSTRAINT group_join_request_group_fk
-                 REFERENCES "group"(groupid),
-    status       VARCHAR(20) DEFAULT 'pending' NOT NULL,
-    request_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    response_date TIMESTAMP
+create table group_join_request
+(
+    requestid     integer generated always as identity
+        constraint group_join_request_pk
+            primary key,
+    user_id       integer                                          not null
+        constraint group_join_request_user_fk
+            references "user",
+    group_id      integer                                          not null
+        constraint group_join_request_group_fk
+            references "group"
+            on delete cascade,
+    status        varchar(20) default 'pending'::character varying not null,
+    request_date  timestamp   default CURRENT_TIMESTAMP            not null,
+    response_date timestamp
 );
 
-ALTER TABLE group_join_request OWNER TO test;
+alter table group_join_request
+    owner to test;
 
--- Estä duplikaatti-pyynnöt samasta käyttäjästä samaan ryhmään
-CREATE UNIQUE INDEX group_join_request_unique
-ON group_join_request(user_id, group_id)
-WHERE status = 'pending';
+create unique index group_join_request_unique
+    on group_join_request (user_id, group_id)
+    where ((status)::text = 'pending'::text);
+
+
