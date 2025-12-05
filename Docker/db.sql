@@ -98,11 +98,36 @@ create table user_group
             references "user",
     group_id integer               not null
         constraint user_group_group_groupid_fk
-            references "group",
+            references "group"
+            on delete cascade,
     active   boolean default false not null
 );
 
 alter table user_group
     owner to test;
+
+create table group_join_request
+(
+    requestid     integer generated always as identity
+        constraint group_join_request_pk
+            primary key,
+    user_id       integer                                          not null
+        constraint group_join_request_user_fk
+            references "user",
+    group_id      integer                                          not null
+        constraint group_join_request_group_fk
+            references "group"
+            on delete cascade,
+    status        varchar(20) default 'pending'::character varying not null,
+    request_date  timestamp   default CURRENT_TIMESTAMP            not null,
+    response_date timestamp
+);
+
+alter table group_join_request
+    owner to test;
+
+create unique index group_join_request_unique
+    on group_join_request (user_id, group_id)
+    where ((status)::text = 'pending'::text);
 
 

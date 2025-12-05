@@ -2,8 +2,9 @@ import { useState, useEffect, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../components/AuthContext";
 import { useParams, useLocation } from "react-router";
-
+import getProfile from "../utilities/getProfile";
 import LoadingElement from "../components/LoadingElement";
+import GroupRequests from "../components/GroupRequests";
 
 import {
   getGroups,
@@ -16,8 +17,6 @@ import {
   deleteGroup,
   sendJoinRequest,
 } from "../utilities/groupManager";
-
-import getProfile from "../utilities/getProfile";
 
 export default function Group() {
   const [loading, setLoading] = useState(true);
@@ -53,7 +52,6 @@ export default function Group() {
     try {
       await leaveGroup(info.name);
       setMessage("You have left the group.");
-      navigate("/groups");
     } catch (error) {
       console.error("Failed to leave group:", error);
       if (error.response?.status === 403) {
@@ -75,6 +73,19 @@ export default function Group() {
     }
   };
 
+  const handleJoinRequest = async () => {
+    try {
+      await sendJoinRequest(info.groupid);
+      setMessage("Request sent! Waiting for owner approval.");
+    } catch (error) {
+      if (error.response?.status === 409) {
+        setMessage(error.response.data.message);
+      } else {
+        setMessage("Failed to send request. Please try again.");
+      }
+    }
+  };
+
   useEffect(() => {
     (async () => {
       setLoading(true);
@@ -85,7 +96,7 @@ export default function Group() {
       if (groupData && membersData) {
         setInfo(groupData);
         setMembers(membersData);
-        console.log(membersData);
+        console.log(groupData.items);
         setItems(groupData.items || []);
         if (user && membersData[0].username === user.username) {
           setOwner(true);
@@ -107,21 +118,24 @@ export default function Group() {
   if (!info.name) return <h2>Group not found</h2>;
 
   return (
-    <div class="container">
-      <div class="group-layout">
+    <div className="container">
+      <div className="group-layout">
         <div>
-          <div class="group-img">
+          <div className="group-img">
             {info.avatar_url ? (
               <img
                 src={`http://localhost:5555/uploads/${info.avatar_url}`}
                 alt={info.name}
-                style={{ width: "200px", height: "200px", objectFit: "cover" }}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                }}
               />
             ) : (
-              <div>No Image</div>
+              <span>No Image</span>
             )}
           </div>
-
           {owner && (
             <>
               <input
@@ -132,41 +146,40 @@ export default function Group() {
                 onChange={changeGroupAvatar}
                 style={{ display: "none" }}
               />
-              <label htmlFor="avatar-upload-form" className="btn-red">
+              <label
+                className="btn-red"
+                style={{ display: "inline-flex", justifyContent: "center" }}
+                htmlFor="avatar-upload-form"
+              >
                 Change Image
               </label>
+
+              <button className="btn-red" onClick={handleDeleteGroup}>
+                Delete Group
+              </button>
             </>
           )}
 
-          {owner && (
-            <button className="btn-red" onClick={handleDeleteGroup}>
-              Delete Group
-            </button>
-          )}
-
-          {isMember ? (
+          {isMember && !owner ? (
             <button className="btn-red" onClick={handleLeaveGroup}>
-              Leave Group
+              {message ? <p>{message}</p> : "Leave Group"}
             </button>
-          ) : (
-            <button
-              className="btn-red"
-              onClick={() => sendJoinRequest(params.name)}
-            >
-              Join Group
+          ) : !isMember ? (
+            <button className="btn-red" onClick={handleJoinRequest}>
+              {message ? <p>{message}</p> : "Join Group"}
             </button>
-          )}
+          ) : null}
         </div>
 
-        <div class="group-info">
+        <div className="group-info">
           <h2>{info.name}</h2>
           <p>{info.desc}</p>
 
-          <h3 class="section-title">Added movies/series</h3>
-          <div class="card-row"></div>
+          <h3 className="section-title">Added movies/series</h3>
+          <div className="card-row"></div>
           {Items && Items.length > 0 ? (
             Items.map((item) => (
-              <div key={item.movieshowid} class="movie-card">
+              <div key={item.movieshowid} className="movie-card">
                 <Link
                   to={`/${item.ismovie ? "movie" : "tv"}/${item.movieshowid}`}
                   className="movie-card-link"
@@ -177,11 +190,11 @@ export default function Group() {
                       alt={item.title}
                     />
                   ) : (
-                    <div class="no-poster">No Poster</div>
+                    <div className="no-poster">No Poster</div>
                   )}
-                  <div class="movie-info">
-                    <h3 class="movie-title">{item.title}</h3>
-                    <p class="movie-year">{item.release_year}</p>
+                  <div className="movie-info">
+                    <h3 className="movie-title">{item.title}</h3>
+                    <p className="movie-year">{item.release_year}</p>
                   </div>
                 </Link>
                 {owner && (
@@ -214,30 +227,39 @@ export default function Group() {
         </div>
 
         <div>
-          <div class="member-block">
+          <div className="member-block">
             <h3>Group owner</h3>
-            <div class="member">
+            <div className="member">
               <img
                 className="review-avatar"
-                src={"http://localhost:5555/uploads/" + members[0].avatar_url}
+                src={
+                  members[0].avatar_url
+                    ? "http://localhost:5555/uploads/" + members[0].avatar_url
+                    : "/avatars/user.png"
+                }
               />
-              <span class="member-name">{members[0].username}</span>
+              <span className="member-name">{members[0].username}</span>
             </div>
           </div>
-          <div class="member-block">
+          <div className="member-block">
             <h3>Members</h3>
-            <div class="member">
+            <div className="member">
               {members
                 .filter((member, index) => index > 0)
                 .map((member) => (
-                  <div>
+                  <div key={member.username}>
                     <img
                       className="review-avatar"
-                      src={"http://localhost:5555/uploads/" + member.avatar_url}
+                      src={
+                        member.avatar_url
+                          ? "http://localhost:5555/uploads/" + member.avatar_url
+                          : "/avatars/user.png"
+                      }
                     ></img>
-                    <span class="member-name">{member.username}</span>
+                    <span className="member-name">{member.username}</span>
                   </div>
                 ))}
+              {owner && <GroupRequests groupid={info.groupid} />}
             </div>
           </div>
         </div>

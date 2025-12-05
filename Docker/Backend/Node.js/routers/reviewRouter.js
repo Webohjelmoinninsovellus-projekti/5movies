@@ -16,8 +16,6 @@ reviewRouter.get("/:type/:id", async (req, res) => {
       ORDER BY user_review.reviewid DESC LIMIT 5;`,
       [type === "movie" ? true : false, id],
       (err, result) => {
-        console.log(result);
-
         if (err) res.status(500).json({ error: err.message });
         else res.status(200).json(result.rows);
       }

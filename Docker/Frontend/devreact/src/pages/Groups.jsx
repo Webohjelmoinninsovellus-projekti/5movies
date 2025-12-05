@@ -76,7 +76,7 @@ export default function Groups() {
             } catch (error) {
               console.error("Error creating group:", error);
               if (error.response?.status === 409) {
-                <p>group name already exist</p>;
+                alert("Group name already exists. Please choose another name.");
               } else if (error.response?.status === 403) {
                 alert("You do not have permission to create a group.");
               }

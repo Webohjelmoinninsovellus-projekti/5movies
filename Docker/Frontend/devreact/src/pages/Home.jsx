@@ -25,11 +25,11 @@ export default function Home() {
 
   return (
     <main>
-      <section class="slider">
+      <section className="slider">
         <SimpleSlider />
       </section>
 
-      <div class="container">
+      <div className="container">
         <Link to="/movies">
           <h2 className="section-title">Movies</h2>
         </Link>
@@ -66,13 +66,13 @@ export default function Home() {
                 </Link>
               </div>
             ))}
-          <div class="slider-title">
+          <div className="slider-title">
             <h2>Now in theaters</h2>
           </div>
         </div>
       </div>
 
-      <section class="slider">
+      <section className="slider">
         <InTheatersSlider />
       </section>
     </main>

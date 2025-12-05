@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../components/AuthContext";
-import { useParams, useLocation } from "react-router";
+import { useParams } from "react-router";
 
 import LoadingElement from "../components/LoadingElement";
 
@@ -15,17 +15,16 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [info, setInfo] = useState([]);
   const [favorites, setFavorites] = useState([]);
-  const [owner, setOwner] = useState(false);
   const [deactivationInputActive, setDeactivationInputActive] = useState(false);
   const [deactivationPassword, setDeactivationPassword] = useState("");
-  const profileAudio = new Audio("/sounds/notification-bell.mp3");
   const [groups, setGroups] = useState([]);
 
   const params = useParams();
 
   const avatar = "http://localhost:5555/uploads/" + info.avatar_url;
 
-  const { user, logout, loadUser } = useContext(AuthContext);
+  const { user, logout } = useContext(AuthContext);
+  const owner = user && info.username === user.username;
 
   const navigate = useNavigate();
 
@@ -37,7 +36,6 @@ export default function Profile() {
 
       if (profileData) {
         setInfo(profileData);
-        console.log(profileData);
       }
 
       const favoritesData = await fetchFavorite(params.username);
@@ -45,7 +43,7 @@ export default function Profile() {
 
       const groupsData = await getUserGroups(params.username);
       if (groupsData) setGroups(groupsData);
-      console.log(groupsData);
+
       setLoading(false);
     })();
   }, [params.username]);
@@ -72,14 +70,6 @@ export default function Profile() {
     }
   };
 
-  useEffect(() => {
-    if (user && info) {
-      setLoading(true);
-      setOwner(user.username === info.username);
-      setLoading(false);
-    }
-  }, [user, info]);
-
   if (loading)
     return (
       <main className="page-wrapper">
@@ -89,21 +79,19 @@ export default function Profile() {
 
   if (!info.username) return <h2>User not found</h2>;
 
-  console.log("This profile's owner: ", owner);
-
   return (
     <main>
       {!loading ? (
-        <div class="container">
-          <section class="profile-section">
-            <div class="avatar">
+        <div className="container">
+          <section className="profile-section">
+            <div className="avatar">
               {avatar ? (
                 <img src={avatar}></img>
               ) : (
                 <img src="/avatars/user.png"></img>
               )}
             </div>
-            <div class="profile-info">
+            <div className="profile-info">
               <h2>{info.username}</h2>
               <p>Joined: {info.datecreated.split("T")[0]}</p>
               <p>{info.desc ? info.desc : ""}</p>
@@ -193,11 +181,11 @@ export default function Profile() {
               )}
             </div>
           </section>
-          <h2 class="section-title">Favorites</h2>
-          <div class="movie-grid">
+          <h2 className="section-title">Favorites</h2>
+          <div className="movie-grid">
             {favorites && favorites.length > 0 ? (
               favorites.map((item) => (
-                <div key={item.movieshowid} class="movie-card">
+                <div key={item.movieshowid} className="movie-card">
                   <Link
                     to={`/${item.ismovie ? "movie" : "tv"}/${item.movieshowid}`}
                     className="movie-card-link"
@@ -208,11 +196,11 @@ export default function Profile() {
                         alt={item.title}
                       />
                     ) : (
-                      <div class="no-poster">No Poster</div>
+                      <div className="no-poster">No Poster</div>
                     )}
-                    <div class="movie-info">
-                      <h3 class="movie-title">{item.title}</h3>
-                      <p class="movie-year">{item.release_year}</p>
+                    <div className="movie-info">
+                      <h3 className="movie-title">{item.title}</h3>
+                      <p className="movie-year">{item.release_year}</p>
                     </div>
                   </Link>
                   {owner && (
@@ -246,25 +234,23 @@ export default function Profile() {
               <p>No favorites added yet.</p>
             )}
           </div>
-          <h2 class="section-title">Groups</h2>
-          <div class="movie-grid">
+          <h2 className="section-title">Groups</h2>
+          <div className="movie-grid">
             {groups && groups.length > 0 ? (
               groups.map((group) => (
-                <div key={group.groupid} class="movie-card">
+                <div key={group.groupid} className="movie-card">
                   <Link to={`/group/${group.name}`} className="movie-card-link">
-                    <div class="group-poster">
-                      {group.avatar_url ? (
+                    <div className="group-poster">
+                      {group.avatar_url && (
                         <img
                           src={`http://localhost:5555/uploads/${group.avatar_url}`}
                           alt={group.name}
                         />
-                      ) : (
-                        <div class="no-poster">{group.name}</div>
                       )}
                     </div>
-                    <div class="movie-info">
-                      <h3 class="movie-title">{group.name}</h3>
-                      <p class="movie-year">{group.count || 0} members</p>
+                    <div className="movie-info">
+                      <h3 className="movie-title">{group.name}</h3>
+                      <p className="movie-year">{group.count || 0} members</p>
                     </div>
                   </Link>
                 </div>

@@ -25,7 +25,6 @@ function SimpleSlider() {
       setLoading(true);
       const results = await fetchPopular();
       setPopulars(results);
-      console.log(results);
       setLoading(false);
     }
 
@@ -33,11 +32,11 @@ function SimpleSlider() {
   }, []);
 
   return (
-    <div class="theater-slider">
+    <div className="theater-slider">
       {loading && <LoadingElement />}
       <Slider {...settings}>
         {populars.map((item) => (
-          <div class="slide">
+          <div className="slide">
             <Link to={`/movie/${item.id}`} reloadDocument={true}>
               <h2>{item.title}</h2>
               <img

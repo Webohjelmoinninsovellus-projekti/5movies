@@ -6,215 +6,143 @@ import path from "path";
 
 const groupRouter = Router();
 
-groupRouter.get("/", (req, res, next) => {
-  pool.query(`SELECT * FROM "group"`, (err, result) => {
-    if (err) res.status(500).json({ error: err.message });
-    else res.status(200).json(result.rows);
-  });
+groupRouter.get("/", verifyToken, (req, res) => {
+  if (req.query.my === "true") {
+    pool.query(
+      `SELECT DISTINCT "group".* 
+       FROM "group"
+       LEFT JOIN user_group ON user_group.group_id = "group".groupid
+       WHERE (user_group.user_id = $1 AND user_group.active = true) OR "group".owner_id = $1
+       ORDER BY "group".name`,
+      [req.user.userid],
+      (err, result) => {
+        if (err) res.status(500).json({ error: err.message });
+        else res.json(result.rows);
+      }
+    );
+  } else {
+    pool.query(`SELECT * FROM "group" ORDER BY name`, (err, result) => {
+      if (err) res.status(500).json({ error: err.message });
+      else res.json(result.rows);
+    });
+  }
+});
+
+groupRouter.get("/:name", async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT "group".*, 
+              (SELECT json_agg(group_item.* ORDER BY dateadded DESC) 
+               FROM group_item 
+               WHERE group_item.groupid = "group".groupid) AS items
+       FROM "group"
+       WHERE name = $1`,
+      [req.params.name]
+    );
+    if (result.rows.length === 0)
+      res.status(404).json({ message: "Group not found" });
+    else res.json(result.rows[0]);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 groupRouter.get("/members/:name", (req, res) => {
-  const { name } = req.params;
-  if (!name) {
-    const error = new Error("Username is required");
-    return next(error);
-  }
   pool.query(
-    `SELECT
-     "user".username,
-     "user".avatar_url
-     FROM
-     "user"
-     INNER JOIN
-     "user_group" ON "user".userid = "user_group".user_id
-     INNER JOIN
-     "group" ON "user_group".group_id = "group".groupid
-     WHERE
-     "group".name = $1
-     ORDER BY
-     ("user".userid = "group".owner_id) DESC,
-     "user".username ASC`,
-    [name],
+    `SELECT "user".username, "user".avatar_url
+     FROM "group"
+     JOIN user_group ON user_group.group_id = "group".groupid
+     JOIN "user" ON "user".userid = user_group.user_id
+     WHERE "group".name = $1
+     ORDER BY ("user".userid = "group".owner_id) DESC, "user".username`,
+    [req.params.name],
     (err, result) => {
       if (err) res.status(500).json({ error: err.message });
-      else res.status(200).json(result.rows);
+      else res.json(result.rows);
     }
   );
 });
 
-groupRouter.get("/:name", async (req, res, next) => {
-  const name = req.params.name;
-  if (!name) {
-    const error = new Error("Group name is required");
-    return next(error);
-  }
-
-  try {
-    const groupResult = await pool.query(
-      `SELECT * FROM "group" WHERE name = $1`,
-      [name]
-    );
-
-    if (groupResult.rows.length === 0) {
-      return res.status(404).json({ message: "Group not found" });
-    }
-
-    const group = groupResult.rows[0];
-
-    const itemsResult = await pool.query(
-      `SELECT * FROM group_item WHERE groupid = $1 ORDER BY dateadded DESC`,
-      [group.groupid]
-    );
-
-    const groupWithItems = {
-      ...group,
-      items: itemsResult.rows,
-    };
-
-    res.status(200).json(groupWithItems);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
 groupRouter.post("/create", verifyToken, async (req, res) => {
   try {
-    const { name, desc } = req.body;
-    const ownerid = req.user.userid;
-
-    const existingGroup = await pool.query(
-      'SELECT * FROM "group" WHERE name = $1',
-      [name]
-    );
-    if (existingGroup.rows.length > 0) {
-      return res.status(409).json({ message: "Group name already exists" });
-    }
-
     const result = await pool.query(
-      'INSERT INTO "group" (name, "desc", owner_id, datecreated, active) VALUES ($1, $2, $3, CURRENT_DATE, true) RETURNING *',
-      [name, desc, ownerid]
+      `INSERT INTO "group" (name, "desc", owner_id, datecreated, active)
+       VALUES ($1, $2, $3, CURRENT_DATE, true)
+       RETURNING *`,
+      [req.body.name, req.body.desc, req.user.userid]
     );
-
-    const groupid = result.rows[0].groupid;
-
     await pool.query(
-      'INSERT INTO "user_group" (user_id, group_id) VALUES ($1, $2)',
-      [ownerid, groupid]
+      `INSERT INTO user_group (user_id, group_id, active)
+       VALUES ($1, $2, true)`,
+      [req.user.userid, result.rows[0].groupid]
     );
-
     res.status(201).json(result.rows[0]);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    if (error.code === "23505")
+      res.status(409).json({ message: "Group name already exists" });
+    else res.status(500).json({ error: error.message });
   }
 });
 
 groupRouter.post("/:name/additem", verifyToken, async (req, res) => {
   try {
-    const groupname = req.params.name;
-    const { movieshowid, ismovie, title, poster_path, release_year } = req.body;
-    const username = req.user.username;
-
-    const groupResult = await pool.query(
-      `SELECT * FROM "group" WHERE name=$1`,
-      [groupname]
-    );
-
-    if (groupResult.rows.length === 0) {
-      return res.status(404).json({ message: "Group not found" });
-    }
-
-    const groupid = groupResult.rows[0].groupid;
-
-    const exists = await pool.query(
-      `SELECT * FROM group_item WHERE groupid=$1 AND movieshowid=$2`,
-      [groupid, movieshowid]
-    );
-    if (exists.rows.length > 0) {
-      return res.status(409).json({ message: "Item already in group" });
-    }
-
     const result = await pool.query(
-      `INSERT INTO group_item 
-       (groupid, movieshowid, ismovie, title, poster_path, release_year)
-       VALUES ($1,$2,$3,$4,$5,$6)
+      `INSERT INTO group_item (groupid, movieshowid, ismovie, title, poster_path, release_year)
+       SELECT "group".groupid, $2, $3, $4, $5, $6
+       FROM "group"
+       WHERE "group".name = $1
+         AND NOT EXISTS (
+           SELECT 1 FROM group_item 
+           WHERE groupid = "group".groupid AND movieshowid = $2
+         )
        RETURNING *`,
-      [groupid, movieshowid, ismovie, title, poster_path, release_year]
+      [
+        req.params.name,
+        req.body.movieshowid,
+        req.body.ismovie,
+        req.body.title,
+        req.body.poster_path,
+        req.body.release_year,
+      ]
     );
-
-    res.status(201).json(result.rows[0]);
+    if (result.rows.length === 0)
+      res.status(409).json({ message: "Item exists or group missing" });
+    else res.status(201).json(result.rows[0]);
   } catch (error) {
-    console.error(error);
     res.status(500).json({ error: error.message });
   }
 });
 
 groupRouter.post("/:name/removeitem", verifyToken, async (req, res) => {
   try {
-    const groupname = req.params.name;
-    const { movieshowid } = req.body;
-    const username = req.user.username;
-
-    const groupResult = await pool.query(
-      `SELECT * FROM "group" WHERE name=$1`,
-      [groupname]
-    );
-
-    if (groupResult.rows.length === 0) {
-      return res.status(404).json({ message: "Group not found" });
-    }
-
-    const group = groupResult.rows[0];
-
-    if (group.owner_id !== req.user.userid) {
-      return res
-        .status(403)
-        .json({ message: "Only group owner can remove items" });
-    }
-
     const result = await pool.query(
-      `DELETE FROM group_item WHERE groupid=$1 AND movieshowid=$2 RETURNING *`,
-      [group.groupid, movieshowid]
+      `DELETE FROM group_item
+       USING "group"
+       WHERE "group".groupid = group_item.groupid
+         AND "group".name = $1
+         AND "group".owner_id = $2
+         AND group_item.movieshowid = $3
+       RETURNING group_item.*`,
+      [req.params.name, req.user.userid, req.body.movieshowid]
     );
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ message: "Item not found in group" });
-    }
-
-    res
-      .status(200)
-      .json({ message: "Item removed successfully", item: result.rows[0] });
+    if (result.rows.length === 0)
+      res.status(403).json({ message: "Not allowed or not found" });
+    else res.json({ message: "Item removed", item: result.rows[0] });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ error: error.message });
   }
 });
 
+const whitelist = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/");
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, "group-" + uniqueSuffix + path.extname(file.originalname));
-  },
-});
-
-const upload = multer({
-  storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = /jpeg|jpg|png|gif/;
-    const extname = allowedTypes.test(
-      path.extname(file.originalname).toLowerCase()
-    );
-    const mimetype = allowedTypes.test(file.mimetype);
-
-    if (mimetype && extname) {
-      return cb(null, true);
-    }
-    cb(new Error("Only image files are allowed"));
+  destination: (req, file, cb) => cb(null, process.cwd() + "/uploads"),
+  filename: (req, file, cb) => {
+    if (whitelist.includes(file.mimetype))
+      cb(null, "group-" + Date.now() + path.extname(file.originalname));
+    else cb(new Error("Invalid file"));
   },
 });
+const upload = multer({ storage });
 
 groupRouter.post(
   "/:name/avatar",
@@ -222,219 +150,152 @@ groupRouter.post(
   upload.single("avatar"),
   async (req, res) => {
     try {
-      const { name } = req.params;
-      const userid = req.user.userid;
-
-      if (!req.file) {
-        return res.status(400).json({ message: "No file uploaded" });
+      if (!req.file) res.status(400).json({ message: "No file uploaded" });
+      else {
+        const result = await pool.query(
+          `UPDATE "group" SET avatar_url = $1 WHERE name = $2 AND owner_id = $3 RETURNING *`,
+          [req.file.filename, req.params.name, req.user.userid]
+        );
+        if (result.rows.length === 0)
+          res.status(403).json({ message: "Not allowed" });
+        else res.json(result.rows[0]);
       }
-
-      const groupResult = await pool.query(
-        `SELECT * FROM "group" WHERE name = $1`,
-        [name]
-      );
-
-      if (groupResult.rows.length === 0) {
-        return res.status(404).json({ message: "Group not found" });
-      }
-
-      const group = groupResult.rows[0];
-
-      if (group.owner_id !== userid) {
-        return res
-          .status(403)
-          .json({ message: "Only group owner can change avatar" });
-      }
-
-      const result = await pool.query(
-        `UPDATE "group" SET avatar_url = $1 WHERE name = $2 RETURNING *`,
-        [req.file.filename, name]
-      );
-
-      res.status(200).json(result.rows[0]);
     } catch (error) {
-      console.error(error);
       res.status(500).json({ error: error.message });
     }
   }
 );
 
-groupRouter.post("/:name/leave", verifyToken, async (req, res) => {
-  try {
-    const { name } = req.params;
-    const userid = req.user.userid;
-
-    const groupResult = await pool.query(
-      `SELECT * FROM "group" WHERE name = $1`,
-      [name]
-    );
-
-    if (groupResult.rows.length === 0) {
-      return res.status(404).json({ message: "Group not found" });
-    }
-
-    const group = groupResult.rows[0];
-
-    if (group.owner_id === userid) {
-      return res.status(403).json({
-        message: "Owner cannot leave the group. Delete the group instead.",
-      });
-    }
-
-    const memberCheck = await pool.query(
-      `SELECT * FROM user_group WHERE user_id = $1 AND group_id = $2`,
-      [userid, group.groupid]
-    );
-
-    if (memberCheck.rows.length === 0) {
-      return res
-        .status(404)
-        .json({ message: "You are not a member of this group" });
-    }
-
-    await pool.query(
-      `DELETE FROM user_group WHERE user_id = $1 AND group_id = $2`,
-      [userid, group.groupid]
-    );
-
-    res.status(200).json({ message: "Successfully left the group" });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
 groupRouter.delete("/:name", verifyToken, async (req, res) => {
   try {
-    const { name } = req.params;
-    const userid = req.user.userid;
-
-    const groupResult = await pool.query(
-      `SELECT * FROM "group" WHERE name = $1`,
-      [name]
+    const result = await pool.query(
+      `DELETE FROM "group" WHERE name = $1 AND owner_id = $2 RETURNING *`,
+      [req.params.name, req.user.userid]
     );
-
-    if (groupResult.rows.length === 0) {
-      return res.status(404).json({ message: "Group not found" });
-    }
-
-    const group = groupResult.rows[0];
-
-    if (group.owner_id !== userid) {
-      return res.status(403).json({
-        message: "Only group owner can delete the group",
-      });
-    }
-
-    await pool.query(`DELETE FROM group_item WHERE groupid = $1`, [
-      group.groupid,
-    ]);
-    await pool.query(`DELETE FROM user_group WHERE group_id = $1`, [
-      group.groupid,
-    ]);
-
-    await pool.query(`DELETE FROM "group" WHERE groupid = $1`, [group.groupid]);
-
-    res.status(200).json({ message: "Group deleted successfully" });
+    if (result.rows.length === 0)
+      res.status(403).json({ message: "Not allowed or not found" });
+    else res.json({ message: "Group deleted" });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ error: error.message });
   }
 });
 
-groupRouter.post("/group/:groupId/request", async (req, res) => {
-  const userId = req.user.id;
-  const groupId = req.params.groupId;
-
-  const [existing] = await db.query(
-    "SELECT * FROM user_group WHERE user_id = ? AND group_id = ?",
-    [userId, groupId]
-  );
-
-  if (rows.length > 0) {
-    if (rows[0].active === 1) {
-      return res.json({ message: "already_member" });
-    } else {
-      return res.json({ message: "already_requested" });
-    }
-  }
-
-  await db.query(
-    "INSERT INTO user_group (user_id, group_id, active) VALUES (?, ?, false)",
-    [userId, groupId]
-  );
-
-  res.json({ message: "request_sent" });
-});
-
-groupRouter.post("/group/:groupId/approve/:userId", async (req, res) => {
-  const groupId = req.params.groupId;
-  const userId = req.params.userId;
-
-  await db.query(
-    "UPDATE user_group SET active = true WHERE user_id = ? AND group_id = ?",
-    [userId, groupId]
-  );
-
-  res.json({ message: "approved" });
-});
-
-groupRouter.get("/group/:groupId/requests", async (req, res) => {
-  const groupId = req.params.groupId;
-
-  const requests = await db.query(
-    `
-    SELECT user_group.user_id, users.username
-    FROM user_group
-    JOIN users ON users.id = user_group.user_id
-    WHERE user_group.group_id = ? AND user_group.active = false
-  `,
-    [groupId]
-  );
-
-  res.json(requests);
-});
-
-// Lisää ENNEN "export default groupRouter;"
-groupRouter.post("/:name/request", verifyToken, async (req, res) => {
+groupRouter.post("/join/:groupid", verifyToken, async (req, res) => {
   try {
-    const { name } = req.params;
-    const userid = req.user.userid;
-
-    const groupResult = await pool.query(
-      `SELECT * FROM "group" WHERE name = $1`,
-      [name]
+    const check = await pool.query(
+      `SELECT groupid, 
+              (SELECT COUNT(*) FROM user_group WHERE user_id=$2 AND group_id=$1) AS is_member,
+              (SELECT COUNT(*) FROM group_join_request WHERE user_id=$2 AND group_id=$1 AND status='pending') AS has_request
+       FROM "group" 
+       WHERE groupid=$1`,
+      [parseInt(req.params.groupid), req.user.userid]
     );
-
-    if (groupResult.rows.length === 0) {
-      return res.status(404).json({ message: "Group not found" });
+    if (check.rows.length === 0)
+      res.status(404).json({ message: "Group not found" });
+    else if (check.rows[0].is_member > 0)
+      res.status(409).json({ message: "Already a member" });
+    else if (check.rows[0].has_request > 0)
+      res.status(409).json({ message: "Request already sent" });
+    else {
+      const result = await pool.query(
+        `INSERT INTO group_join_request (user_id, group_id, status) VALUES ($1,$2,'pending') RETURNING *`,
+        [req.user.userid, parseInt(req.params.groupid)]
+      );
+      res
+        .status(201)
+        .json({ message: "Join request sent", request: result.rows[0] });
     }
-
-    const group = groupResult.rows[0];
-
-    // Tarkista onko käyttäjä jo ryhmässä tai pyytänyt
-    const existing = await pool.query(
-      `SELECT * FROM user_group WHERE user_id = $1 AND group_id = $2`,
-      [userid, group.groupid]
-    );
-
-    if (existing.rows.length > 0) {
-      if (existing.rows[0].active === true) {
-        return res.status(409).json({ message: "You are already a member" });
-      } else {
-        return res.status(409).json({ message: "Request already sent" });
-      }
-    }
-
-    // Luo uusi liittymispyyntö (active = false)
-    await pool.query(
-      `INSERT INTO user_group (user_id, group_id, active) VALUES ($1, $2, false)`,
-      [userid, group.groupid]
-    );
-
-    res.status(201).json({ message: "Join request sent successfully" });
   } catch (error) {
-    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+groupRouter.get("/requests/:groupid", verifyToken, async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT group_join_request.*, "user".username, "user".avatar_url
+       FROM group_join_request
+       JOIN "group" ON "group".groupid = group_join_request.group_id
+       JOIN "user" ON "user".userid = group_join_request.user_id
+       WHERE group_join_request.group_id=$1 AND "group".owner_id=$2 AND group_join_request.status='pending'
+       ORDER BY group_join_request.request_date DESC`,
+      [parseInt(req.params.groupid), req.user.userid]
+    );
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+groupRouter.post("/accept/:requestid", verifyToken, async (req, res) => {
+  try {
+    const result = await pool.query(
+      `WITH updated AS (
+        UPDATE group_join_request SET status='accepted', response_date=CURRENT_TIMESTAMP
+        WHERE requestid=$1 AND status='pending'
+        RETURNING user_id, group_id
+      )
+      INSERT INTO user_group (user_id, group_id, active)
+      SELECT user_id, group_id, true FROM updated
+      RETURNING *`,
+      [parseInt(req.params.requestid)]
+    );
+    if (result.rows.length === 0)
+      res.status(403).json({ message: "Not allowed or request processed" });
+    else res.json({ message: "Request accepted", added: result.rows });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+groupRouter.post("/reject/:requestid", verifyToken, async (req, res) => {
+  try {
+    const result = await pool.query(
+      `UPDATE group_join_request SET status='rejected', response_date=CURRENT_TIMESTAMP
+       WHERE requestid=$1 AND status='pending'
+       RETURNING *`,
+      [parseInt(req.params.requestid)]
+    );
+    if (result.rows.length === 0)
+      res.status(403).json({ message: "Not allowed or request processed" });
+    else res.json({ message: "Request rejected", request: result.rows[0] });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+groupRouter.get("/my-requests", verifyToken, async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT group_join_request.*, "group".name AS group_name, "group".avatar_url AS group_avatar
+       FROM group_join_request
+       JOIN "group" ON "group".groupid = group_join_request.group_id
+       WHERE group_join_request.user_id=$1
+       ORDER BY group_join_request.request_date DESC`,
+      [req.user.userid]
+    );
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+groupRouter.post("/:name/leave", verifyToken, async (req, res) => {
+  try {
+    const result = await pool.query(
+      `DELETE FROM user_group
+       USING "group"
+       WHERE "group".groupid = user_group.group_id
+         AND "group".name=$1
+         AND user_group.user_id=$2
+         AND "group".owner_id<>$2
+       RETURNING user_group.*`,
+      [req.params.name, req.user.userid]
+    );
+    if (result.rows.length === 0)
+      res.status(403).json({ message: "Cannot leave group or not a member" });
+    else res.json({ message: "Left group successfully" });
+  } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });

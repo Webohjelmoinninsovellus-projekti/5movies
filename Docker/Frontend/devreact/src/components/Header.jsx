@@ -74,7 +74,7 @@ export default function Header() {
           <Link to="/groups">Groups</Link>
         </nav>
       </div>
-      <div class="search-box">
+      <div className="search-box">
         <input
           // tabIndex="-1"
           type="text"
@@ -86,14 +86,14 @@ export default function Header() {
         {user ? (
           <Link to={`/profile/${user.username}`}>
             {user.avatar ? (
-              <img class="user-icon" src={`${avatar + user.avatar}`}></img>
+              <img className="user-icon" src={`${avatar + user.avatar}`}></img>
             ) : (
-              <img class="user-icon" src="/avatars/user.png"></img>
+              <img className="user-icon" src="/avatars/user.png"></img>
             )}
           </Link>
         ) : (
           <Link to="/login">
-            <img class="user-icon" src="/avatars/user.png"></img>
+            <img className="user-icon" src="/avatars/user.png"></img>
           </Link>
         )}
 

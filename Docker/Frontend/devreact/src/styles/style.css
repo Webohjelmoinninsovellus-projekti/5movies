@@ -43,10 +43,12 @@ img.logo {
   width: 50px;
   height: 54px;
 }
+
 nav {
   display: flex;
   gap: 10px;
 }
+
 nav a {
   background: #b30000;
   padding: 6px 18px;
@@ -100,12 +102,15 @@ nav a:hover {
   transition: background-color 0.2s ease;
   border-color: #b30000;
 }
+
 .dropdown-item:hover {
   background-color: #333;
 }
+
 .dropdown-item.active {
   background: #e20c0c;
 }
+
 .user-icon {
   width: 35px;
   height: 35px;
@@ -128,7 +133,7 @@ nav a:hover {
 }
 
 .red-button:hover {
-  background: rgba(208, 0, 0, 0.547);
+  background: #d00000;
 }
 
 .avatar-upload-form {
@@ -147,6 +152,7 @@ nav a:hover {
   text-align: center;
   justify-content: center;
 }
+
 .theater-slider {
   width: 100%;
   overflow: hidden;
@@ -206,6 +212,7 @@ a:active {
   grid-template-columns: repeat(4, 1fr);
   gap: 15px;
 }
+
 .card {
   background: #111;
   height: 250px;
@@ -213,6 +220,7 @@ a:active {
   overflow: hidden;
   filter: brightness(70%);
 }
+
 .card img {
   width: 120%;
   height: 120%;
@@ -238,6 +246,7 @@ a:active {
   text-align: center;
   margin-top: 120px;
 }
+
 .login-wrapper h2 {
   font-size: 42px;
   margin-bottom: 25px;
@@ -255,6 +264,7 @@ a:active {
   color: white;
   font-size: 16px;
 }
+
 .login-box button {
   width: 150px;
   margin-top: 10px;
@@ -266,6 +276,7 @@ a:active {
   font-size: 16px;
   cursor: pointer;
 }
+
 .login-box button:hover {
   background: #d00000;
 }
@@ -275,6 +286,7 @@ a:active {
   font-size: 14px;
   text-align: center;
 }
+
 .login-extra a {
   color: #d00000;
   text-decoration: none;
@@ -287,6 +299,7 @@ a:active {
   margin-top: 120px;
   padding-bottom: 60px;
 }
+
 .info-card {
   background: rgba(0, 0, 0, 0.65);
   border: 1px solid #333;
@@ -295,10 +308,12 @@ a:active {
   border-radius: 12px;
   text-align: center;
 }
+
 .social-icons img {
   width: 60px;
   margin: 8px;
 }
+
 .qr img {
   width: 150px;
 }
@@ -311,10 +326,12 @@ a:active {
   text-align: center;
   border-radius: 12px;
 }
+
 .form-card h2 {
   font-size: 32px;
   margin-bottom: 18px;
 }
+
 .form-card input,
 .form-card textarea {
   width: 260px;
@@ -326,6 +343,7 @@ a:active {
   background: #111;
   color: white;
 }
+
 .form-card button {
   background: #b30000;
   color: #fff;
@@ -336,6 +354,7 @@ a:active {
   cursor: pointer;
   font-size: 16px;
 }
+
 .form-card button:hover {
   background: #d00000;
 }
@@ -413,8 +432,53 @@ a:active {
   border-radius: 15px;
   cursor: pointer;
 }
+
 .group-card button:hover {
   background: #d00000;
+}
+
+.group-requests {
+  margin-top: 10px;
+  padding: 15px;
+  background: #1a1a1a;
+  border-radius: 8px;
+}
+
+.member-block {
+  padding-bottom: 10px;
+}
+
+.member {
+  padding: 5px;
+  padding-top: 10px;
+}
+
+.requests-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.request-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  background: #111;
+  border: 2px solid #333;
+  border-radius: 8px;
+}
+
+.request-card img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+
+.request-card button {
+  margin-left: auto;
+  margin-right: 5px;
 }
 
 .profile-section {
@@ -424,6 +488,7 @@ a:active {
   margin-top: 120px;
   flex-wrap: wrap;
 }
+
 .avatar {
   width: 180px;
   height: 180px;
@@ -434,6 +499,10 @@ a:active {
   width: 32px;
   height: 32px;
   border-radius: 50%;
+}
+
+.review-text {
+  overflow-wrap: anywhere;
 }
 
 .avatar img {
@@ -448,6 +517,7 @@ a:active {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -461,20 +531,24 @@ a:active {
 .profile-info {
   flex: 1;
 }
+
 .profile-info h2 {
   font-size: 42px;
   margin-bottom: 10px;
 }
+
 .profile-info p {
   margin-bottom: 8px;
   line-height: 1.5;
   color: #ccc;
 }
+
 .settings-container {
   position: relative;
   display: inline-block;
   margin-top: 10px;
 }
+
 .settings-btn {
   background: #b30000;
   border: none;
@@ -484,6 +558,7 @@ a:active {
   cursor: pointer;
   font-size: 16px;
 }
+
 .settings-dropdown {
   display: none;
   flex-direction: column;
@@ -495,6 +570,7 @@ a:active {
   z-index: 10;
   border-radius: 6px;
 }
+
 .settings-dropdown button {
   background: none;
   border: none;
@@ -503,6 +579,7 @@ a:active {
   text-align: left;
   cursor: pointer;
 }
+
 .settings-dropdown button:hover {
   background: #b30000;
 }
@@ -512,12 +589,14 @@ a:active {
   font-size: 35px;
   text-shadow: 3px 3px 5px black;
 }
+
 .card-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 15px;
   margin-top: 15px;
 }
+
 .card {
   background: #111;
   border: 2px solid #333;
@@ -535,6 +614,7 @@ a:active {
   gap: 12px;
   margin-top: 15px;
 }
+
 .movie-card {
   background: #111;
   border: 2px solid #333;
@@ -546,11 +626,13 @@ a:active {
   overflow: hidden;
   position: relative;
 }
+
 .movie-card img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
+
 .movie-card .no-poster {
   width: 100%;
   height: 100%;
@@ -558,6 +640,7 @@ a:active {
   justify-content: center;
   align-items: center;
 }
+
 .movie-card .movie-info {
   position: absolute;
   bottom: 0;
@@ -566,6 +649,7 @@ a:active {
   background: rgba(0, 0, 0, 0.8);
   padding: 8px;
 }
+
 .movie-card .movie-title {
   font-size: 12px;
   margin: 0;
@@ -574,16 +658,19 @@ a:active {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 .movie-card .movie-year {
   font-size: 10px;
   margin: 2px 0 0 0;
   color: #999;
 }
+
 .movie-card-link {
   display: block;
   width: 100%;
   height: 100%;
 }
+
 .favorite-remove-btn {
   position: absolute;
   bottom: 8px;
@@ -598,16 +685,19 @@ a:active {
   z-index: 10;
   transition: all 0.2s;
 }
+
 .favorite-remove-btn:hover {
   background-color: #ff4444;
   color: white;
 }
+
 .activity-list {
   margin-top: 20px;
   list-style: none;
   color: #ccc;
   font-size: 14px;
 }
+
 .activity-list li {
   padding: 6px 0;
   border-bottom: 1px solid #333;
@@ -619,6 +709,7 @@ a:active {
   gap: 30px;
   margin-top: 40px;
 }
+
 .group-img {
   width: 100%;
   height: 250px;
@@ -630,10 +721,12 @@ a:active {
   font-size: 22px;
   color: #999;
 }
+
 .btn-red {
   background: #b30000;
   color: #fff;
   border: none;
+  font-size: 15px;
   border-radius: 6px;
   padding: 10px 15px;
   margin-top: 15px;
@@ -689,9 +782,11 @@ footer a {
   nav {
     display: none;
   }
+
   .slider {
     height: 250px;
   }
+
   .category-row,
   .media-row {
     grid-template-columns: 1fr;
@@ -703,13 +798,16 @@ footer a {
   .media-row {
     grid-template-columns: repeat(2, 1fr);
   }
+
   .slider {
     height: 300px;
   }
+
   .section-title {
     font-size: 28px;
   }
 }
+
 #story {
   resize: none;
 }
