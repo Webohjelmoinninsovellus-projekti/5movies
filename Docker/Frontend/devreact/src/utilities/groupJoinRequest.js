@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const url = "http://localhost:5555";
+const url = import.meta.env.VITE_IP;
 
 export const sendJoinRequest = async (groupid) => {
   try {

@@ -5,6 +5,8 @@ import {
   rejectRequest,
 } from "../utilities/groupJoinRequest";
 
+const url = import.meta.env.VITE_IP;
+
 export default function GroupRequests({ groupid }) {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -66,7 +68,7 @@ export default function GroupRequests({ groupid }) {
             <img
               src={
                 req.avatar_url
-                  ? `http://localhost:5555/uploads/${req.avatar_url}`
+                  ? `${url}/uploads/${req.avatar_url}`
                   : "/avatars/user.png"
               }
               alt={req.username}

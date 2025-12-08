@@ -29,6 +29,7 @@ export default function Group() {
   const [message, setMessage] = useState("");
 
   const params = useParams();
+  const url = import.meta.env.VITE_IP;
 
   const { user, logout } = useContext(AuthContext);
 
@@ -124,7 +125,7 @@ export default function Group() {
           <div className="group-img">
             {info.avatar_url ? (
               <img
-                src={`http://localhost:5555/uploads/${info.avatar_url}`}
+                src={`${url}/uploads/${info.avatar_url}`}
                 alt={info.name}
                 style={{
                   width: "100%",
@@ -244,7 +245,7 @@ export default function Group() {
                 className="review-avatar"
                 src={
                   members[0].avatar_url
-                    ? "http://localhost:5555/uploads/" + members[0].avatar_url
+                    ? url + "/uploads/" + members[0].avatar_url
                     : "/avatars/user.png"
                 }
               />
@@ -262,7 +263,7 @@ export default function Group() {
                       className="review-avatar"
                       src={
                         member.avatar_url
-                          ? "http://localhost:5555/uploads/" + member.avatar_url
+                          ? url + "/uploads/" + member.avatar_url
                           : "/avatars/user.png"
                       }
                     ></img>

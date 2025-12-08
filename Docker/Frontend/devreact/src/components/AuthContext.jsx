@@ -3,12 +3,14 @@ import axios from "axios";
 
 export const AuthContext = createContext(null);
 
+const url = import.meta.env.VITE_IP;
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
 
   async function loadUser() {
     try {
-      const response = await axios.get("http://localhost:5555/user/me", {
+      const response = await axios.get(`${url}/user/me`, {
         withCredentials: true,
       });
       setUser(response.data);
@@ -20,11 +22,7 @@ export function AuthProvider({ children }) {
 
   async function logout() {
     try {
-      await axios.post(
-        "http://localhost:5555/user/logout",
-        {},
-        { withCredentials: true }
-      );
+      await axios.post(`${url}/user/logout`, {}, { withCredentials: true });
     } catch (error) {
       console.error("Logout failed:", error);
     }
