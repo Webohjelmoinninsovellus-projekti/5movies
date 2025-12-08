@@ -6,7 +6,7 @@ import path from "path";
 
 const groupRouter = Router();
 
-groupRouter.get("/", verifyToken, (req, res) => {
+groupRouter.get("/", (req, res) => {
   if (req.query.my === "true") {
     pool.query(
       `SELECT DISTINCT "group".* 

@@ -164,11 +164,21 @@ export default function Group() {
             <button className="btn-red" onClick={handleLeaveGroup}>
               {message ? <p>{message}</p> : "Leave Group"}
             </button>
-          ) : !isMember ? (
-            <button className="btn-red" onClick={handleJoinRequest}>
-              {message ? <p>{message}</p> : "Join Group"}
-            </button>
-          ) : null}
+          ) : (
+            user &&
+            !isMember && (
+              <button className="btn-red" onClick={handleJoinRequest}>
+                {message ? <p>{message}</p> : "Join Group"}
+              </button>
+            )
+          )}
+          {!user && (
+            <Link to="/login">
+              <button className="btn-red">
+                {message ? <p>{message}</p> : "Join Group"}
+              </button>
+            </Link>
+          )}
         </div>
 
         <div className="group-info">
