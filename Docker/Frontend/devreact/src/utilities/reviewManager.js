@@ -1,5 +1,7 @@
 import axios from "axios";
 
+const url = import.meta.env.VITE_IP;
+
 async function fetchReviews(type, id) {
   try {
     const mediaType = type === "/mo" ? "movie" : "tv";
@@ -9,7 +11,7 @@ async function fetchReviews(type, id) {
       headers: {
         accept: "application/json",
       },
-      url: `http://localhost:5555/review/${mediaType}/${id}`,
+      url: `${url}/review/${mediaType}/${id}`,
     });
 
     if (response) return response.data;
@@ -22,7 +24,7 @@ async function fetchReviews(type, id) {
 async function sendReview(ismovie, comment, movieshowid, rating) {
   try {
     const response = await axios.post(
-      "http://localhost:5555/review/add",
+      `${url}/review/add`,
       {
         ismovie,
         comment,

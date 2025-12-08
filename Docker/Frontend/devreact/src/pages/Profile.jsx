@@ -21,7 +21,8 @@ export default function Profile() {
 
   const params = useParams();
 
-  const avatar = "http://localhost:5555/uploads/" + info.avatar_url;
+  const url = import.meta.env.VITE_IP;
+  const avatar = url + "/uploads/" + info.avatar_url;
 
   const { user, logout } = useContext(AuthContext);
   const owner = user && info.username === user.username;
@@ -243,7 +244,7 @@ export default function Profile() {
                     <div className="group-poster">
                       {group.avatar_url && (
                         <img
-                          src={`http://localhost:5555/uploads/${group.avatar_url}`}
+                          src={`${url}/uploads/${group.avatar_url}`}
                           alt={group.name}
                         />
                       )}

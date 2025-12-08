@@ -29,6 +29,8 @@ export default function Info() {
   const params = useParams();
   const type = useLocation().pathname.slice(0, 3);
 
+  const url = import.meta.env.VITE_IP;
+
   const location = useLocation();
 
   const totalStars = 5;
@@ -361,10 +363,7 @@ export default function Info() {
                           {item.avatar_url ? (
                             <img
                               className="review-avatar"
-                              src={
-                                "http://localhost:5555/uploads/" +
-                                item.avatar_url
-                              }
+                              src={url + "/uploads/" + item.avatar_url}
                             ></img>
                           ) : (
                             <img

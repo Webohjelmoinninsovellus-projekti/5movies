@@ -1,5 +1,7 @@
 import axios from "axios";
 
+const url = import.meta.env.VITE_IP;
+
 async function fetchFavorite(username) {
   try {
     const response = await axios({
@@ -7,7 +9,7 @@ async function fetchFavorite(username) {
       headers: {
         accept: "application/json",
       },
-      url: `http://localhost:5555/favorite/${username}`,
+      url: `${url}/favorite/${username}`,
     });
 
     if (response) return response.data;
@@ -26,7 +28,7 @@ async function favoriteSender(
 ) {
   try {
     const response = await axios.post(
-      "http://localhost:5555/favorite/add",
+      `${url}/favorite/add`,
       {
         ismovie,
         movieshowid,
@@ -48,7 +50,7 @@ async function favoriteRemover(movieshowid) {
   try {
     const response = await axios({
       method: "delete",
-      url: `http://localhost:5555/favorite/remove/${movieshowid}`,
+      url: `${url}/favorite/remove/${movieshowid}`,
       withCredentials: true,
     });
 

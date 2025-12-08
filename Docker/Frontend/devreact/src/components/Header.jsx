@@ -12,7 +12,8 @@ export default function Header() {
   const [cursor, setCursor] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  const avatar = "http://localhost:5555/uploads/";
+  const url = import.meta.env.VITE_IP;
+  const avatar = url + "/uploads/";
 
   useEffect(() => {
     if (query.length === 0) {
@@ -23,7 +24,7 @@ export default function Header() {
     setLoading(true);
     const timeout = setTimeout(() => {
       axios
-        .get(`http://localhost:5555/tmdb/search/${query}`)
+        .get(`${url}/tmdb/search/${query}`)
         .then((response) => {
           setResults(response.data.results.slice(0, 5));
         })

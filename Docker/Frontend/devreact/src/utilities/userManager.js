@@ -3,11 +3,13 @@ import { useContext } from "react";
 import { Navigate } from "react-router-dom";
 import { AuthContext } from "../components/AuthContext";
 
+const url = import.meta.env.VITE_IP;
+
 async function login(usernameInput, passwordInput) {
   try {
     const inputUser = { username: usernameInput, password: passwordInput };
     const response = await axios.post(
-      `http://localhost:5555/user/login`,
+      `${url}/user/login`,
       {
         user: inputUser,
       },
@@ -26,7 +28,7 @@ async function login(usernameInput, passwordInput) {
 async function register(usernameInput, passwordInput) {
   try {
     const inputUser = { username: usernameInput, password: passwordInput };
-    const response = await axios.post("http://localhost:5555/user/register", {
+    const response = await axios.post(`${url}/user/register`, {
       user: inputUser,
     });
 
@@ -44,7 +46,7 @@ async function deactivate(username, password) {
   try {
     const user = { username: username, password: password };
 
-    const response = await axios.put("http://localhost:5555/user/deactivate", {
+    const response = await axios.put(`${url}/user/deactivate`, {
       user: user,
     });
 
