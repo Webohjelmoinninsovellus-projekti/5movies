@@ -36,28 +36,26 @@ userRouter.get("/me", verifyToken, (req, res) => {
 
         res.status(200).json({
           username: req.user.username,
-          avatar: result.rows[0].avatar_url,
+          avatar: result.rows[0].avatar_path,
         });
       }
     );
   } else {
-    res.status(401).json({ message: "Not authenticated" });
+    res.status(401).json({ message: "Not authenticated." });
   }
 });
 
 userRouter.get("/:username/groups", (req, res) => {
   const { username } = req.params;
   if (!username) {
-    const error = new Error("Username is required");
+    const error = new Error("Username is required.");
     return next(error);
   }
   pool.query(
-    `SELECT "group".name, "group".id_group, (
-    SELECT COUNT("user_group".user_id) FROM "user_group" WHERE "user_group".group_id = "group".id_group
-    )
-     FROM "group"
-     INNER JOIN user_group ON "group".id_group = user_group.group_id
+    `SELECT "group".name, "group".id_group, (SELECT COUNT("user_group".user_id) FROM "user_group" WHERE "user_group".group_id = "group".id_group)
+     FROM user_group
      INNER JOIN "user" ON user_group.user_id = "user".id_user
+     INNER JOIN "group" ON user_group.group_id = "group".id_group
      WHERE "user".username = $1`,
     [username],
     (err, result) => {
@@ -70,7 +68,7 @@ userRouter.get("/:username/groups", (req, res) => {
 userRouter.get("/:username", (req, res, next) => {
   const username = req.params.username;
   if (!username) {
-    const error = new Error("Username is required");
+    const error = new Error("Username is required.");
     return next(error);
   }
 
@@ -93,13 +91,13 @@ userRouter.post("/logout", (req, res) => {
 
   console.log(req.cookies);
 
-  res.status(200).json({ message: "Logged out" });
+  res.status(200).json({ message: "Logged out." });
 });
 
 userRouter.post("/register", (req, res, next) => {
   const { user } = req.body;
   if (!user || !user.username || !user.password) {
-    const error = new Error("Username and password are required");
+    const error = new Error("Username and password are required.");
     return next(error);
   } else {
     hash(user.password, 10, (err, hashedPassword) => {
@@ -130,12 +128,12 @@ userRouter.post("/login", (req, res, next) => {
   }
 
   pool.query(
-    `SELECT username, password, deactivation_date FROM "user" WHERE username = $1`,
+    `SELECT id_user, username, password, deactivation_date FROM "user" WHERE username = $1`,
     [user.username],
     (err, result) => {
       if (err) return next(err);
       if (result.rows.length === 0) {
-        const error = new Error("User not found");
+        const error = new Error("User not found.");
         error.status = 404;
         return next(error);
       }
@@ -145,14 +143,13 @@ userRouter.post("/login", (req, res, next) => {
       compare(user.password, dbUser.password, (err, isMatch) => {
         if (err) return next(err);
         else if (!isMatch) {
-          const error = new Error("Invalid password");
+          const error = new Error("Invalid password.");
           error.status = 401;
           return next(error);
         } else {
           const accessToken = jwt.sign(
             {
               username: dbUser.username,
-              id_user: dbUser.id_user,
             },
             SECRET_KEY,
             { expiresIn: "30m" }

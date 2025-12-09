@@ -12,7 +12,8 @@ export default function Header() {
   const [cursor, setCursor] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  const avatar = "http://localhost:5555/uploads/";
+  const url = import.meta.env.VITE_IP;
+  const avatar = url + "/uploads/";
 
   useEffect(() => {
     if (query.length === 0) {
@@ -23,7 +24,7 @@ export default function Header() {
     setLoading(true);
     const timeout = setTimeout(() => {
       axios
-        .get(`http://localhost:5555/tmdb/search/${query}`)
+        .get(`${url}/tmdb/search/${query}`)
         .then((response) => {
           setResults(response.data.results.slice(0, 5));
         })
@@ -74,7 +75,7 @@ export default function Header() {
           <Link to="/groups">Groups</Link>
         </nav>
       </div>
-      <div class="search-box">
+      <div className="search-box">
         <input
           // tabIndex="-1"
           type="text"
@@ -86,14 +87,14 @@ export default function Header() {
         {user ? (
           <Link to={`/profile/${user.username}`}>
             {user.avatar ? (
-              <img class="user-icon" src={`${avatar + user.avatar}`}></img>
+              <img className="user-icon" src={`${avatar + user.avatar}`}></img>
             ) : (
-              <img class="user-icon" src="/avatars/user.png"></img>
+              <img className="user-icon" src="/avatars/user.png"></img>
             )}
           </Link>
         ) : (
           <Link to="/login">
-            <img class="user-icon" src="/avatars/user.png"></img>
+            <img className="user-icon" src="/avatars/user.png"></img>
           </Link>
         )}
 

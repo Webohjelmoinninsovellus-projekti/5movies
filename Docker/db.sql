@@ -6,15 +6,15 @@ CREATE TABLE "user"(
     bio varchar(256),
     date_created date DEFAULT CURRENT_DATE NOT NULL,
     avatar_path varchar(256),
-    deactivation_date boolean DEFAULT NULL
+    deactivation_date date DEFAULT NULL
 );
 
 ALTER TABLE "user" OWNER TO test;
 
 CREATE TABLE user_review(
     id_review integer GENERATED ALWAYS AS IDENTITY (MINVALUE 0) CONSTRAINT id_review_pk PRIMARY KEY,
-    is_movie boolean NOT NULL,
-    item_id integer NOT NULL,
+    type boolean NOT NULL,
+    tmdb_id integer NOT NULL,
     rating integer NOT NULL,
     comment char(1024),
     date_created date DEFAULT CURRENT_DATE NOT NULL,
@@ -25,9 +25,9 @@ ALTER TABLE user_review OWNER TO test;
 
 CREATE TABLE user_favourite(
     id_favorite integer GENERATED ALWAYS AS IDENTITY (MINVALUE 0),
-    is_movie boolean DEFAULT TRUE NOT NULL,
-    item_id integer NOT NULL,
-    item_title varchar(256),
+    type boolean DEFAULT TRUE NOT NULL,
+    tmdb_id integer NOT NULL,
+    title varchar(256),
     date_added date DEFAULT CURRENT_DATE NOT NULL,
     release_year integer,
     poster_path varchar(256),
@@ -59,9 +59,9 @@ ALTER TABLE user_group OWNER TO test;
 
 CREATE TABLE group_item(
     id_group_item serial PRIMARY KEY,
-    is_movie boolean NOT NULL,
-    item_id integer NOT NULL,
-    item_title varchar(256) NOT NULL,
+    type boolean NOT NULL,
+    tmdb_id integer NOT NULL,
+    title varchar(256) NOT NULL,
     poster_path varchar(256),
     release_year integer,
     date_added timestamp DEFAULT CURRENT_TIMESTAMP,

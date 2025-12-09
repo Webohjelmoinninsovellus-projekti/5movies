@@ -1,12 +1,13 @@
 import axios from "axios";
-import { useContext } from "react";
 import { Navigate } from "react-router-dom";
 import { AuthContext } from "../components/AuthContext";
+
+const url = import.meta.env.VITE_IP;
 
 async function register(usernameInput, passwordInput) {
   try {
     const inputUser = { username: usernameInput, password: passwordInput };
-    const response = await axios.post("http://localhost:5555/user/register", {
+    const response = await axios.post(`${url}/user/register`, {
       user: inputUser,
     });
 
@@ -24,7 +25,7 @@ async function login(usernameInput, passwordInput) {
   try {
     const inputUser = { username: usernameInput, password: passwordInput };
     const response = await axios.post(
-      `http://localhost:5555/user/login`,
+      `${url}/user/login`,
       {
         user: inputUser,
       },
@@ -42,10 +43,9 @@ async function login(usernameInput, passwordInput) {
 
 async function getProfile(username) {
   try {
-    const response = await axios.get(`http://localhost:5555/user/${username}`, {
+    const response = await axios.get(`${url}/user/${username}`, {
       withCredentials: true,
     });
-
     if (response) return response.data;
   } catch (error) {
     console.error("Error fetching profile:", error);
@@ -53,11 +53,11 @@ async function getProfile(username) {
   }
 }
 
-async function deactivate(username, password) {
+async function deactivate(username, passwordInput) {
   try {
-    const user = { username: username, password: password };
+    const user = { username: username, password: passwordInput };
 
-    const response = await axios.put("http://localhost:5555/user/deactivate", {
+    const response = await axios.put(`${url}/user/deactivate`, {
       user: user,
     });
 

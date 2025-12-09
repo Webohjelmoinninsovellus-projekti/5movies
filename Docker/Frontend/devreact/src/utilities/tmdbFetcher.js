@@ -1,12 +1,14 @@
 import axios from "axios";
 
+const url = import.meta.env.VITE_IP;
+
 async function fetchItemData(type, id) {
   try {
     const mediaType = type === "/mo" ? "movie" : "tv";
 
     const response = await axios({
       method: "get",
-      url: `http://localhost:5555/tmdb/info/${mediaType}/${id}`,
+      url: `${url}/tmdb/info/${mediaType}/${id}`,
     });
 
     if (response) return response.data;
@@ -20,7 +22,7 @@ async function fetchDiscovery(type, pageId) {
   try {
     const response = await axios({
       method: "get",
-      url: `http://localhost:5555/tmdb/discovery/${type}/${pageId}`,
+      url: `${url}/tmdb/discovery/${type}/${pageId}`,
     });
 
     return response.data.results;
@@ -34,7 +36,7 @@ async function fetchPopular() {
   try {
     const response = await axios({
       method: "get",
-      url: "http://localhost:5555/tmdb/popular",
+      url: `${url}/tmdb/popular`,
     });
 
     if (response) return response.data.results;
@@ -48,7 +50,7 @@ async function inTheatersData() {
   try {
     const response = await axios({
       method: "get",
-      url: "http://localhost:5555/tmdb/in_theaters",
+      url: `${url}/tmdb/in-theaters`,
     });
 
     return response.data.results;
