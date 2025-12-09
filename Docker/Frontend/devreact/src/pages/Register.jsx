@@ -70,9 +70,7 @@ export default function Register() {
                     const data = await login(username, password);
 
                     if (data) {
-                      setMessage(
-                        "Registration successful! You can now log in."
-                      );
+                      setMessage("Registration successful!");
                       await loadUser();
                       confetti();
                       wonAudio.play();

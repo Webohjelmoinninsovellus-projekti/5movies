@@ -42,7 +42,7 @@ avatarRouter.post(
 
       if (!whitelist.includes(meta.mime)) {
         await fs.unlink(req.file.path);
-        res.status(400).json({ message: "Invalid file" });
+        res.status(400).json({ message: "Invalid file." });
       } else {
         console.log(req.file);
 
@@ -55,7 +55,7 @@ avatarRouter.post(
                 "Database error during avatar update:",
                 err.message
               );
-              res.status(500).json({ error: "Failed to update database" });
+              res.status(500).json({ error: "Failed to update database." });
             }
 
             res.status(200).json({

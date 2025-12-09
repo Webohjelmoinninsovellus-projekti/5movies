@@ -24,14 +24,6 @@ export default function Info() {
   const [favoriteError, setFavoriteError] = useState("");
   const [favoriteRemoved, setFavoriteRemoved] = useState(false);
 
-  const { user } = useContext(AuthContext);
-
-  const params = useParams();
-  const type = useLocation().pathname.slice(0, 3);
-
-  const location = useLocation();
-
-  const totalStars = 5;
   const [groupName, setGroupName] = useState("");
   const [groupError, setGroupError] = useState("");
   const [movieAdded, setMovieAdded] = useState(false);
@@ -39,9 +31,18 @@ export default function Info() {
   const [groups, setGroups] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState("");
 
+  const { user } = useContext(AuthContext);
+
+  const params = useParams();
+  const location = useLocation();
+  const type = useLocation().pathname.slice(0, 3);
+
+  const url = import.meta.env.VITE_IP;
+
+  const totalStars = 5;
+
   const handleClick = async (value) => {
     setRating(value);
-    if (onRate) onRate(value);
   };
 
   useEffect(() => {
@@ -55,7 +56,7 @@ export default function Info() {
       if (reviewsData) setReviews(reviewsData);
 
       if (user) {
-        const userGroups = await getGroups();
+        const userGroups = await getGroups(true);
         if (userGroups) setGroups(userGroups);
       }
 
@@ -144,18 +145,12 @@ export default function Info() {
                       rating,
                       comment
                     );
+
                     const reviewsData = await fetchReviews(type, params.id);
                     if (reviewsData) setReviews(reviewsData);
 
                     setComment("");
                     setRating(0);
-
-                    /* if (data) {
-                    navigate(`/Info/${data.comment}`);
-                  } */
-
-                    // TODO : update reviews automatically after submitting review
-                    //setReviews(reviews + [])
                   }}
                 >
                   Submit Review
@@ -214,7 +209,7 @@ export default function Info() {
                   >
                     <option value="">Select a group</option>
                     {groups.map((group) => (
-                      <option key={group.groupid} value={group.name}>
+                      <option key={group.id_group} value={group.name}>
                         {group.name}
                       </option>
                     ))}
@@ -231,11 +226,11 @@ export default function Info() {
 
                       try {
                         await addItem(selectedGroup, {
-                          movieshowid: info.id,
-                          ismovie: type === "/mo" ? true : false,
+                          type: type === "/mo" ? true : false,
+                          tmdbId: info.id,
                           title: type === "/mo" ? info.title : info.name,
-                          poster_path: info.poster_path,
-                          release_year: parseInt(
+                          posterPath: info.poster_path,
+                          releaseYear: parseInt(
                             (type === "/mo"
                               ? info.release_date
                               : info.first_air_date
@@ -342,6 +337,7 @@ export default function Info() {
                 >
                   {reviews.map((item) => (
                     <div
+                      key={item.username}
                       style={{
                         display: "flex",
                         flexDirection: "column",
@@ -349,11 +345,14 @@ export default function Info() {
                         padding: "0.6rem",
                         border: "0.1rem solid red",
                         borderRadius: "10px",
-                        width: "33%",
+                        width: "100%",
                         flexWrap: "wrap",
                       }}
                     >
-                      <Link to={`/profile/${item.username}`}>
+                      <Link
+                        key={item.username}
+                        to={`/profile/${item.username}`}
+                      >
                         <div
                           style={{
                             display: "flex",
@@ -362,13 +361,10 @@ export default function Info() {
                             gap: "8px",
                           }}
                         >
-                          {item.avatar_url ? (
+                          {item.avatar_path ? (
                             <img
                               className="review-avatar"
-                              src={
-                                "http://localhost:5555/uploads/" +
-                                item.avatar_url
-                              }
+                              src={url + "/uploads/" + item.avatar_path}
                             ></img>
                           ) : (
                             <img
@@ -380,8 +376,8 @@ export default function Info() {
                         </div>
                       </Link>
                       <h3>{item.rating}/5</h3>
-                      <p>{item.comment}</p>
-                      <p>{item.date.slice(0, 10)}</p>
+                      <p className="review-text">{item.comment}</p>
+                      <p>{item.date_created.slice(0, 10)}</p>
                     </div>
                   ))}
                 </div>

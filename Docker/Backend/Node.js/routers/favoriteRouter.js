@@ -8,7 +8,7 @@ favoriteRouter.get("/:username", async (req, res) => {
   const { username } = req.params;
 
   pool.query(
-    `SELECT user_favourite.is_movie, user_favourite.item_id, user_favourite.item_title, user_favourite.date_added, user_favourite.release_year, user_favourite.poster_path
+    `SELECT user_favourite.type, user_favourite.tmdb_id, user_favourite.title, user_favourite.date_added, user_favourite.release_year, user_favourite.poster_path
     FROM user_favourite
     INNER JOIN "user" ON user_favourite.user_id = "user".id_user
     WHERE "user".username = $1 AND "user".deactivation_date IS NULL
@@ -23,14 +23,12 @@ favoriteRouter.get("/:username", async (req, res) => {
 
 favoriteRouter.post("/add", verifyToken, async (req, res) => {
   try {
-    const { isMovie, itemId, itemTitle, releaseYear, posterPath } = req.body;
-    const userId = req.user.user_id;
+    const { type, tmdbId, title, releaseYear, posterPath } = req.body;
+    const userId = req.user.userid;
 
     const existing = await pool.query(
-      `
-      SELECT * FROM user_favourite
-      WHERE item_id = $1 AND user_id = $2`,
-      [itemId, userId]
+      `SELECT * FROM user_favourite WHERE tmdb_id = $1 AND user_id = $2`,
+      [tmdbId, userId]
     );
 
     if (existing.rows.length > 0) {
@@ -40,10 +38,10 @@ favoriteRouter.post("/add", verifyToken, async (req, res) => {
     }
 
     const { rows } = await pool.query(
-      `INSERT INTO user_favourite (is_movie, item_id, item_title, poster_path, release_year, user_id)
+      `INSERT INTO user_favourite (type, tmdb_id, title, poster_path, release_year, user_id)
       VALUES ($1, $2, $3, $4, $5, $6)
         RETURNING *`,
-      [isMovie, itemId, itemTitle, posterPath, releaseYear, userId]
+      [type, tmdbId, title, posterPath, releaseYear, userId]
     );
     res.status(201).json({
       message: "Added item to favorites successfully.",
@@ -55,7 +53,7 @@ favoriteRouter.post("/add", verifyToken, async (req, res) => {
   }
 });
 
-favoriteRouter.delete("/remove/:item_id", verifyToken, async (req, res) => {
+favoriteRouter.delete("/remove/:itemId", verifyToken, async (req, res) => {
   try {
     const { itemId } = req.params;
     const userId = req.user.userid;
@@ -63,10 +61,7 @@ favoriteRouter.delete("/remove/:item_id", verifyToken, async (req, res) => {
     console.log("Removing item from favorites:", { userId, itemId });
 
     const { rows } = await pool.query(
-      `
-      DELETE FROM user_favourite
-      WHERE item_id = $1 AND user_id = $2
-      RETURNING *`,
+      `DELETE FROM user_favourite WHERE tmdb_id = $1 AND user_id = $2 RETURNING *`,
       [parseInt(itemId), userId]
     );
 

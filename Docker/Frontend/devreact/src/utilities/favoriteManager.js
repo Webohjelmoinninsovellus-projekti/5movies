@@ -1,5 +1,7 @@
 import axios from "axios";
 
+const url = import.meta.env.VITE_IP;
+
 async function fetchFavorite(username) {
   try {
     const response = await axios({
@@ -7,7 +9,7 @@ async function fetchFavorite(username) {
       headers: {
         accept: "application/json",
       },
-      url: `http://localhost:5555/favorite/${username}`,
+      url: `${url}/favorite/${username}`,
     });
 
     if (response) return response.data;
@@ -17,20 +19,14 @@ async function fetchFavorite(username) {
   }
 }
 
-async function favoriteSender(
-  isMovie,
-  itemId,
-  itemTitle,
-  releaseYear,
-  posterPath
-) {
+async function favoriteSender(type, tmdbId, title, releaseYear, posterPath) {
   try {
     const response = await axios.post(
-      "http://localhost:5555/favorite/add",
+      `${url}/favorite/add`,
       {
-        isMovie,
-        itemId,
-        itemTitle,
+        type,
+        tmdbId,
+        title,
         releaseYear,
         posterPath,
       },
@@ -44,11 +40,12 @@ async function favoriteSender(
   }
 }
 
-async function favoriteRemover(itemId) {
+// BUG: removes item despite not knowing type
+async function favoriteRemover(tmdbId) {
   try {
     const response = await axios({
       method: "delete",
-      url: `http://localhost:5555/favorite/remove/${itemId}`,
+      url: `${url}/favorite/remove/${tmdbId}`,
       withCredentials: true,
     });
 

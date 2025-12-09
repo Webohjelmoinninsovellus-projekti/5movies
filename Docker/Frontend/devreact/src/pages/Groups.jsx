@@ -76,7 +76,7 @@ export default function Groups() {
             } catch (error) {
               console.error("Error creating group:", error);
               if (error.response?.status === 409) {
-                <p>group name already exist</p>;
+                alert("Group name already exists. Please choose another name.");
               } else if (error.response?.status === 403) {
                 alert("You do not have permission to create a group.");
               }
@@ -106,7 +106,7 @@ export default function Groups() {
             )
             //.filter((info, index) => index < 1)
             .map((group) => (
-              <Link key={group.groupid} to={`/group/${group.name}`}>
+              <Link key={group.id_group} to={`/group/${group.name}`}>
                 <button className="group-card">{group.name}</button>
               </Link>
             ))}
