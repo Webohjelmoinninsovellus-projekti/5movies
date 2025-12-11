@@ -14,7 +14,7 @@ const userRouter = Router();
 
 cron.schedule("* 14 * * *", async () => {
   pool.query(
-    "DELETE FROM public.user WHERE active = false AND CURRENT_DATE - deactivation_date >= 1",
+    `DELETE FROM "user" WHERE CURRENT_DATE - deactivation_date >= 1`,
     (err, result) => {
       if (err) console.log(err);
       else console.log(result);
@@ -111,7 +111,7 @@ userRouter.post("/register", (req, res, next) => {
             else
               res
                 .status(201)
-                .json({ id: result.rows[0].id, username: user.username });
+                .json({ id: result.rows[0].id_user, username: user.username });
           }
         );
       }
@@ -150,6 +150,7 @@ userRouter.post("/login", (req, res, next) => {
           const accessToken = jwt.sign(
             {
               username: dbUser.username,
+              user_id: dbUser.id_user,
             },
             SECRET_KEY,
             { expiresIn: "30m" }

@@ -24,7 +24,7 @@ favoriteRouter.get("/:username", async (req, res) => {
 favoriteRouter.post("/add", verifyToken, async (req, res) => {
   try {
     const { type, tmdbId, title, releaseYear, posterPath } = req.body;
-    const userId = req.user.userid;
+    const userId = req.user.user_id;
 
     const existing = await pool.query(
       `SELECT * FROM user_favourite WHERE tmdb_id = $1 AND user_id = $2`,
@@ -45,7 +45,7 @@ favoriteRouter.post("/add", verifyToken, async (req, res) => {
     );
     res.status(201).json({
       message: "Added item to favorites successfully.",
-      favoriteId: rows[0].id,
+      favoriteId: rows[0].id_favorite,
     });
   } catch (error) {
     console.error("Error while adding to favorites:", error);
@@ -56,7 +56,7 @@ favoriteRouter.post("/add", verifyToken, async (req, res) => {
 favoriteRouter.delete("/remove/:itemId", verifyToken, async (req, res) => {
   try {
     const { itemId } = req.params;
-    const userId = req.user.userid;
+    const userId = req.user.user_id;
 
     console.log("Removing item from favorites:", { userId, itemId });
 
@@ -73,7 +73,7 @@ favoriteRouter.delete("/remove/:itemId", verifyToken, async (req, res) => {
 
     res.status(200).json({
       message: "Item successfully removed from favorites.",
-      favoriteId: rows[0].id,
+      favoriteId: rows[0].id_favorite,
     });
   } catch (error) {
     console.error("Error while removing item from favorites:", error);
