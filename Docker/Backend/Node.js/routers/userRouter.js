@@ -150,6 +150,7 @@ userRouter.post("/login", (req, res, next) => {
           const accessToken = jwt.sign(
             {
               username: dbUser.username,
+              user_id: dbUser.id_user,
             },
             SECRET_KEY,
             { expiresIn: "30m" }

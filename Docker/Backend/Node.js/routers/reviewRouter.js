@@ -26,7 +26,7 @@ reviewRouter.get("/:type/:id", async (req, res) => {
 reviewRouter.post("/add", verifyToken, async (req, res) => {
   try {
     const { type, tmdbId, rating, comment } = req.body;
-    const userId = req.user.userid;
+    const userId = req.user.user_id;
 
     if (rating > 5 || rating < 0)
       throw new Error("Rating is outside of allowed range.");
