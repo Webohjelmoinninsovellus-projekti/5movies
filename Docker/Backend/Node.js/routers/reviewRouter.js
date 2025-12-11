@@ -13,6 +13,7 @@ reviewRouter.get("/:type/:id", async (req, res) => {
       FROM user_review
       INNER JOIN "user" ON user_review.user_id = "user".id_user
       WHERE "user".deactivation_date IS NULL AND user_review.type = $1 AND user_review.tmdb_id = $2
+      WHERE "user".deactivation_date IS NULL AND user_review.type = $1 AND user_review.tmdb_id = $2
       ORDER BY user_review.id_review DESC LIMIT 6`,
       [type === "movie" ? true : false, id],
       (err, result) => {
@@ -33,9 +34,20 @@ reviewRouter.post("/add", verifyToken, async (req, res) => {
     else {
       pool.query(
         `INSERT INTO user_review (type, tmdb_id, rating, comment, user_id)
+      pool.query(
+        `INSERT INTO user_review (type, tmdb_id, rating, comment, user_id)
         SELECT $1, $2, $3, $4, $5
         WHERE NOT EXISTS (SELECT 1 FROM user_review WHERE type = $1 AND tmdb_id = $2 AND user_id = $5)
+        WHERE NOT EXISTS (SELECT 1 FROM user_review WHERE type = $1 AND tmdb_id = $2 AND user_id = $5)
       `,
+        [type, tmdbId, rating, comment, userId],
+        (err, result) => {
+          if (result)
+            res.status(201).json({
+              message: "Review saved successfully.",
+            });
+        }
+      );
         [type, tmdbId, rating, comment, userId],
         (err, result) => {
           if (result)
@@ -47,6 +59,7 @@ reviewRouter.post("/add", verifyToken, async (req, res) => {
     }
   } catch (error) {
     console.error("Error while saving review:", error);
+    res.status(500).json({ message: "Internal server error." });
     res.status(500).json({ message: "Internal server error." });
   }
 });

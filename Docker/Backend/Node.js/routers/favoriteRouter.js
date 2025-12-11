@@ -49,7 +49,7 @@ favoriteRouter.post("/add", verifyToken, async (req, res) => {
     });
   } catch (error) {
     console.error("Error while adding to favorites:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: "Internal server error." });
   }
 });
 
