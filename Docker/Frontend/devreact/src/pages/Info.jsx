@@ -71,332 +71,327 @@ export default function Info() {
   return (
     <main>
       {!loading ? (
-        <div id="movieCard">
-          <a
-            href={`https://image.tmdb.org/t/p/original${info.poster_path}`}
-            target="_blank"
-          >
-            <img
-              className="info-img"
-              src={`https://image.tmdb.org/t/p/w400${info.poster_path}`}
-              alt={`${type === "/mo" ? info.title : info.name} poster`}
-            />
-          </a>
-          <div id="movieText">
-            <div id="movieHeader">
-              <a href={info.homepage} target="_blank">
-                <h2>{type === "/mo" ? info.title : info.name}</h2>
-              </a>
-              <p>
-                {(type === "/mo"
-                  ? info.release_date
-                  : info.first_air_date
-                ).slice(0, 4)}
-              </p>
-              {type === "/mo" ? (
-                <p>{info.runtime} min</p>
-              ) : (
+        <>
+          <div id="movieCard">
+            <a
+              href={`https://image.tmdb.org/t/p/original${info.poster_path}`}
+              target="_blank"
+            >
+              <img
+                className="info-img"
+                src={`https://image.tmdb.org/t/p/w400${info.poster_path}`}
+                alt={`${type === "/mo" ? info.title : info.name} poster`}
+              />
+            </a>
+            <div id="movieText">
+              <div id="movieHeader">
+                <a href={info.homepage} target="_blank">
+                  <h2>{type === "/mo" ? info.title : info.name}</h2>
+                </a>
+                <p>
+                  {(type === "/mo"
+                    ? info.release_date
+                    : info.first_air_date
+                  ).slice(0, 4)}
+                </p>
+                {type === "/mo" ? (
+                  <p>{info.runtime} min</p>
+                ) : (
+                  <>
+                    <p>• {info.number_of_seasons} seasons</p>
+                    <p>• {info.number_of_episodes} episodes</p>
+                  </>
+                )}
+                <p>• {Number(info.vote_average.toFixed(2))} / 10</p>
+                {<p>• [{info.genres.map((genre) => ` ${genre.name} `)}]</p>}
+              </div>
+              <p>{info.overview}</p>
+              {user && (
                 <>
-                  <p>• {info.number_of_seasons} seasons</p>
-                  <p>• {info.number_of_episodes} episodes</p>
-                </>
-              )}
-              <p>• {Number(info.vote_average.toFixed(2))} / 10</p>
-              {<p>• [{info.genres.map((genre) => ` ${genre.name} `)}]</p>}
-            </div>
-            <p>{info.overview}</p>
-            {user && (
-              <>
-                <div
-                  style={{
-                    display: "flex",
-                    cursor: "pointer",
-                    gap: "5px",
-                    fontSize: "32px",
-                  }}
-                >
-                  {Array.from({ length: totalStars }, (_, i) => {
-                    const value = i + 1;
-                    return (
-                      <span
-                        key={value}
-                        onClick={() => handleClick(value)}
-                        onMouseEnter={() => setHover(value)}
-                        onMouseLeave={() => setHover(0)}
-                        style={{
-                          color:
-                            value <= (hover || rating) ? "#eb1919ff" : "#ccc",
-                          transition: "0.3s",
-                        }}
-                      >
-                        ★
-                      </span>
-                    );
-                  })}
-                </div>
-                <input
-                  type="text"
-                  placeholder="Write your review here..."
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                  style={{
-                    width: "300px",
-                    height: "50px",
-                    fontSize: "15px",
-                    marginTop: "10px",
-                  }}
-                />
-                <button
-                  className="red-button"
-                  onClick={async () => {
-                    await sendReview(
-                      type === "/mo" ? true : false,
-                      info.id,
-                      rating,
-                      comment
-                    );
-
-                    const reviewsData = await fetchReviews(type, params.id);
-                    if (reviewsData) setReviews(reviewsData);
-
-                    setComment("");
-                    setRating(0);
-                  }}
-                >
-                  Submit Review
-                </button>
-                <button
-                  className="red-button"
-                  onClick={async () => {
-                    if (favoriteAdded) return;
-
-                    try {
-                      await favoriteSender(
-                        type === "/mo" ? true : false,
-                        info.id,
-                        type === "/mo" ? info.title : info.name,
-                        parseInt(
-                          (type === "/mo"
-                            ? info.release_date
-                            : info.first_air_date
-                          ).slice(0, 4)
-                        ),
-                        info.poster_path
-                      );
-                      setFavoriteAdded(true);
-                      setFavoriteRemoved(false);
-                      setFavoriteError("");
-                    } catch (error) {
-                      console.error("Failed to add favorite:", error);
-                      if (
-                        error.response?.status === 409 ||
-                        error.response?.data?.message?.includes("duplicate")
-                      ) {
-                        setFavoriteError("Already added to favorites!");
-                      } else {
-                        setFavoriteError(
-                          "Failed to add to favorites. Please try again."
-                        );
-                      }
-                      setTimeout(() => setFavoriteError(""), 3000);
-                    }
-                  }}
-                  disabled={favoriteAdded}
-                  style={{
-                    opacity: favoriteAdded ? 0.6 : 1,
-                    cursor: favoriteAdded ? "not-allowed" : "pointer",
-                    marginRight: "10px",
-                  }}
-                >
-                  {favoriteAdded ? "✓ Added to favorites" : "Add to favorites"}
-                </button>
-
-                <div>
-                  <select
-                    className="red-button"
-                    value={selectedGroup}
-                    onChange={(e) => setSelectedGroup(e.target.value)}
+                  <div
+                    style={{
+                      display: "flex",
+                      cursor: "pointer",
+                      gap: "5px",
+                      fontSize: "32px",
+                    }}
                   >
-                    <option value="">Select a group</option>
-                    {groups.map((group) => (
-                      <option key={group.id_group} value={group.name}>
-                        {group.name}
-                      </option>
-                    ))}
-                  </select>
-
+                    {Array.from({ length: totalStars }, (_, i) => {
+                      const value = i + 1;
+                      return (
+                        <span
+                          key={value}
+                          onClick={() => handleClick(value)}
+                          onMouseEnter={() => setHover(value)}
+                          onMouseLeave={() => setHover(0)}
+                          style={{
+                            color:
+                              value <= (hover || rating) ? "#eb1919ff" : "#ccc",
+                            transition: "0.3s",
+                          }}
+                        >
+                          ★
+                        </span>
+                      );
+                    })}
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Write your review here..."
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    style={{
+                      width: "300px",
+                      height: "50px",
+                      fontSize: "15px",
+                      marginTop: "10px",
+                    }}
+                  />
                   <button
                     className="red-button"
                     onClick={async () => {
-                      if (!selectedGroup) {
-                        setGroupError("Please select a group first!");
-                        setTimeout(() => setGroupError(""), 3000);
-                        return;
-                      }
+                      await sendReview(
+                        type === "/mo" ? true : false,
+                        info.id,
+                        rating,
+                        comment
+                      );
+
+                      const reviewsData = await fetchReviews(type, params.id);
+                      if (reviewsData) setReviews(reviewsData);
+
+                      setComment("");
+                      setRating(0);
+                    }}
+                  >
+                    Submit Review
+                  </button>
+                  <button
+                    className="red-button"
+                    onClick={async () => {
+                      if (favoriteAdded) return;
 
                       try {
-                        await addItem(selectedGroup, {
-                          type: type === "/mo" ? true : false,
-                          tmdbId: info.id,
-                          title: type === "/mo" ? info.title : info.name,
-                          posterPath: info.poster_path,
-                          releaseYear: parseInt(
+                        await favoriteSender(
+                          type === "/mo" ? true : false,
+                          info.id,
+                          type === "/mo" ? info.title : info.name,
+                          parseInt(
                             (type === "/mo"
                               ? info.release_date
                               : info.first_air_date
                             ).slice(0, 4)
                           ),
-                        });
-
-                        setMovieAdded(true);
-                        setMovieRemoved(false);
-                        setGroupError("");
-
-                        setTimeout(() => setMovieAdded(false), 3000);
+                          info.poster_path
+                        );
+                        setFavoriteAdded(true);
+                        setFavoriteRemoved(false);
+                        setFavoriteError("");
                       } catch (error) {
-                        console.error("Failed to add to group:", error);
-
-                        if (error.response?.status === 409) {
-                          setGroupError("Already added to this group!");
+                        console.error("Failed to add favorite:", error);
+                        if (
+                          error.response?.status === 409 ||
+                          error.response?.data?.message?.includes("duplicate")
+                        ) {
+                          setFavoriteError("Already added to favorites!");
                         } else {
-                          setGroupError(
-                            "Failed to add to group. Please try again."
+                          setFavoriteError(
+                            "Failed to add to favorites. Please try again."
                           );
                         }
-                        setTimeout(() => setGroupError(""), 3000);
+                        setTimeout(() => setFavoriteError(""), 3000);
                       }
                     }}
-                    disabled={!selectedGroup}
+                    disabled={favoriteAdded}
                     style={{
-                      opacity: !selectedGroup ? 0.6 : 1,
-                      cursor: !selectedGroup ? "not-allowed" : "pointer",
+                      opacity: favoriteAdded ? 0.6 : 1,
+                      cursor: favoriteAdded ? "not-allowed" : "pointer",
+                      marginRight: "10px",
                     }}
                   >
-                    Add to group
+                    {favoriteAdded
+                      ? "✓ Added to favorites"
+                      : "Add to favorites"}
                   </button>
-                </div>
 
-                {movieAdded && !movieRemoved && (
-                  <p
-                    style={{
-                      color: "#4CAF50",
-                      marginTop: "10px",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    ✓ Successfully added to the group!
-                  </p>
-                )}
+                  <div>
+                    <select
+                      className="red-button"
+                      value={selectedGroup}
+                      onChange={(e) => setSelectedGroup(e.target.value)}
+                    >
+                      <option value="">Select a group</option>
+                      {groups.map((group) => (
+                        <option key={group.id_group} value={group.name}>
+                          {group.name}
+                        </option>
+                      ))}
+                    </select>
 
-                {groupError && (
-                  <p
-                    style={{
-                      color: "#ff6b6b",
-                      marginTop: "10px",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {groupError}
-                  </p>
-                )}
+                    <button
+                      className="red-button"
+                      onClick={async () => {
+                        if (!selectedGroup) {
+                          setGroupError("Please select a group first!");
+                          setTimeout(() => setGroupError(""), 3000);
+                          return;
+                        }
 
-                {favoriteAdded && !favoriteRemoved && (
-                  <p
-                    style={{
-                      color: "#4CAF50",
-                      marginTop: "10px",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    ✓ Successfully added to your favorites!
-                  </p>
-                )}
-                {favoriteRemoved && (
-                  <p
-                    style={{
-                      color: "#ff9800",
-                      marginTop: "10px",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    ✓ Removed from your favorites!
-                  </p>
-                )}
-                {favoriteError && (
-                  <p
-                    style={{
-                      color: "#ff6b6b",
-                      marginTop: "10px",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {favoriteError}
-                  </p>
-                )}
-              </>
-            )}
-            <div>
-              <h2>Reviews</h2>
-              {reviews.length > 0 ? (
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    gap: "1rem",
-                  }}
-                >
-                  {reviews.map((item) => (
-                    <div
-                      key={item.username}
+                        try {
+                          await addItem(selectedGroup, {
+                            type: type === "/mo" ? true : false,
+                            tmdbId: info.id,
+                            title: type === "/mo" ? info.title : info.name,
+                            posterPath: info.poster_path,
+                            releaseYear: parseInt(
+                              (type === "/mo"
+                                ? info.release_date
+                                : info.first_air_date
+                              ).slice(0, 4)
+                            ),
+                          });
+
+                          setMovieAdded(true);
+                          setMovieRemoved(false);
+                          setGroupError("");
+
+                          setTimeout(() => setMovieAdded(false), 3000);
+                        } catch (error) {
+                          console.error("Failed to add to group:", error);
+
+                          if (error.response?.status === 409) {
+                            setGroupError("Already added to this group!");
+                          } else {
+                            setGroupError(
+                              "Failed to add to group. Please try again."
+                            );
+                          }
+                          setTimeout(() => setGroupError(""), 3000);
+                        }
+                      }}
+                      disabled={!selectedGroup}
                       style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "1rem",
-                        padding: "0.6rem",
-                        border: "0.1rem solid red",
-                        borderRadius: "10px",
-                        width: "100%",
-                        flexWrap: "wrap",
+                        opacity: !selectedGroup ? 0.6 : 1,
+                        cursor: !selectedGroup ? "not-allowed" : "pointer",
                       }}
                     >
-                      <Link
-                        key={item.username}
-                        to={`/profile/${item.username}`}
-                      >
-                        <div
-                          style={{
-                            display: "flex",
-                            flexDirection: "row",
-                            alignItems: "center",
-                            gap: "8px",
-                          }}
-                        >
-                          {item.avatar_path ? (
-                            <img
-                              className="review-avatar"
-                              src={url + "/uploads/" + item.avatar_path}
-                            ></img>
-                          ) : (
-                            <img
-                              className="review-avatar"
-                              src={"/avatars/user.png"}
-                            ></img>
-                          )}
-                          <h3>{item.username}</h3>
-                        </div>
-                      </Link>
-                      <h3>{item.rating}/5</h3>
-                      <p className="review-text">{item.comment}</p>
-                      <p>{item.date_created.slice(0, 10)}</p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p>No reviews.</p>
+                      Add to group
+                    </button>
+                  </div>
+
+                  {movieAdded && !movieRemoved && (
+                    <p
+                      style={{
+                        color: "#4CAF50",
+                        marginTop: "10px",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      ✓ Successfully added to the group!
+                    </p>
+                  )}
+
+                  {groupError && (
+                    <p
+                      style={{
+                        color: "#ff6b6b",
+                        marginTop: "10px",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {groupError}
+                    </p>
+                  )}
+
+                  {favoriteAdded && !favoriteRemoved && (
+                    <p
+                      style={{
+                        color: "#4CAF50",
+                        marginTop: "10px",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      ✓ Successfully added to your favorites!
+                    </p>
+                  )}
+                  {favoriteRemoved && (
+                    <p
+                      style={{
+                        color: "#ff9800",
+                        marginTop: "10px",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      ✓ Removed from your favorites!
+                    </p>
+                  )}
+                  {favoriteError && (
+                    <p
+                      style={{
+                        color: "#ff6b6b",
+                        marginTop: "10px",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {favoriteError}
+                    </p>
+                  )}
+                </>
               )}
             </div>
           </div>
-        </div>
+          <div style={{ margin: "1rem" }}>
+            <h2>Reviews</h2>
+            {reviews.length > 0 ? (
+              <div
+                style={{
+                  display: "flex",
+                  flexFlow: "row wrap",
+                  gap: "1rem",
+                }}
+              >
+                {reviews.map((item) => (
+                  <div
+                    key={item.username}
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "1rem",
+                      width: "100%",
+                      padding: "0.6rem",
+                      border: "0.1rem solid red",
+                      borderRadius: "10px",
+                    }}
+                  >
+                    <Link key={item.username} to={`/profile/${item.username}`}>
+                      <div className="member">
+                        {item.avatar_path ? (
+                          <img
+                            loading="lazy"
+                            className="review-avatar"
+                            src={url + "/uploads/" + item.avatar_path}
+                          ></img>
+                        ) : (
+                          <img
+                            loading="lazy"
+                            className="review-avatar"
+                            src={"/avatars/user.png"}
+                          ></img>
+                        )}
+                        <h3>{item.username}</h3>
+                      </div>
+                    </Link>
+                    <h3>{item.rating}/5</h3>
+                    <p className="review-text">{item.comment}</p>
+                    <p>{item.date_created.slice(0, 10)}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p>No reviews.</p>
+            )}
+          </div>
+        </>
       ) : (
         <LoadingElement />
       )}

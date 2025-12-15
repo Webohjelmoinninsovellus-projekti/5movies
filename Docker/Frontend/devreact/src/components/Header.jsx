@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useRef } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { AuthContext } from "./AuthContext";
@@ -11,11 +11,16 @@ export default function Header() {
   const [results, setResults] = useState([]);
   const [cursor, setCursor] = useState(0);
   const [loading, setLoading] = useState(false);
-
+  //tässäki testaan sitä hakukentän settiä
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  //tähä asti
   const url = import.meta.env.VITE_IP;
   const avatar = url + "/uploads/";
 
-  useEffect(() => {
+  const searchBoxRef = useRef(null);
+
+  /*useEffect(() => {
     if (query.length === 0) {
       setResults([]);
       setLoading(false);
@@ -26,7 +31,12 @@ export default function Header() {
       axios
         .get(`${url}/tmdb/search/${query}`)
         .then((response) => {
-          setResults(response.data.results.slice(0, 5));
+          setResults(
+            response.data.results.filter(
+              (result) =>
+                result.media_type !== "person" && result.poster_path !== null
+            )
+          );
         })
         .catch((error) => {
           console.error("Error fetching search results:", error);
@@ -38,6 +48,46 @@ export default function Header() {
     }, 200);
     return () => clearTimeout(timeout);
   }, [query]);
+  vanha use effect jos tuo mun uus ei kelepaa:) */
+
+  //tässä lisää eeron hakukenttä sekoilua
+  useEffect(() => {
+    setResults([]);
+    setPage(1);
+    setHasMore(true);
+    setLoading(false);
+  }, [query]);
+  //tässä loppuu
+
+  useEffect(() => {
+    if (query.length === 0) {
+      setResults([]);
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    const timeout = setTimeout(() => {
+      axios
+        .get(`${url}/tmdb/search/${query}?page=${page}`)
+        .then((response) => {
+          const filtered = response.data.results.filter(
+            (r) => r.media_type !== "person" && r.poster_path
+          );
+
+          setResults((prev) =>
+            page === 1 ? filtered : [...prev, ...filtered]
+          );
+
+          if (page >= response.data.total_pages) {
+            setHasMore(false);
+          }
+        })
+        .catch(() => setHasMore(false))
+        .finally(() => setLoading(false));
+    }, 200);
+
+    return () => clearTimeout(timeout);
+  }, [query, page]);
 
   useEffect(() => {
     setCursor(0);
@@ -47,6 +97,24 @@ export default function Header() {
     const scrollfollower = document.querySelector(".dropdown-item.active");
     scrollfollower?.scrollIntoView({ block: "nearest" });
   }, [cursor]);
+
+  //tää on tolle et se tyhjentää haun jos painaa jostain muualta:)
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        searchBoxRef.current &&
+        !searchBoxRef.current.contains(event.target)
+      ) {
+        setResults([]);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+  //loppuu tähä :)
 
   const handleKeyDown = (e) => {
     if (e.key === "ArrowUp") {
@@ -81,7 +149,7 @@ export default function Header() {
           <Link to="/groups">Groups</Link>
         </nav>
       </div>
-      <div className="search-box">
+      <div className="search-box" ref={searchBoxRef}>
         <input
           //tabIndex="-1"
           type="text"
@@ -93,14 +161,26 @@ export default function Header() {
         {user ? (
           <Link to={`/profile/${user.username}`}>
             {user.avatar ? (
-              <img className="user-icon" src={`${avatar + user.avatar}`}></img>
+              <img
+                className="user-icon"
+                loading="lazy"
+                src={`${avatar + user.avatar}`}
+              ></img>
             ) : (
-              <img className="user-icon" src="/avatars/user.png"></img>
+              <img
+                className="user-icon"
+                loading="lazy"
+                src="/avatars/user.png"
+              ></img>
             )}
           </Link>
         ) : (
           <Link to="/login">
-            <img className="user-icon" src="/avatars/user.png"></img>
+            <img
+              className="user-icon"
+              loading="lazy"
+              src="/avatars/user.png"
+            ></img>
           </Link>
         )}
 
@@ -114,18 +194,20 @@ export default function Header() {
 
             {!loading &&
               results.map((item, index) => (
-                <li
+                <Link
                   key={item.id}
-                  className={`dropdown-item ${
-                    index === cursor ? "active" : ""
-                  }`}
+                  to={`/${item.media_type}/${item.id}`}
+                  reloadDocument={true}
                 >
-                  <Link
-                    to={`/${item.media_type}/${item.id}`}
-                    reloadDocument={true}
+                  <li
+                    key={item.id}
+                    className={`dropdown-item ${
+                      index === cursor ? "active" : ""
+                    }`}
                   >
                     {item.poster_path ? (
                       <img
+                        loading="lazy"
                         src={`https://image.tmdb.org/t/p/w92${item.poster_path}`}
                         alt={item.title || item.name}
                       />
@@ -140,9 +222,17 @@ export default function Header() {
                       />
                     )}
                     <span>{item.title || item.name}</span>
-                  </Link>
-                </li>
+                  </li>
+                </Link>
               ))}
+            {hasMore && !loading && (
+              <li
+                className="dropdown-item show-more"
+                onClick={() => setPage((p) => p + 1)}
+              >
+                Näytä lisää
+              </li>
+            )}
           </ul>
         )}
       </div>

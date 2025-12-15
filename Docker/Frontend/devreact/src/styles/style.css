@@ -95,11 +95,30 @@ nav a:hover {
 }
 
 .dropdown-item {
-  padding: 0, 5rem;
   border-bottom: 1px solid #f3f4f6;
-  gap: 0, 75rem;
   transition: background-color 0.2s ease;
   border-color: #b30000;
+}
+
+.show-more {
+  text-align: center;
+  font-weight: bold;
+  color: #ffffff; /* Valkoinen teksti tummalla taustalla */
+  padding: 8px 0;
+  cursor: pointer;
+  border-bottom: none;
+}
+.show-more:hover {
+  color: #ba2626; /* Hover-efekti */
+  background-color: #222; /* hieman vaaleampi tausta hoverissa */
+}
+
+.dropdown-item span {
+  position: absolute;
+  font-size: 14pt;
+  align-self: center;
+  justify-content: center;
+  padding-left: 5%;
 }
 
 .dropdown-item:hover {
@@ -214,16 +233,15 @@ a:active {
 
 .card {
   background: #111;
-  height: 250px;
   position: relative;
   overflow: hidden;
   filter: brightness(70%);
+  border: 2px solid #454545;
 }
 
 .card img {
-  width: 120%;
-  height: 120%;
-  object-fit: cover;
+  width: 100%;
+  height: 100%;
 }
 
 .card:hover {
@@ -415,6 +433,10 @@ a:active {
   width: 350px;
 }
 
+.group-info {
+  margin-bottom: 10px;
+}
+
 .group-card span {
   font-size: 18px;
 }
@@ -444,12 +466,17 @@ a:active {
 }
 
 .member-block {
-  padding-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding-bottom: 1rem;
 }
 
 .member {
-  padding: 5px;
-  padding-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-align: center;
 }
 
 .requests-list {
@@ -584,8 +611,7 @@ a:active {
 }
 
 .group-section-title {
-  margin-top: 60px;
-  font-size: 35px;
+  font-size: 20pt;
   text-shadow: 3px 3px 5px black;
 }
 
@@ -594,17 +620,6 @@ a:active {
   grid-template-columns: repeat(3, 1fr);
   gap: 15px;
   margin-top: 15px;
-}
-
-.card {
-  background: #111;
-  border: 2px solid #333;
-  height: 220px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 18px;
-  color: #999;
 }
 
 .movie-grid {
@@ -843,7 +858,11 @@ footer a {
     text-align: center;
   }
 
-  .group-layout,
+  .group-layout {
+    margin-top: 0;
+    text-align: center;
+    justify-content: center;
+  }
   .profile-section,
   .profile-nav-items {
     text-align: center;

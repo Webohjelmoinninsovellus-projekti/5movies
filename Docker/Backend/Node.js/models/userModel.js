@@ -11,7 +11,7 @@ export async function getAvatarFromUsername(username) {
 
 export async function getProfileByUsername(username) {
   const result = await pool.query(
-    `SELECT username, bio, date_created FROM "user" WHERE username = $1 AND deactivation_date IS NULL`,
+    `SELECT username, bio, date_created, avatar_path FROM "user" WHERE username = $1 AND deactivation_date IS NULL`,
     [username]
   );
   return result.rows[0] || null;
@@ -19,7 +19,7 @@ export async function getProfileByUsername(username) {
 
 export async function getGroupsByUsername(username) {
   const result = await pool.query(
-    `SELECT "group".name, "group".id_group,
+    `SELECT "group".name, "group".id_group, "group".icon_path,
       (SELECT COUNT("user_group".user_id) FROM "user_group" WHERE "user_group".group_id = "group".id_group) AS member_count
      FROM user_group
      INNER JOIN "user" ON user_group.user_id = "user".id_user

@@ -6,7 +6,7 @@ export async function getFavoritesByUsername(username) {
     FROM user_favourite
     INNER JOIN "user" ON user_favourite.user_id = "user".id_user
     WHERE "user".username = $1 AND "user".deactivation_date IS NULL
-    ORDER BY user_favourite.id_favorite DESC LIMIT 10`,
+    ORDER BY user_favourite.id_favorite DESC`,
     [username]
   );
   return result.rows;

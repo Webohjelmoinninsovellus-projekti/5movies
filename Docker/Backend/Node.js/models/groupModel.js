@@ -5,10 +5,10 @@ export async function findGroupsForUser(userId, my) {
     return (
       await pool.query(
         `SELECT DISTINCT "group".*
-       FROM "group"
-       LEFT JOIN user_group ON user_group.group_id = "group".id_group
-       WHERE (user_group.user_id = $1 AND user_group.active = true) OR "group".owner_id = $1
-       ORDER BY "group".name`,
+        FROM "group"
+        LEFT JOIN user_group ON user_group.group_id = "group".id_group
+        WHERE (user_group.user_id = $1 AND user_group.active = true) OR "group".owner_id = $1
+        ORDER BY "group".name`,
         [userId]
       )
     ).rows;
@@ -19,7 +19,7 @@ export async function findGroupsForUser(userId, my) {
 export async function findGroupByName(name) {
   const result = await pool.query(
     `SELECT "group".*,
-        (SELECT json_agg(group_item.* ORDER BY date_added DESC)
+        (SELECT json_agg(group_item.* ORDER BY date_added ASC)
         FROM group_item
         WHERE group_item.group_id = "group".id_group) AS items
      FROM "group"
@@ -33,11 +33,13 @@ export async function findGroupByName(name) {
 export async function findMembersByGroupName(name) {
   const result = await pool.query(
     `SELECT "user".username, "user".avatar_path
-     FROM "user"
-     JOIN "group" ON "group".owner_id = "user".id_user
-     JOIN user_group ON user_group.group_id = "group".id_group
+     FROM "group"
+     JOIN user_group
+     ON user_group.group_id = "group".id_group
+     JOIN "user"
+     ON "user".id_user = user_group.user_id
      WHERE "group".name = $1
-     ORDER BY ("user".id_user = "group".owner_id) DESC, "user".username`,
+     ORDER BY ("user".id_user = "group".owner_id) DESC, user_group.id_user_group`,
     [name]
   );
 
