@@ -50,11 +50,14 @@ groupRouter.get("/:name", async (req, res) => {
 groupRouter.get("/members/:name", (req, res) => {
   pool.query(
     `SELECT "user".username, "user".avatar_path
-     FROM "user"
-     JOIN "group" ON "group".owner_id = "user".id_user
-     JOIN user_group ON user_group.group_id = "group".id_group
+     FROM "group"
+     JOIN user_group
+     ON user_group.group_id = "group".id_group
+     JOIN "user"
+     ON "user".id_user = user_group.user_id
      WHERE "group".name = $1
-     ORDER BY ("user".id_user = "group".owner_id) DESC, "user".username`,
+     ORDER BY ("user".id_user = "group".owner_id) DESC, "user".username;
+`,
     [req.params.name],
     (err, result) => {
       if (err) res.status(500).json({ error: err.message });
@@ -191,7 +194,7 @@ groupRouter.post("/join/:groupId", verifyToken, async (req, res) => {
               (SELECT COUNT(*) FROM user_group WHERE user_id = $2 AND group_id = $1) AS is_member,
               (SELECT COUNT(*) FROM group_join_request WHERE user_id = $2 AND group_id = $1 AND status = 'pending') AS has_request
        FROM "group"
-       WHERE ig_group = $1`,
+       WHERE id_group = $1`,
       [parseInt(req.params.groupId), req.user.user_id]
     );
     if (check.rows.length === 0)

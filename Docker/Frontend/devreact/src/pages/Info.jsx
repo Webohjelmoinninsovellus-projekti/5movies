@@ -72,6 +72,16 @@ export default function Info() {
     <main>
       {!loading ? (
         <div id="movieCard">
+          <a
+            href={`https://image.tmdb.org/t/p/original${info.poster_path}`}
+            target="_blank"
+          >
+            <img
+              className="info-img"
+              src={`https://image.tmdb.org/t/p/w400${info.poster_path}`}
+              alt={`${type === "/mo" ? info.title : info.name} poster`}
+            />
+          </a>
           <div id="movieText">
             <div id="movieHeader">
               <a href={info.homepage} target="_blank">
@@ -386,16 +396,6 @@ export default function Info() {
               )}
             </div>
           </div>
-
-          <a
-            href={`https://image.tmdb.org/t/p/original${info.poster_path}`}
-            target="_blank"
-          >
-            <img
-              src={`https://image.tmdb.org/t/p/w400${info.poster_path}`}
-              alt={`${type === "/mo" ? info.title : info.name} poster`}
-            />
-          </a>
         </div>
       ) : (
         <LoadingElement />

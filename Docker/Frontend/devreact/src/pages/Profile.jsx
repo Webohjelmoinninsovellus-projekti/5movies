@@ -97,7 +97,7 @@ export default function Profile() {
               <p>{info.bio ? info.bio : ""}</p>
               {owner && (
                 <>
-                  <nav className="nav-items">
+                  <nav className="profile-nav-items">
                     <div>
                       <form>
                         <input

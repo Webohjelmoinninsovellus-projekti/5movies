@@ -52,7 +52,7 @@ userRouter.get("/:username/groups", (req, res) => {
     return next(error);
   }
   pool.query(
-    `SELECT "group".name, "group".id_group, (SELECT COUNT("user_group".user_id) FROM "user_group" WHERE "user_group".group_id = "group".id_group)
+    `SELECT "group".name, "group".id_group, "group".icon_path, (SELECT COUNT("user_group".user_id) FROM "user_group" WHERE "user_group".group_id = "group".id_group)
      FROM user_group
      INNER JOIN "user" ON user_group.user_id = "user".id_user
      INNER JOIN "group" ON user_group.group_id = "group".id_group
@@ -73,7 +73,7 @@ userRouter.get("/:username", (req, res, next) => {
   }
 
   pool.query(
-    `SELECT username, bio, date_created FROM "user" WHERE username = ($1) AND deactivation_date IS NULL`,
+    `SELECT username, bio, date_created, avatar_path FROM "user" WHERE username = ($1) AND deactivation_date IS NULL`,
     [username],
     (err, result) => {
       if (err) res.status(500).json({ error: err.message });
