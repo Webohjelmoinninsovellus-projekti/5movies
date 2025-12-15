@@ -106,7 +106,7 @@ export default function Groups() {
             )
             //.filter((info, index) => index < 1)
             .map((group) => (
-              <Link key={group.groupid} to={`/group/${group.name}`}>
+              <Link key={group.id_group} to={`/group/${group.name}`}>
                 <button className="group-card">{group.name}</button>
               </Link>
             ))}

@@ -2,10 +2,10 @@ import axios from "axios";
 
 const url = import.meta.env.VITE_IP;
 
-export const sendJoinRequest = async (groupid) => {
+export const sendJoinRequest = async (groupId) => {
   try {
     const response = await axios.post(
-      `${url}/group/join/${groupid}`,
+      `${url}/group/join/${groupId}`,
       {},
       { withCredentials: true }
     );
@@ -16,9 +16,9 @@ export const sendJoinRequest = async (groupid) => {
   }
 };
 
-export const getGroupRequests = async (groupid) => {
+export const getGroupRequests = async (groupId) => {
   try {
-    const response = await axios.get(`${url}/group/requests/${groupid}`, {
+    const response = await axios.get(`${url}/group/requests/${groupId}`, {
       withCredentials: true,
     });
     return response.data;
@@ -28,10 +28,10 @@ export const getGroupRequests = async (groupid) => {
   }
 };
 
-export const acceptRequest = async (requestid) => {
+export const acceptRequest = async (requestId) => {
   try {
     const response = await axios.post(
-      `${url}/group/accept/${requestid}`,
+      `${url}/group/accept/${requestId}`,
       {},
       { withCredentials: true }
     );
@@ -42,10 +42,10 @@ export const acceptRequest = async (requestid) => {
   }
 };
 
-export const rejectRequest = async (requestid) => {
+export const rejectRequest = async (requestId) => {
   try {
     const response = await axios.post(
-      `${url}/group/reject/${requestid}`,
+      `${url}/group/reject/${requestId}`,
       {},
       { withCredentials: true }
     );

@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../components/AuthContext";
 import { useParams, useLocation } from "react-router";
-import getProfile from "../utilities/getProfile";
+import { getProfile } from "../utilities/userManager";
 import LoadingElement from "../components/LoadingElement";
 import GroupRequests from "../components/GroupRequests";
 
@@ -123,9 +123,9 @@ export default function Group() {
       <div className="group-layout">
         <div>
           <div className="group-img">
-            {info.avatar_url ? (
+            {info.icon_path ? (
               <img
-                src={`${url}/uploads/${info.avatar_url}`}
+                src={`${url}/uploads/${info.icon_path}`}
                 alt={info.name}
                 style={{
                   width: "100%",
@@ -184,15 +184,15 @@ export default function Group() {
 
         <div className="group-info">
           <h2>{info.name}</h2>
-          <p>{info.desc}</p>
+          <p>{info.description}</p>
 
           <h3 className="section-title">Added movies/series</h3>
           <div className="card-row"></div>
           {Items && Items.length > 0 ? (
             Items.map((item) => (
-              <div key={item.movieshowid} className="movie-card">
+              <div key={item.id_group_item} className="movie-card">
                 <Link
-                  to={`/${item.ismovie ? "movie" : "tv"}/${item.movieshowid}`}
+                  to={`/${item.type ? "movie" : "tv"}/${item.tmdb_id}`}
                   className="movie-card-link"
                 >
                   {item.poster_path ? (
@@ -216,7 +216,7 @@ export default function Group() {
                       e.stopPropagation();
 
                       try {
-                        await removeItem(info.name, item.movieshowid);
+                        await removeItem(info.name, item.tmdb_id);
                         const updatedGroup = await getGroup(params.name);
                         if (updatedGroup) setInfo(updatedGroup);
                         setItems(updatedGroup.items || []);
@@ -244,8 +244,8 @@ export default function Group() {
               <img
                 className="review-avatar"
                 src={
-                  members[0].avatar_url
-                    ? url + "/uploads/" + members[0].avatar_url
+                  members[0].avatar_path
+                    ? url + "/uploads/" + members[0].avatar_path
                     : "/avatars/user.png"
                 }
               />
@@ -263,14 +263,14 @@ export default function Group() {
                       className="review-avatar"
                       src={
                         member.avatar_url
-                          ? url + "/uploads/" + member.avatar_url
+                          ? url + "/uploads/" + member.avatar_path
                           : "/avatars/user.png"
                       }
                     ></img>
                     <span className="member-name">{member.username}</span>
                   </div>
                 ))}
-              {owner && <GroupRequests groupid={info.groupid} />}
+              {owner && <GroupRequests groupId={info.id_group} />}
             </div>
           </div>
         </div>

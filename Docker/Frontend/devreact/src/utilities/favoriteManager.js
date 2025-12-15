@@ -19,22 +19,16 @@ async function fetchFavorite(username) {
   }
 }
 
-async function favoriteSender(
-  ismovie,
-  movieshowid,
-  title,
-  poster_path,
-  release_year
-) {
+async function favoriteSender(type, tmdbId, title, releaseYear, posterPath) {
   try {
     const response = await axios.post(
       `${url}/favorite/add`,
       {
-        ismovie,
-        movieshowid,
+        type,
+        tmdbId,
         title,
-        poster_path,
-        release_year,
+        releaseYear,
+        posterPath,
       },
       { withCredentials: true }
     );
@@ -46,11 +40,12 @@ async function favoriteSender(
   }
 }
 
-async function favoriteRemover(movieshowid) {
+// BUG: removes item despite not knowing type
+async function favoriteRemover(tmdbId) {
   try {
     const response = await axios({
       method: "delete",
-      url: `${url}/favorite/remove/${movieshowid}`,
+      url: `${url}/favorite/remove/${tmdbId}`,
       withCredentials: true,
     });
 

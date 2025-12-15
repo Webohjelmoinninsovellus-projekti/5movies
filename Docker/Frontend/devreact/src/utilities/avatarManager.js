@@ -7,6 +7,7 @@ export default async function uploadAvatar(data) {
     const response = await axios.post(`${url}/avatar/upload`, data, {
       withCredentials: true,
     });
+
     if (response) return response.data;
   } catch (error) {
     console.error("Error uploading avatar:", error);

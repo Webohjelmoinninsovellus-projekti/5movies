@@ -19,7 +19,7 @@ const storage = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     if (!whitelist.includes(file.mimetype)) {
-      return cb(new Error("file is not allowed"));
+      return cb(new Error("Filetype is not allowed."));
     }
 
     cb(null, Date.now() + path.extname(file.originalname));
@@ -35,19 +35,19 @@ avatarRouter.post(
     if (!req.file || !req.user) {
       res
         .status(400)
-        .json({ message: "No file uploaded or user not authenticated" });
+        .json({ message: "No file uploaded or user not authenticated." });
       await fs.unlink(req.file.path);
     } else {
       const meta = await fileTypeFromFile(req.file.path);
 
       if (!whitelist.includes(meta.mime)) {
         await fs.unlink(req.file.path);
-        res.status(400).json({ message: "Invalid file" });
+        res.status(400).json({ message: "Invalid file." });
       } else {
         console.log(req.file);
 
         pool.query(
-          `UPDATE "user" SET avatar_url = $1 WHERE username = $2 RETURNING *`,
+          `UPDATE "user" SET avatar_path = $1 WHERE username = $2 RETURNING *`,
           [req.file.filename, req.user.username],
           (err, result) => {
             if (err) {
@@ -55,11 +55,11 @@ avatarRouter.post(
                 "Database error during avatar update:",
                 err.message
               );
-              res.status(500).json({ error: "Failed to update database" });
+              res.status(500).json({ error: "Failed to update database." });
             }
 
             res.status(200).json({
-              message: "Avatar updated successfully",
+              message: "Avatar updated successfully.",
               user: result.rows[0],
               file: req.file,
             });

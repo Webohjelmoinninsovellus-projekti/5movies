@@ -4,8 +4,9 @@ const url = import.meta.env.VITE_IP;
 
 async function getGroups(myGroups = false) {
   try {
-    const geturl = myGroups ? `${url}/group?my=true` : `${url}/group`;
-    const response = await axios.get(geturl, { withCredentials: true });
+    const getUrl = myGroups ? `${url}/group?my=true` : `${url}/group`;
+    const response = await axios.get(getUrl, { withCredentials: true });
+
     if (response) return response.data;
   } catch (error) {
     console.error("Error fetching group profile:", error);
@@ -13,9 +14,9 @@ async function getGroups(myGroups = false) {
   }
 }
 
-async function getGroup(name) {
+async function getGroup(groupName) {
   try {
-    const response = await axios.get(`${url}/group/${name}`);
+    const response = await axios.get(`${url}/group/${groupName}`);
     if (response) return response.data;
   } catch (error) {
     console.error("Error fetching group profile:", error);
@@ -23,9 +24,10 @@ async function getGroup(name) {
   }
 }
 
-async function getGroupMembers(name) {
+async function getGroupMembers(groupName) {
   try {
-    const response = await axios.get(`${url}/group/members/${name}`);
+    const response = await axios.get(`${url}/group/members/${groupName}`);
+
     if (response) return response.data;
   } catch (error) {
     console.error("Error fetching group owner:", error);
@@ -33,11 +35,12 @@ async function getGroupMembers(name) {
   }
 }
 
-async function addItem(groupname, item) {
+async function addItem(groupName, item) {
   try {
-    const res = await axios.post(`${url}/group/${groupname}/additem`, item, {
+    const res = await axios.post(`${url}/group/${groupName}/add-item`, item, {
       withCredentials: true,
     });
+
     return res.data;
   } catch (err) {
     console.error("Error adding item to group:", err);
@@ -45,13 +48,14 @@ async function addItem(groupname, item) {
   }
 }
 
-async function removeItem(groupname, movieshowid) {
+async function removeItem(groupName, itemId) {
   try {
     const res = await axios.post(
-      `${url}/group/${groupname}/removeitem`,
-      { movieshowid },
+      `${url}/group/${groupName}/remove-item`,
+      { itemId },
       { withCredentials: true }
     );
+
     return res.data;
   } catch (err) {
     console.error("Error removing item from group:", err);
@@ -64,6 +68,7 @@ async function getUserGroups(username) {
     const response = await axios.get(`${url}/user/${username}/groups`, {
       withCredentials: true,
     });
+
     return response.data;
   } catch (error) {
     console.error("Error fetching user groups:", error);
@@ -71,11 +76,11 @@ async function getUserGroups(username) {
   }
 }
 
-async function createGroup(name, desc) {
+async function createGroup(name, description) {
   try {
     const response = await axios.post(
       `${url}/group/create`,
-      { name, desc },
+      { name: name, description },
       { withCredentials: true }
     );
     return response.data;
@@ -85,10 +90,10 @@ async function createGroup(name, desc) {
   }
 }
 
-async function uploadGroupAvatar(groupname, formData) {
+async function uploadGroupAvatar(groupName, formData) {
   try {
     const response = await axios.post(
-      `${url}/group/${groupname}/avatar`,
+      `${url}/group/${groupName}/icon`,
       formData,
       {
         withCredentials: true,
@@ -97,6 +102,7 @@ async function uploadGroupAvatar(groupname, formData) {
         },
       }
     );
+
     return response.data;
   } catch (error) {
     console.error("Error uploading group avatar:", error);
@@ -104,10 +110,10 @@ async function uploadGroupAvatar(groupname, formData) {
   }
 }
 
-async function leaveGroup(groupname) {
+async function leaveGroup(groupName) {
   try {
     const response = await axios.post(
-      `${url}/group/${groupname}/leave`,
+      `${url}/group/${groupName}/leave`,
       {},
       { withCredentials: true }
     );
@@ -118,9 +124,9 @@ async function leaveGroup(groupname) {
   }
 }
 
-async function deleteGroup(groupname) {
+async function deleteGroup(groupName) {
   try {
-    const response = await axios.delete(`${url}/group/${groupname}`, {
+    const response = await axios.delete(`${url}/group/${groupName}`, {
       withCredentials: true,
     });
     return response.data;
@@ -130,10 +136,10 @@ async function deleteGroup(groupname) {
   }
 }
 
-async function sendJoinRequest(groupid) {
+async function sendJoinRequest(groupId) {
   try {
     const res = await axios.post(
-      `${url}/group/join/${groupid}`,
+      `${url}/group/join/${groupId}`,
       {},
       { withCredentials: true }
     );

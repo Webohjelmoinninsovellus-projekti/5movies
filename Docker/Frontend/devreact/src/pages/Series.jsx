@@ -29,18 +29,14 @@ export default function Series() {
             {series
               .filter((movie) => movie.genre_ids?.includes(16))
               .filter((movie, index) => index < 4)
-              .map((movie) => (
-                <Link
-                  key={movie.id}
-                  to={`/tv/${movie.id}`}
-                  reloadDocument={true}
-                >
+              .map((item) => (
+                <Link key={item.id} to={`/tv/${item.id}`} reloadDocument={true}>
                   <div className="card">
                     <img
-                      src={`https://image.tmdb.org/t/p/w500${movie.backdrop_path}`}
-                      alt={movie.name}
+                      src={`https://image.tmdb.org/t/p/w500${item.backdrop_path}`}
+                      alt={item.name}
                     />
-                    <span>{movie.name}</span>
+                    <span>{item.name}</span>
                   </div>
                 </Link>
               ))}
@@ -51,18 +47,14 @@ export default function Series() {
             {series
               .filter((movie) => movie.genre_ids?.includes(10759))
               .filter((movie, index) => index < 4)
-              .map((movie) => (
-                <Link
-                  key={movie.id}
-                  to={`/tv/${movie.id}`}
-                  reloadDocument={true}
-                >
+              .map((item) => (
+                <Link key={item.id} to={`/tv/${item.id}`} reloadDocument={true}>
                   <div className="card">
                     <img
-                      src={`https://image.tmdb.org/t/p/w500${movie.backdrop_path}`}
-                      alt={movie.name}
+                      src={`https://image.tmdb.org/t/p/w500${item.backdrop_path}`}
+                      alt={item.name}
                     />
-                    <span>{movie.name}</span>
+                    <span>{item.name}</span>
                   </div>
                 </Link>
               ))}
@@ -70,20 +62,16 @@ export default function Series() {
           <h2 className="section-title">Mystery</h2>
           <div className="category-row">
             {series
-              .filter((movie) => movie.genre_ids?.includes(9648))
-              .filter((movie, index) => index < 4)
-              .map((movie) => (
-                <Link
-                  key={movie.id}
-                  to={`/tv/${movie.id}`}
-                  reloadDocument={true}
-                >
+              .filter((item) => item.genre_ids?.includes(9648))
+              .filter((item, index) => index < 4)
+              .map((item) => (
+                <Link key={item.id} to={`/tv/${item.id}`} reloadDocument={true}>
                   <div className="card">
                     <img
-                      src={`https://image.tmdb.org/t/p/w500${movie.backdrop_path}`}
-                      alt={movie.name}
+                      src={`https://image.tmdb.org/t/p/w500${item.backdrop_path}`}
+                      alt={item.name}
                     />
-                    <span>{movie.name}</span>
+                    <span>{item.name}</span>
                   </div>
                 </Link>
               ))}
@@ -91,20 +79,16 @@ export default function Series() {
           <h2 className="section-title">Drama</h2>
           <div className="category-row">
             {series
-              .filter((movie) => movie.genre_ids?.includes(18))
-              .filter((movie, index) => index < 4)
-              .map((movie) => (
-                <Link
-                  key={movie.id}
-                  to={`/tv/${movie.id}`}
-                  reloadDocument={true}
-                >
+              .filter((item) => item.genre_ids?.includes(18))
+              .filter((item, index) => index < 4)
+              .map((item) => (
+                <Link key={item.id} to={`/tv/${item.id}`} reloadDocument={true}>
                   <div className="card">
                     <img
-                      src={`https://image.tmdb.org/t/p/w500${movie.backdrop_path}`}
-                      alt={movie.name}
+                      src={`https://image.tmdb.org/t/p/w500${item.backdrop_path}`}
+                      alt={item.name}
                     />
-                    <span>{movie.name}</span>
+                    <span>{item.name}</span>
                   </div>
                 </Link>
               ))}
@@ -112,20 +96,16 @@ export default function Series() {
           <h2 className="section-title">Comedy</h2>
           <div className="category-row">
             {series
-              .filter((movie) => movie.genre_ids?.includes(35))
-              .filter((movie, index) => index < 4)
-              .map((movie) => (
-                <Link
-                  key={movie.id}
-                  to={`/tv/${movie.id}`}
-                  reloadDocument={true}
-                >
+              .filter((item) => item.genre_ids?.includes(35))
+              .filter((item, index) => index < 4)
+              .map((item) => (
+                <Link key={item.id} to={`/tv/${item.id}`} reloadDocument={true}>
                   <div className="card">
                     <img
-                      src={`https://image.tmdb.org/t/p/w500${movie.backdrop_path}`}
-                      alt={movie.name}
+                      src={`https://image.tmdb.org/t/p/w500${item.backdrop_path}`}
+                      alt={item.name}
                     />
-                    <span>{movie.name}</span>
+                    <span>{item.name}</span>
                   </div>
                 </Link>
               ))}

@@ -27,7 +27,7 @@ userRouter.get("/me", verifyToken, (req, res) => {
     console.log("Profile requested for user:" + req.user.username);
 
     pool.query(
-      `SELECT avatar_url FROM "user" WHERE username = $1`,
+      `SELECT avatar_path FROM "user" WHERE username = $1`,
       [req.user.username],
       (err, result) => {
         if (err) {
@@ -36,26 +36,26 @@ userRouter.get("/me", verifyToken, (req, res) => {
 
         res.status(200).json({
           username: req.user.username,
-          avatar: result.rows[0].avatar_url,
+          avatar: result.rows[0].avatar_path,
         });
       }
     );
   } else {
-    res.status(401).json({ message: "Not authenticated" });
+    res.status(401).json({ message: "Not authenticated." });
   }
 });
 
 userRouter.get("/:username/groups", (req, res) => {
   const { username } = req.params;
   if (!username) {
-    const error = new Error("Username is required");
+    const error = new Error("Username is required.");
     return next(error);
   }
   pool.query(
-    `SELECT "group".name, "group".groupid, "group".avatar_url, (SELECT COUNT("user_group".user_id) FROM "user_group" WHERE "user_group".group_id = "group".groupid)
+    `SELECT "group".name, "group".id_group, (SELECT COUNT("user_group".user_id) FROM "user_group" WHERE "user_group".group_id = "group".id_group)
      FROM user_group
-     INNER JOIN "user" ON user_group.user_id = "user".userid
-     INNER JOIN "group" ON user_group.group_id = "group".groupid
+     INNER JOIN "user" ON user_group.user_id = "user".id_user
+     INNER JOIN "group" ON user_group.group_id = "group".id_group
      WHERE "user".username = $1`,
     [username],
     (err, result) => {
@@ -68,12 +68,12 @@ userRouter.get("/:username/groups", (req, res) => {
 userRouter.get("/:username", (req, res, next) => {
   const username = req.params.username;
   if (!username) {
-    const error = new Error("Username is required");
+    const error = new Error("Username is required.");
     return next(error);
   }
 
   pool.query(
-    `SELECT * FROM "user" WHERE username = ($1) AND active = true`,
+    `SELECT username, bio, date_created FROM "user" WHERE username = ($1) AND deactivation_date IS NULL`,
     [username],
     (err, result) => {
       if (err) res.status(500).json({ error: err.message });
@@ -91,13 +91,13 @@ userRouter.post("/logout", (req, res) => {
 
   console.log(req.cookies);
 
-  res.status(200).json({ message: "Logged out" });
+  res.status(200).json({ message: "Logged out." });
 });
 
 userRouter.post("/register", (req, res, next) => {
   const { user } = req.body;
   if (!user || !user.username || !user.password) {
-    const error = new Error("Username and password are required");
+    const error = new Error("Username and password are required.");
     return next(error);
   } else {
     hash(user.password, 10, (err, hashedPassword) => {
@@ -128,12 +128,12 @@ userRouter.post("/login", (req, res, next) => {
   }
 
   pool.query(
-    `SELECT * FROM "user" WHERE username = $1`,
+    `SELECT id_user, username, password, deactivation_date FROM "user" WHERE username = $1`,
     [user.username],
     (err, result) => {
       if (err) return next(err);
       if (result.rows.length === 0) {
-        const error = new Error("User not found");
+        const error = new Error("User not found.");
         error.status = 404;
         return next(error);
       }
@@ -143,14 +143,14 @@ userRouter.post("/login", (req, res, next) => {
       compare(user.password, dbUser.password, (err, isMatch) => {
         if (err) return next(err);
         else if (!isMatch) {
-          const error = new Error("Invalid password");
+          const error = new Error("Invalid password.");
           error.status = 401;
           return next(error);
         } else {
           const accessToken = jwt.sign(
             {
               username: dbUser.username,
-              userid: dbUser.userid,
+              user_id: dbUser.id_user,
             },
             SECRET_KEY,
             { expiresIn: "30m" }
@@ -164,9 +164,10 @@ userRouter.post("/login", (req, res, next) => {
               maxAge: 1000 * 60 * 30, // 30 minutes
             });
 
-            if (dbUser.active == false) {
+            if (dbUser.deactivation_date != null) {
               pool.query(
-                "UPDATE public.user SET active = true, deactivation_date = null WHERE active = false AND username = $1 AND password = $2",
+                `UPDATE "user" SET deactivation_date = NULL
+                WHERE deactivation_date IS NOT NULL AND username = $1 AND password = $2`,
                 [dbUser.username, dbUser.password],
 
                 (err, result) => {
@@ -193,7 +194,7 @@ userRouter.put("/deactivate", (req, res, next) => {
   }
 
   pool.query(
-    "SELECT * FROM public.user WHERE username = $1",
+    `SELECT username, password, deactivation_date FROM "user" WHERE username = $1`,
     [user.username],
     (err, result) => {
       if (err) return next(err);
@@ -212,8 +213,9 @@ userRouter.put("/deactivate", (req, res, next) => {
             return next(error);
           } else {
             pool.query(
-              "UPDATE public.user SET active = false, deactivation_date = CURRENT_DATE WHERE active = true AND username = $1 AND password = $2",
-              [user.username, dbUser.password],
+              `UPDATE "user" SET deactivation_date = CURRENT_DATE
+              WHERE deactivation_date IS NULL AND username = $1 AND password = $2`,
+              [dbUser.username, dbUser.password],
 
               (err, result) => {
                 if (err) return next(err);
