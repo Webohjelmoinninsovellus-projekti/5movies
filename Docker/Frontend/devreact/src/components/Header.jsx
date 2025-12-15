@@ -69,15 +69,21 @@ export default function Header() {
           <img src="/5moviestransparent.png" className="logo" alt="logo"></img>
         </Link>
         <nav className="nav-items">
-          <Link to="/">Home</Link>
-          <Link to="/movies">Movies</Link>
-          <Link to="/series">Series</Link>
+          <Link className="mobile-hide" to="/">
+            Home
+          </Link>
+          <Link className="mobile-hide" to="/movies">
+            Movies
+          </Link>
+          <Link className="mobile-hide" to="/series">
+            Series
+          </Link>
           <Link to="/groups">Groups</Link>
         </nav>
       </div>
       <div className="search-box">
         <input
-          // tabIndex="-1"
+          //tabIndex="-1"
           type="text"
           placeholder="Search"
           value={query}
@@ -98,7 +104,7 @@ export default function Header() {
           </Link>
         )}
 
-        {results.length > -1 && (
+        {results.length > 0 && (
           <ul className="dropdown-menu">
             {loading && (
               <li>
@@ -110,9 +116,9 @@ export default function Header() {
               results.map((item, index) => (
                 <li
                   key={item.id}
-                  className={
-                    cursor === index ? "dropdown-item active" : "dropdown-item"
-                  }
+                  className={`dropdown-item ${
+                    index === cursor ? "active" : ""
+                  }`}
                 >
                   <Link
                     to={`/${item.media_type}/${item.id}`}

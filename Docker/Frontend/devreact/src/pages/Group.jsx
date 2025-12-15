@@ -38,7 +38,7 @@ export default function Group() {
   const changeGroupAvatar = async (e) => {
     e.preventDefault();
     const avatar = new FormData();
-    avatar.append("avatar", e.target.files[0]);
+    avatar.append("icon", e.target.files[0]);
 
     try {
       const avatarData = await uploadGroupAvatar(info.name, avatar);
@@ -76,7 +76,7 @@ export default function Group() {
 
   const handleJoinRequest = async () => {
     try {
-      await sendJoinRequest(info.groupid);
+      await sendJoinRequest(info.id_group);
       setMessage("Request sent! Waiting for owner approval.");
     } catch (error) {
       if (error.response?.status === 409) {
@@ -97,7 +97,6 @@ export default function Group() {
       if (groupData && membersData) {
         setInfo(groupData);
         setMembers(membersData);
-        console.log(groupData.items);
         setItems(groupData.items || []);
         if (user && membersData[0].username === user.username) {
           setOwner(true);
@@ -109,7 +108,6 @@ export default function Group() {
           setIsMember(true);
         }
       }
-
       setLoading(false);
     })();
   }, [params.name, user]);
@@ -117,6 +115,8 @@ export default function Group() {
   if (loading) return <LoadingElement />;
 
   if (!info.name) return <h2>Group not found</h2>;
+
+  console.log(members);
 
   return (
     <div className="container">
@@ -262,7 +262,7 @@ export default function Group() {
                     <img
                       className="review-avatar"
                       src={
-                        member.avatar_url
+                        member.avatar_path
                           ? url + "/uploads/" + member.avatar_path
                           : "/avatars/user.png"
                       }

@@ -83,13 +83,13 @@ export default function GroupRequests({ groupId }) {
             <div style={{ marginLeft: "auto", display: "flex", gap: "10px" }}>
               <button
                 className="red-button"
-                onClick={() => handleAccept(req.requestid)}
+                onClick={() => handleAccept(req.request_id)}
               >
                 Accept
               </button>
               <button
                 className="red-button"
-                onClick={() => handleReject(req.requestid)}
+                onClick={() => handleReject(req.request_id)}
               >
                 Reject
               </button>
