@@ -5,7 +5,7 @@ dotenv.config();
 
 const BASE = "https://api.themoviedb.org/3/";
 
-async function fetchTmdb(path) {
+export default async function fetchTmdb(path) {
   const response = await axios({
     method: "get",
     headers: {

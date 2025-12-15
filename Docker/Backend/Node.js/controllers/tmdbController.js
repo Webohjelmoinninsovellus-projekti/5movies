@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import { fetchTmdb } from "../models/tmdbModel.js";
+import fetchTmdb from "../models/tmdbModel.js";
 
 dotenv.config();
 
@@ -56,7 +56,7 @@ export async function searchMulti(req, res, next) {
     const { query } = req.params;
     if (!query) return res.status(404).json("Query is not defined");
 
-    const data = await fetchTmdbSearch(
+    const data = await fetchTmdb(
       `search/multi?include_adult=false&query=${encodeURIComponent(
         query
       )}&language=en-US&page=1`
