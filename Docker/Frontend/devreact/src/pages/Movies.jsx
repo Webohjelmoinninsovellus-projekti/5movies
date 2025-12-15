@@ -27,20 +27,20 @@ export default function Movies() {
           <h2 className="section-title">Horror</h2>
           <div className="category-row">
             {movies
-              .filter((movie) => movie.genre_ids?.includes(27))
-              .filter((movie, index) => index < 4)
-              .map((movie) => (
+              .filter((item) => item.genre_ids?.includes(27))
+              .filter((item, index) => index < 4)
+              .map((item) => (
                 <Link
-                  key={movie.id}
-                  to={`/movie/${movie.id}`}
+                  key={item.id}
+                  to={`/movie/${item.id}`}
                   reloadDocument={true}
                 >
                   <div className="card">
                     <img
-                      src={`https://image.tmdb.org/t/p/w500${movie.backdrop_path}`}
-                      alt={movie.title}
+                      src={`https://image.tmdb.org/t/p/w500${item.backdrop_path}`}
+                      alt={item.title}
                     />
-                    <span>{movie.title}</span>
+                    <span>{item.title}</span>
                   </div>
                 </Link>
               ))}
@@ -49,20 +49,20 @@ export default function Movies() {
           <h2 className="section-title">Action</h2>
           <div className="category-row">
             {movies
-              .filter((movie) => movie.genre_ids?.includes(28))
-              .filter((movie, index) => index < 4)
-              .map((movie) => (
+              .filter((item) => item.genre_ids?.includes(28))
+              .filter((item, index) => index < 4)
+              .map((item) => (
                 <Link
-                  key={movie.id}
-                  to={`/movie/${movie.id}`}
+                  key={item.id}
+                  to={`/movie/${item.id}`}
                   reloadDocument={true}
                 >
                   <div className="card">
                     <img
-                      src={`https://image.tmdb.org/t/p/w500${movie.backdrop_path}`}
-                      alt={movie.title}
+                      src={`https://image.tmdb.org/t/p/w500${item.backdrop_path}`}
+                      alt={item.title}
                     />
-                    <span>{movie.title}</span>
+                    <span>{item.title}</span>
                   </div>
                 </Link>
               ))}
@@ -70,20 +70,20 @@ export default function Movies() {
           <h2 className="section-title">Science Fiction</h2>
           <div className="category-row">
             {movies
-              .filter((movie) => movie.genre_ids?.includes(878))
-              .filter((movie, index) => index < 4)
-              .map((movie) => (
+              .filter((item) => item.genre_ids?.includes(878))
+              .filter((item, index) => index < 4)
+              .map((item) => (
                 <Link
-                  key={movie.id}
-                  to={`/movie/${movie.id}`}
+                  key={item.id}
+                  to={`/movie/${item.id}`}
                   reloadDocument={true}
                 >
                   <div className="card">
                     <img
-                      src={`https://image.tmdb.org/t/p/w500${movie.backdrop_path}`}
-                      alt={movie.title}
+                      src={`https://image.tmdb.org/t/p/w500${item.backdrop_path}`}
+                      alt={item.title}
                     />
-                    <span>{movie.title}</span>
+                    <span>{item.title}</span>
                   </div>
                 </Link>
               ))}
@@ -91,20 +91,20 @@ export default function Movies() {
           <h2 className="section-title">Drama</h2>
           <div className="category-row">
             {movies
-              .filter((movie) => movie.genre_ids?.includes(18))
-              .filter((movie, index) => index < 4)
-              .map((movie) => (
+              .filter((item) => item.genre_ids?.includes(18))
+              .filter((item, index) => index < 4)
+              .map((item) => (
                 <Link
-                  key={movie.id}
-                  to={`/movie/${movie.id}`}
+                  key={item.id}
+                  to={`/movie/${item.id}`}
                   reloadDocument={true}
                 >
                   <div className="card">
                     <img
-                      src={`https://image.tmdb.org/t/p/w500${movie.backdrop_path}`}
-                      alt={movie.title}
+                      src={`https://image.tmdb.org/t/p/w500${item.backdrop_path}`}
+                      alt={item.title}
                     />
-                    <span>{movie.title}</span>
+                    <span>{item.title}</span>
                   </div>
                 </Link>
               ))}
@@ -112,20 +112,20 @@ export default function Movies() {
           <h2 className="section-title">Comedy</h2>
           <div className="category-row">
             {movies
-              .filter((movie) => movie.genre_ids?.includes(35))
-              .filter((movie, index) => index < 4)
-              .map((movie) => (
+              .filter((item) => item.genre_ids?.includes(35))
+              .filter((item, index) => index < 4)
+              .map((item) => (
                 <Link
-                  key={movie.id}
-                  to={`/movie/${movie.id}`}
+                  key={item.id}
+                  to={`/movie/${item.id}`}
                   reloadDocument={true}
                 >
                   <div className="card">
                     <img
-                      src={`https://image.tmdb.org/t/p/w500${movie.backdrop_path}`}
-                      alt={movie.title}
+                      src={`https://image.tmdb.org/t/p/w500${item.backdrop_path}`}
+                      alt={item.title}
                     />
-                    <span>{movie.title}</span>
+                    <span>{item.title}</span>
                   </div>
                 </Link>
               ))}

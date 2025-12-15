@@ -46,7 +46,6 @@ export default function Login() {
             placeholder="Username"
             onChange={(e) => {
               setUsername(e.target.value);
-              //setUsername(value);
             }}
           />
           <input

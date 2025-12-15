@@ -5,11 +5,10 @@ import { useParams } from "react-router";
 
 import LoadingElement from "../components/LoadingElement";
 
-import getProfile from "../utilities/getProfile";
 import { getUserGroups } from "../utilities/groupManager";
 import uploadAvatar from "../utilities/avatarManager";
 import { fetchFavorite, favoriteRemover } from "../utilities/favoriteManager";
-import { deactivate } from "../utilities/userManager";
+import { getProfile, deactivate } from "../utilities/userManager";
 
 export default function Profile() {
   const [loading, setLoading] = useState(true);
@@ -22,7 +21,7 @@ export default function Profile() {
   const params = useParams();
 
   const url = import.meta.env.VITE_IP;
-  const avatar = url + "/uploads/" + info.avatar_url;
+  const avatar = url + "/uploads/" + info.avatar_path;
 
   const { user, logout } = useContext(AuthContext);
   const owner = user && info.username === user.username;
@@ -94,8 +93,8 @@ export default function Profile() {
             </div>
             <div className="profile-info">
               <h2>{info.username}</h2>
-              <p>Joined: {info.datecreated.split("T")[0]}</p>
-              <p>{info.desc ? info.desc : ""}</p>
+              <p>Joined: {info.date_created.split("T")[0]}</p>
+              <p>{info.bio ? info.bio : ""}</p>
               {owner && (
                 <>
                   <nav className="nav-items">
@@ -122,7 +121,7 @@ export default function Profile() {
                       <button
                         className="red-button"
                         onClick={async () => {
-                          const data = await logout();
+                          await logout();
                           navigate("/login");
                         }}
                       >
@@ -131,7 +130,7 @@ export default function Profile() {
                     </div>
                     <button
                       className="red-button"
-                      onClick={async (e) => {
+                      onClick={async () => {
                         if (deactivationPassword === "") {
                           if (!deactivationInputActive) {
                             setDeactivationInputActive(true);
@@ -186,9 +185,9 @@ export default function Profile() {
           <div className="movie-grid">
             {favorites && favorites.length > 0 ? (
               favorites.map((item) => (
-                <div key={item.movieshowid} className="movie-card">
+                <div key={item.tmdb_id} className="movie-card">
                   <Link
-                    to={`/${item.ismovie ? "movie" : "tv"}/${item.movieshowid}`}
+                    to={`/${item.type ? "movie" : "tv"}/${item.tmdb_id}`}
                     className="movie-card-link"
                   >
                     {item.poster_path ? (
@@ -212,7 +211,7 @@ export default function Profile() {
                         e.stopPropagation();
                         {
                           try {
-                            await favoriteRemover(item.movieshowid);
+                            await favoriteRemover(item.tmdb_id);
                             const updatedFavorites = await fetchFavorite(
                               params.username
                             );
@@ -239,12 +238,12 @@ export default function Profile() {
           <div className="movie-grid">
             {groups && groups.length > 0 ? (
               groups.map((group) => (
-                <div key={group.groupid} className="movie-card">
+                <div key={group.id_group} className="movie-card">
                   <Link to={`/group/${group.name}`} className="movie-card-link">
                     <div className="group-poster">
-                      {group.avatar_url && (
+                      {group.icon_path && (
                         <img
-                          src={`${url}/uploads/${group.avatar_url}`}
+                          src={`${url}/uploads/${group.icon_path}`}
                           alt={group.name}
                         />
                       )}

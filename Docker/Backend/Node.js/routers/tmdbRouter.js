@@ -74,7 +74,7 @@ tmdbRouter.get("/popular", async (req, res) => {
   }
 });
 
-tmdbRouter.get("/intheaters", async (req, res) => {
+tmdbRouter.get("/in-theaters", async (req, res) => {
   try {
     const response = await axios({
       method: "get",

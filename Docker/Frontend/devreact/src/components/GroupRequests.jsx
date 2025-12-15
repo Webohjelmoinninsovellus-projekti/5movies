@@ -7,14 +7,14 @@ import {
 
 const url = import.meta.env.VITE_IP;
 
-export default function GroupRequests({ groupid }) {
+export default function GroupRequests({ groupId }) {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchRequests = async () => {
       try {
-        const data = await getGroupRequests(groupid);
+        const data = await getGroupRequests(groupId);
         setRequests(data);
       } catch (error) {
         console.error("Failed to fetch requests:", error);
@@ -24,11 +24,11 @@ export default function GroupRequests({ groupid }) {
     };
 
     fetchRequests();
-  }, [groupid]);
+  }, [groupId]);
 
   const refetchRequests = async () => {
     try {
-      const data = await getGroupRequests(groupid);
+      const data = await getGroupRequests(groupId);
       setRequests(data);
     } catch (error) {
       console.error("Failed to fetch requests:", error);

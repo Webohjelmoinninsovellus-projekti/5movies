@@ -1,109 +1,72 @@
-create table "user"
-(
-    datecreated       date    default CURRENT_DATE not null,
-    username          varchar(32)                  not null
-        constraint username_pk
-            unique,
-    avatar_url        varchar(256),
-    userid            integer generated always as identity (minvalue 0 maxvalue 65500)
-        constraint userid_pk
-            primary key,
-    password          varchar(128)                 not null,
-    "desc"            varchar(256),
-    active            boolean default true         not null,
-    deactivation_date date
+CREATE TABLE "user"(
+    id_user integer GENERATED ALWAYS AS IDENTITY (MINVALUE 0
+    MAXVALUE 65500) CONSTRAINT id_user_pk PRIMARY KEY,
+    username varchar(32) NOT NULL CONSTRAINT username_pk UNIQUE,
+    password varchar(128) NOT NULL,
+    bio varchar(256),
+    date_created date DEFAULT CURRENT_DATE NOT NULL,
+    avatar_path varchar(256),
+    deactivation_date date DEFAULT NULL
 );
 
-alter table "user"
-    owner to test;
+ALTER TABLE "user" OWNER TO test;
 
-create table user_review
-(
-    ismovie     boolean default true         not null,
-    movieshowid integer                      not null,
-    date        date    default CURRENT_DATE not null,
-    userid      integer                      not null
-        constraint user_review_user_userid_fk
-            references "user",
-    comment     char(1024),
-    reviewid    integer generated always as identity (minvalue 0)
-        constraint user_review_id_pk
-            primary key,
-    rating      integer                      not null
+CREATE TABLE user_review(
+    id_review integer GENERATED ALWAYS AS IDENTITY (MINVALUE 0) CONSTRAINT id_review_pk PRIMARY KEY,
+    type boolean NOT NULL,
+    tmdb_id integer NOT NULL,
+    rating integer NOT NULL,
+    comment char(1024),
+    date_created date DEFAULT CURRENT_DATE NOT NULL,
+    user_id integer NOT NULL CONSTRAINT user_review_user_id_user_fk REFERENCES "user"
 );
 
-alter table user_review
-    owner to test;
+ALTER TABLE user_review OWNER TO test;
 
-create table user_favourite
-(
-    id           integer generated always as identity (minvalue 0),
-    movieshowid  integer                      not null,
-    user_id      integer                      not null
-        constraint user_favourite_user_userid_fk
-            references "user",
-    date         date    default CURRENT_DATE not null,
-    ismovie      boolean default true         not null,
-    title        varchar(256),
-    poster_path  varchar(256),
-    release_year integer
-);
-
-alter table user_favourite
-    owner to test;
-
-create table "group"
-(
-    groupid     integer generated always as identity (minvalue 0)
-        constraint group_pk
-            primary key,
-    avatar_url  varchar(256),
-    name        varchar(32)                  not null,
-    datecreated date    default CURRENT_DATE not null,
-    active      boolean default true         not null,
-    "desc"      varchar(256),
-    owner_id    integer                      not null
-        constraint group_user_userid_fk
-            references "user"
-);
-
-alter table "group"
-    owner to test;
-
-create table group_item
-(
-    groupitemid  serial
-        primary key,
-    groupid      integer      not null
-        references "group"
-            on delete cascade,
-    movieshowid  integer      not null,
-    ismovie      boolean      not null,
-    title        varchar(256) not null,
-    poster_path  varchar(256),
+CREATE TABLE user_favourite(
+    id_favorite integer GENERATED ALWAYS AS IDENTITY (MINVALUE 0),
+    type boolean DEFAULT TRUE NOT NULL,
+    tmdb_id integer NOT NULL,
+    title varchar(256),
+    date_added date DEFAULT CURRENT_DATE NOT NULL,
     release_year integer,
-    dateadded    timestamp default CURRENT_TIMESTAMP
+    poster_path varchar(256),
+    user_id integer NOT NULL CONSTRAINT user_favourite_user_id_user_fk REFERENCES "user"
 );
 
-alter table group_item
-    owner to test;
+ALTER TABLE user_favourite OWNER TO test;
 
-create table user_group
-(
-    id       integer generated always as identity (minvalue 0)
-        constraint user_group_pk
-            primary key,
-    user_id  integer               not null
-        constraint user_group_user_userid_fk
-            references "user",
-    group_id integer               not null
-        constraint user_group_group_groupid_fk
-            references "group"
-            on delete cascade,
-    active   boolean default false not null
+CREATE TABLE "group"(
+    id_group integer GENERATED ALWAYS AS IDENTITY (MINVALUE 0) CONSTRAINT group_pk PRIMARY KEY,
+    name varchar(32) NOT NULL,
+    date_created date DEFAULT CURRENT_DATE NOT NULL,
+    description varchar(256),
+    icon_path varchar(256),
+    active boolean DEFAULT TRUE NOT NULL,
+    owner_id integer NOT NULL CONSTRAINT group_user_id_user_fk REFERENCES "user"
 );
 
-alter table user_group
-    owner to test;
+ALTER TABLE "group" OWNER TO test;
 
+CREATE TABLE user_group(
+    id_user_group integer GENERATED ALWAYS AS IDENTITY (MINVALUE 0) CONSTRAINT user_group_pk PRIMARY KEY,
+    active boolean DEFAULT FALSE NOT NULL,
+    user_id integer NOT NULL CONSTRAINT user_group_user_id_user_fk REFERENCES "user",
+    group_id integer NOT NULL CONSTRAINT user_group_group_id_group_fk REFERENCES "group"
+);
+
+ALTER TABLE user_group OWNER TO test;
+
+CREATE TABLE group_item(
+    id_group_item serial PRIMARY KEY,
+    type boolean NOT NULL,
+    tmdb_id integer NOT NULL,
+    title varchar(256) NOT NULL,
+    poster_path varchar(256),
+    release_year integer,
+    date_added timestamp DEFAULT CURRENT_TIMESTAMP,
+    group_id integer NOT NULL REFERENCES "group" ON DELETE CASCADE
+);
+
+ALTER TABLE group_item OWNER TO test;
 

@@ -24,22 +24,22 @@ export default function Info() {
   const [favoriteError, setFavoriteError] = useState("");
   const [favoriteRemoved, setFavoriteRemoved] = useState(false);
 
-  const { user } = useContext(AuthContext);
-
-  const params = useParams();
-  const type = useLocation().pathname.slice(0, 3);
-
-  const url = import.meta.env.VITE_IP;
-
-  const location = useLocation();
-
-  const totalStars = 5;
   const [groupName, setGroupName] = useState("");
   const [groupError, setGroupError] = useState("");
   const [movieAdded, setMovieAdded] = useState(false);
   const [movieRemoved, setMovieRemoved] = useState(false);
   const [groups, setGroups] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState("");
+
+  const { user } = useContext(AuthContext);
+
+  const params = useParams();
+  const location = useLocation();
+  const type = useLocation().pathname.slice(0, 3);
+
+  const url = import.meta.env.VITE_IP;
+
+  const totalStars = 5;
 
   const handleClick = async (value) => {
     setRating(value);
@@ -141,10 +141,11 @@ export default function Info() {
                   onClick={async () => {
                     await sendReview(
                       type === "/mo" ? true : false,
-                      comment,
                       info.id,
-                      rating
+                      rating,
+                      comment
                     );
+
                     const reviewsData = await fetchReviews(type, params.id);
                     if (reviewsData) setReviews(reviewsData);
 
@@ -164,13 +165,13 @@ export default function Info() {
                         type === "/mo" ? true : false,
                         info.id,
                         type === "/mo" ? info.title : info.name,
-                        info.poster_path,
                         parseInt(
                           (type === "/mo"
                             ? info.release_date
                             : info.first_air_date
                           ).slice(0, 4)
-                        )
+                        ),
+                        info.poster_path
                       );
                       setFavoriteAdded(true);
                       setFavoriteRemoved(false);
@@ -208,7 +209,7 @@ export default function Info() {
                   >
                     <option value="">Select a group</option>
                     {groups.map((group) => (
-                      <option key={group.groupid} value={group.name}>
+                      <option key={group.id_group} value={group.name}>
                         {group.name}
                       </option>
                     ))}
@@ -225,11 +226,11 @@ export default function Info() {
 
                       try {
                         await addItem(selectedGroup, {
-                          movieshowid: info.id,
-                          ismovie: type === "/mo" ? true : false,
+                          type: type === "/mo" ? true : false,
+                          tmdbId: info.id,
                           title: type === "/mo" ? info.title : info.name,
-                          poster_path: info.poster_path,
-                          release_year: parseInt(
+                          posterPath: info.poster_path,
+                          releaseYear: parseInt(
                             (type === "/mo"
                               ? info.release_date
                               : info.first_air_date
@@ -360,10 +361,10 @@ export default function Info() {
                             gap: "8px",
                           }}
                         >
-                          {item.avatar_url ? (
+                          {item.avatar_path ? (
                             <img
                               className="review-avatar"
-                              src={url + "/uploads/" + item.avatar_url}
+                              src={url + "/uploads/" + item.avatar_path}
                             ></img>
                           ) : (
                             <img
@@ -376,7 +377,7 @@ export default function Info() {
                       </Link>
                       <h3>{item.rating}/5</h3>
                       <p className="review-text">{item.comment}</p>
-                      <p>{item.date.slice(0, 10)}</p>
+                      <p>{item.date_created.slice(0, 10)}</p>
                     </div>
                   ))}
                 </div>

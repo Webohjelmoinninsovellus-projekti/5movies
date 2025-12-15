@@ -9,11 +9,11 @@ reviewRouter.get("/:type/:id", async (req, res) => {
   if (!type || !id) return new Error("Type or ID is not defined");
   else {
     pool.query(
-      `SELECT user_review.userid, user_review.date, user_review.comment, user_review.rating, public.user.username, public.user.avatar_url
+      `SELECT user_review.user_id, user_review.date_created, user_review.comment, user_review.rating, "user".username, "user".avatar_path
       FROM user_review
-      INNER JOIN public.user ON user_review.userid = public.user.userid
-      WHERE public.user.active = true AND user_review.ismovie = $1 AND user_review.movieshowid = $2
-      ORDER BY user_review.reviewid DESC LIMIT 5;`,
+      INNER JOIN "user" ON user_review.user_id = "user".id_user
+      WHERE "user".deactivation_date IS NULL AND user_review.type = $1 AND user_review.tmdb_id = $2
+      ORDER BY user_review.id_review DESC LIMIT 6`,
       [type === "movie" ? true : false, id],
       (err, result) => {
         if (err) res.status(500).json({ error: err.message });
@@ -25,29 +25,29 @@ reviewRouter.get("/:type/:id", async (req, res) => {
 
 reviewRouter.post("/add", verifyToken, async (req, res) => {
   try {
-    console.log(req.user);
-    const { ismovie, comment, movieshowid, rating } = req.body;
-    const { userid } = req.user;
+    const { type, tmdbId, rating, comment } = req.body;
+    const userId = req.user.user_id;
 
     if (rating > 5 || rating < 0)
       throw new Error("Rating is outside of allowed range.");
     else {
       pool.query(
-        `INSERT INTO user_review (ismovie, comment, movieshowid, userid, rating)
+        `INSERT INTO user_review (type, tmdb_id, rating, comment, user_id)
         SELECT $1, $2, $3, $4, $5
-        WHERE NOT EXISTS (SELECT 1 FROM user_review WHERE ismovie = $1 AND movieshowid = $3 AND userid = $4);`,
-        [ismovie, comment, movieshowid, userid, rating],
+        WHERE NOT EXISTS (SELECT 1 FROM user_review WHERE type = $1 AND tmdb_id = $2 AND user_id = $5)
+      `,
+        [type, tmdbId, rating, comment, userId],
         (err, result) => {
-          res.status(201).json({
-            message: "Review saved successfully",
-            /* reviewId: result.rows[0].reviewid, */
-          });
+          if (result)
+            res.status(201).json({
+              message: "Review saved successfully.",
+            });
         }
       );
     }
   } catch (error) {
     console.error("Error while saving review:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: "Internal server error." });
   }
 });
 
