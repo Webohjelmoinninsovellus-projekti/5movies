@@ -37,7 +37,4 @@ services:
     volumes:
       - ./Backend/Postgresql:/var/lib/postgresql/data
     environment:
-      - POSTGRES_PASSWORD=test
-      - POSTGRES_USER=test
-      - POSTGRES_DB=testdb
       - PGPORT=5557
