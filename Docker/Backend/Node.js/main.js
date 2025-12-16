@@ -2,7 +2,6 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
-
 import tmdbRouter from "./routers/tmdbRouter.js";
 import userRouter from "./routers/userRouter.js";
 import reviewRouter from "./routers/reviewRouter.js";

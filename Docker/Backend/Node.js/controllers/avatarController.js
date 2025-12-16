@@ -21,6 +21,7 @@ export async function uploadAvatar(req, res, next) {
     const updated = await updateAvatar(req.file.filename, req.user.username);
     if (!updated)
       return res.status(500).json({ error: "Failed to update database." });
+
     return res.status(200).json({
       message: "Avatar updated successfully.",
       user: updated,
