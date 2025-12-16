@@ -13,7 +13,7 @@ import avatarRouter from "./routers/avatarRouter.js";
 dotenv.config();
 
 const app = express();
-app.use(cors({ credentials: true, origin: "http://localhost:5556" }));
+app.use(cors({ credentials: true, origin: process.env.REACT_IP }));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
