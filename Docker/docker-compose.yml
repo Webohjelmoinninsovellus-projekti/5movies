@@ -40,7 +40,7 @@ services:
     environment:
       - POSTGRES_PASSWORD=test
       - POSTGRES_USER=test
-      - POSTGRES_DB=testdb
+      - POSTGRES_DB=usertest
       - PGPORT=5557
       
 volumes:
