@@ -107,6 +107,7 @@ export default function Header() {
         !searchBoxRef.current.contains(event.target)
       ) {
         setResults([]);
+        setQuery("");
       }
     };
 
@@ -117,6 +118,7 @@ export default function Header() {
   }, []);
   //loppuu tähä :)
 
+  /* vanha handleKeyDown jos tuo mun uus ei kelepaa:)
   const handleKeyDown = (e) => {
     if (e.key === "ArrowUp") {
       setCursor((c) => Math.max(0, c - 1));
@@ -126,6 +128,26 @@ export default function Header() {
       const item = results[cursor];
       if (item) {
         window.location.href = `/${item.media_type}/${item.id}`;
+      }
+    }
+    if (e.keyCode === 9) e.preventDefault();
+  };*/
+
+  const handleKeyDown = (e) => {
+    const maxIndex = results.length + (hasMore ? 1 : 0) - 1;
+
+    if (e.key === "ArrowDown") {
+      setCursor((c) => Math.min(maxIndex, c + 1));
+    } else if (e.key === "ArrowUp") {
+      setCursor((c) => Math.max(0, c - 1));
+    } else if (e.key === "Enter") {
+      if (cursor === results.length && hasMore) {
+        setPage((p) => p + 1);
+      } else {
+        const item = results[cursor];
+        if (item) {
+          window.location.href = `/${item.media_type}/${item.id}`;
+        }
       }
     }
     if (e.keyCode === 9) e.preventDefault();
@@ -227,11 +249,13 @@ export default function Header() {
                 </Link>
               ))}
             {hasMore && !loading && results.length > 0 && (
-              <li
-                className="dropdown-item show-more"
+              <li //tässä muutos että pääsee nuolinäppäimillä myös tonne näytä lisää nappiin
+                className={`dropdown-item show-more ${
+                  cursor === results.length ? "active" : ""
+                }`}
                 onClick={() => setPage((p) => p + 1)}
               >
-                Näytä lisää
+                Show more
               </li>
             )}
           </ul>
