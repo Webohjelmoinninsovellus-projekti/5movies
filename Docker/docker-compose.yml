@@ -35,6 +35,12 @@ services:
     ports:
       - '5557:5557'
     volumes:
-      - ./Backend/Postgresql:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
     environment:
+      - POSTGRES_PASSWORD=test
+      - POSTGRES_USER=test
+      - POSTGRES_DB=testdb
       - PGPORT=5557
+      
+volumes:
+  pgdata:
