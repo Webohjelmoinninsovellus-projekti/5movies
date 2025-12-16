@@ -1,54 +1,112 @@
-CREATE TABLE "user"(
-    id_user integer GENERATED ALWAYS AS IDENTITY (MINVALUE 0
-    MAXVALUE 65500) CONSTRAINT id_user_pk PRIMARY KEY,
-    username varchar(32) NOT NULL CONSTRAINT username_pk UNIQUE,
-    password varchar(128) NOT NULL,
-    bio varchar(256),
-    date_created date DEFAULT CURRENT_DATE NOT NULL,
-    avatar_path varchar(256),
-    deactivation_date date DEFAULT NULL
+create table "user"
+(
+    id_user           integer generated always as identity (minvalue 0 maxvalue 65500)
+        constraint id_user_pk
+            primary key,
+    username          varchar(32)               not null
+        constraint username_pk
+            unique,
+    password          varchar(128)              not null,
+    bio               varchar(256),
+    date_created      date default CURRENT_DATE not null,
+    avatar_path       varchar(256),
+    deactivation_date date
 );
 
-ALTER TABLE "user" OWNER TO test;
+alter table "user"
+    owner to test;
 
-CREATE TABLE user_review(
-    id_review integer GENERATED ALWAYS AS IDENTITY (MINVALUE 0) CONSTRAINT id_review_pk PRIMARY KEY,
-    type boolean NOT NULL,
-    tmdb_id integer NOT NULL,
-    rating integer NOT NULL,
-    comment char(1024),
-    date_created date DEFAULT CURRENT_DATE NOT NULL,
-    user_id integer NOT NULL CONSTRAINT user_review_user_id_user_fk REFERENCES "user"
+create table user_review
+(
+    id_review    integer generated always as identity (minvalue 0)
+        constraint id_review_pk
+            primary key,
+    type         boolean                   not null,
+    tmdb_id      integer                   not null,
+    rating       integer                   not null,
+    comment      char(1024),
+    date_created date default CURRENT_DATE not null,
+    user_id      integer                   not null
+        constraint user_review_user_id_user_fk
+            references "user"
 );
 
-ALTER TABLE user_review OWNER TO test;
+alter table user_review
+    owner to test;
 
-CREATE TABLE user_favourite(
-    id_favorite integer GENERATED ALWAYS AS IDENTITY (MINVALUE 0),
-    type boolean DEFAULT TRUE NOT NULL,
-    tmdb_id integer NOT NULL,
-    title varchar(256),
-    date_added date DEFAULT CURRENT_DATE NOT NULL,
+create table user_favourite
+(
+    id_favorite  integer generated always as identity (minvalue 0),
+    type         boolean default true         not null,
+    tmdb_id      integer                      not null,
+    title        varchar(256),
+    date_added   date    default CURRENT_DATE not null,
     release_year integer,
-    poster_path varchar(256),
-    user_id integer NOT NULL CONSTRAINT user_favourite_user_id_user_fk REFERENCES "user"
+    poster_path  varchar(256),
+    user_id      integer                      not null
+        constraint user_favourite_user_id_user_fk
+            references "user"
 );
 
-ALTER TABLE user_favourite OWNER TO test;
+alter table user_favourite
+    owner to test;
 
-CREATE TABLE "group"(
-    id_group integer GENERATED ALWAYS AS IDENTITY (MINVALUE 0) CONSTRAINT group_pk PRIMARY KEY,
-    name varchar(32) NOT NULL,
-    date_created date DEFAULT CURRENT_DATE NOT NULL,
-    description varchar(256),
-    icon_path varchar(256),
-    active boolean DEFAULT TRUE NOT NULL,
-    owner_id integer NOT NULL CONSTRAINT group_user_id_user_fk REFERENCES "user"
+create table "group"
+(
+    id_group     integer generated always as identity (minvalue 0)
+        constraint group_pk
+            primary key,
+    name         varchar(32)                  not null,
+    date_created date    default CURRENT_DATE not null,
+    description  varchar(256),
+    icon_path    varchar(256),
+    active       boolean default true         not null,
+    owner_id     integer                      not null
+        constraint group_user_id_user_fk
+            references "user"
 );
 
-ALTER TABLE "group" OWNER TO test;
+alter table "group"
+    owner to test;
 
-create table "group_join_request"
+create table user_group
+(
+    id_user_group integer generated always as identity (minvalue 0)
+        constraint user_group_pk
+            primary key,
+    active        boolean default false not null,
+    user_id       integer               not null
+        constraint user_group_user_id_user_fk
+            references "user"
+            on delete cascade,
+    group_id      integer               not null
+        constraint user_group_group_id_group_fk
+            references "group"
+            on delete cascade
+);
+
+alter table user_group
+    owner to test;
+
+create table group_item
+(
+    id_group_item serial
+        primary key,
+    type          boolean      not null,
+    tmdb_id       integer      not null,
+    title         varchar(256) not null,
+    poster_path   varchar(256),
+    release_year  integer,
+    date_added    timestamp default CURRENT_TIMESTAMP,
+    group_id      integer      not null
+        references "group"
+            on delete cascade
+);
+
+alter table group_item
+    owner to test;
+
+create table group_join_request
 (
     user_id       integer not null,
     group_id      integer
@@ -57,30 +115,11 @@ create table "group_join_request"
             on delete cascade,
     status        varchar(32),
     request_date  date default CURRENT_DATE,
-    requestid     integer generated by default as identity,
+    request_id    integer generated by default as identity,
     response_date date
 );
-	
-alter table "group_join_request" owner to test;
 
-CREATE TABLE user_group(
-    id_user_group integer GENERATED ALWAYS AS IDENTITY (MINVALUE 0) CONSTRAINT user_group_pk PRIMARY KEY,
-    active boolean DEFAULT FALSE NOT NULL,
-    user_id integer NOT NULL CONSTRAINT user_group_user_id_user_fk REFERENCES "user",
-    group_id integer NOT NULL CONSTRAINT user_group_group_id_group_fk REFERENCES "group"
-);
+alter table group_join_request
+    owner to test;
 
-ALTER TABLE user_group OWNER TO test;
 
-CREATE TABLE group_item(
-    id_group_item serial PRIMARY KEY,
-    type boolean NOT NULL,
-    tmdb_id integer NOT NULL,
-    title varchar(256) NOT NULL,
-    poster_path varchar(256),
-    release_year integer,
-    date_added timestamp DEFAULT CURRENT_TIMESTAMP,
-    group_id integer NOT NULL REFERENCES "group" ON DELETE CASCADE
-);
-
-ALTER TABLE group_item OWNER TO test;

@@ -52,17 +52,18 @@ export default function Header() {
 
   //tässä lisää eeron hakukenttä sekoilua
   useEffect(() => {
-    setResults([]);
+    //setResults([]);
     setPage(1);
     setHasMore(true);
-    setLoading(false);
+    setLoading(true);
   }, [query]);
   //tässä loppuu
 
   useEffect(() => {
     if (query.length === 0) {
-      setResults([]);
       setLoading(false);
+      setResults([]);
+
       return;
     }
     setLoading(true);
@@ -184,7 +185,7 @@ export default function Header() {
           </Link>
         )}
 
-        {results.length > 0 && (
+        {query && (
           <ul className="dropdown-menu">
             {loading && (
               <li>
@@ -225,7 +226,7 @@ export default function Header() {
                   </li>
                 </Link>
               ))}
-            {hasMore && !loading && (
+            {hasMore && !loading && results.length > 0 && (
               <li
                 className="dropdown-item show-more"
                 onClick={() => setPage((p) => p + 1)}

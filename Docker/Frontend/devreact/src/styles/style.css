@@ -103,14 +103,14 @@ nav a:hover {
 .show-more {
   text-align: center;
   font-weight: bold;
-  color: #ffffff; /* Valkoinen teksti tummalla taustalla */
+  color: #ffffff;
   padding: 8px 0;
   cursor: pointer;
   border-bottom: none;
 }
 .show-more:hover {
-  color: #ba2626; /* Hover-efekti */
-  background-color: #222; /* hieman vaaleampi tausta hoverissa */
+  color: #ba2626;
+  background-color: #222;
 }
 
 .dropdown-item span {
@@ -818,7 +818,7 @@ footer a {
   position: relative;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 900px) {
   .nav-items {
     margin: auto;
   }
@@ -844,6 +844,11 @@ footer a {
     margin: auto;
   }
 
+  .review {
+    align-items: center;
+    text-align: center;
+  }
+
   #movieText,
   #movieHeader {
     display: flex;
@@ -858,6 +863,7 @@ footer a {
     text-align: center;
   }
 
+  .member,
   .group-layout {
     margin-top: 0;
     text-align: center;
@@ -875,9 +881,7 @@ footer a {
   .media-row {
     grid-template-columns: 1fr;
   }
-}
 
-@media (max-width: 900px) {
   .slider {
     height: auto;
   }

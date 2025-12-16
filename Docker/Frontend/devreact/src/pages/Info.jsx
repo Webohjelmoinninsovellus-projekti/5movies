@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, lazy } from "react";
 import { useParams, useLocation } from "react-router";
 import { Link } from "react-router-dom";
 
@@ -8,6 +8,7 @@ import LoadingElement from "../components/LoadingElement";
 import { fetchItemData } from "../utilities/tmdbFetcher";
 import { fetchReviews, sendReview } from "../utilities/reviewManager";
 import { favoriteSender } from "../utilities/favoriteManager";
+
 import { addItem, removeItem, getGroups } from "../utilities/groupManager";
 
 export default function Info() {
@@ -340,7 +341,7 @@ export default function Info() {
               )}
             </div>
           </div>
-          <div style={{ margin: "1rem" }}>
+          <div className="review" style={{ margin: "1rem" }}>
             <h2>Reviews</h2>
             {reviews.length > 0 ? (
               <div

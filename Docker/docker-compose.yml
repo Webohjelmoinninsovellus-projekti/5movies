@@ -7,6 +7,14 @@ services:
     volumes: 
       - ./Backend/Node.js:/app
       - /app/node_modules
+    environment:
+      - BACKEND_SECRET_KEY=${BACKEND_SECRET_KEY}
+      - TMDB_API_KEY=${TMDB_API_KEY}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
   react:
     build: ./Frontend/devreact
     container_name: react_frontend
@@ -19,6 +27,8 @@ services:
     tty: true
     environment:
       - CHOKIDAR_USEPOLLING=true
+      - VITE_BACKEND_PORT=${VITE_BACKEND_PORT}
+      - VITE_IP=${VITE_IP}
   database:
     image: postgres:14-alpine
     container_name: database_backend
