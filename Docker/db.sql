@@ -56,7 +56,9 @@ create table "group"
     id_group     integer generated always as identity (minvalue 0)
         constraint group_pk
             primary key,
-    name         varchar(32)                  not null,
+    name         varchar(32)                  not null
+        constraint group_name_pk
+            unique,
     date_created date    default CURRENT_DATE not null,
     description  varchar(256),
     icon_path    varchar(256),

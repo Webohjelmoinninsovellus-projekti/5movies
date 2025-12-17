@@ -7,18 +7,15 @@ import { uploadAvatar } from "../controllers/avatarController.js";
 
 const avatarRouter = Router();
 
-const uploadsDir = path.join(process.cwd(), "uploads");
-
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, process.cwd() + "/uploads"),
   filename: (req, file, cb) =>
     cb(null, Date.now() + path.extname(file.originalname)),
 });
-const upload = multer({ storage });
+
+var maxSize = 2 * 1000 * 1000;
+
+const upload = multer({ storage, limits: { fileSize: maxSize } });
 
 avatarRouter.post(
   "/upload",

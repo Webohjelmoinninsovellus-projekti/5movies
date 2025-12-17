@@ -232,6 +232,7 @@ a:active {
 }
 
 .card {
+  text-align: center;
   background: #111;
   position: relative;
   overflow: hidden;

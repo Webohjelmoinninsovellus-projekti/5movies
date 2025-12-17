@@ -58,7 +58,7 @@ export async function getInTheaters(req, res, next) {
 export async function searchMulti(req, res, next) {
   try {
     const { query } = req.params;
-    const page = Number(req.query.page) || 1; // ton lisäsin kokeilen et saako hakuun toista sivua:)
+    const page = Number(req.query.page) || 1;
 
     if (!query) return res.status(404).json("Query is not defined");
 
@@ -84,9 +84,20 @@ export async function searchMulti(req, res, next) {
     const searchData = await fetchTmdb(
       `search/multi?include_adult=false&query=${encodeURIComponent(
         query
-      )}&language=en-US&page=${page}` // lisäsin ton page-parametrin toho aikane oli vaan 1
+      )}&language=en-US&page=${page}`
     );
-    return res.status(200).json(searchData);
+
+    const BLOCKED_REGEX =
+      /\b(porn|xxx|erotic|hentai|sex|nude|nudity|pornography|porno|breast|breasts|breasted|tits|tit|pussy|vagina|vaginas|cock|penis|dick|cum|semen|masturbate|masturbation|orgasm|slut|whore|fap|rape|incest|anal|asshole|bukkake|bdsm|fetish|milf|shemale|transsexual|prostitute|hooker|blowjob|handjob|bj|gangbang|cumshot|coochie|clitoris|clit|g-spot|ejaculate|dildo|vibrator|sex toy|stripper|oral|deepthroat|pornos|pornhub|redtube|xhamster|bangbros|sexually|fetishes|sexually explicit|voyeur|peep|gangrape|rape fantasy|raping|rape scene|childporn|child sexual abuse|cp|underage sex|bestiality|zoophilia|necrophilia|rape porn|orgy|threesome|fisting|spanking|bondage|bdsm|dominatrix|dominant|submissive|squirting|lesbian sex|gay sex|gay porn|anal sex|sex tape|sex video|sex movie|hardcore sex|softcore sex|nsfw|pornographic|sexually suggestive|adult film|adult movie|adult content|sexploitation|sexploitation film|exhibitionism|voyeurism|masturbatory|pornstar|pornstars|grope|groper|groping)\b/i;
+
+    const filteredResults = (searchData.results || []).filter((item) => {
+      const title = item.title || item.name || "";
+      const overview = item.overview || "";
+
+      return !BLOCKED_REGEX.test(title) && !BLOCKED_REGEX.test(overview);
+    });
+
+    return res.status(200).json({ ...searchData, results: filteredResults });
   } catch (error) {
     next(error);
   }
