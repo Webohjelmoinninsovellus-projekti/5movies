@@ -7,7 +7,7 @@ services:
     volumes: 
       - ./Backend/Node.js:/app
       - /app/node_modules
-      - /app/uploads
+      - uploads:/app/uploads
     environment:
       - BACKEND_SECRET_KEY=${BACKEND_SECRET_KEY}
       - TMDB_API_KEY=${TMDB_API_KEY}
@@ -48,3 +48,4 @@ services:
       
 volumes:
   pgdata:
+  uploads:
