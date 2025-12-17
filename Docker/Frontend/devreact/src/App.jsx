@@ -1,5 +1,5 @@
 import { useLayoutEffect, lazy } from "react";
-import { Routes, Route, useParams, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 
 const Snowfall = lazy(() => import("react-snowfall"));
 

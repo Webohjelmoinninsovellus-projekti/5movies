@@ -86,17 +86,15 @@ export async function insertGroupItem(
   return result.rows[0] || null;
 }
 
-export async function deleteGroupItem(name, userId, type, tmdbId) {
+export async function deleteGroupItem(tmdbId, userId) {
   const result = await pool.query(
     `DELETE FROM group_item
     USING "group"
     WHERE "group".id_group = group_item.group_id
-        AND "group".name = $1
-        AND group_item.type = $2
-        AND group_item.tmdb_id = $3
-        AND "group".owner_id = $4
+        AND group_item.tmdb_id = $1
+        AND "group".owner_id = $2
      RETURNING group_item.*`,
-    [name, type, tmdbId, userId]
+    [tmdbId, userId]
   );
 
   return result.rows[0] || null;

@@ -12,7 +12,6 @@ async function register(usernameInput, passwordInput) {
     });
 
     if (response) {
-      console.log(response);
       return response;
     }
   } catch (error) {
@@ -62,7 +61,6 @@ async function deactivate(username, passwordInput) {
     });
 
     if (response) {
-      console.log(response);
       return response;
     }
   } catch (error) {

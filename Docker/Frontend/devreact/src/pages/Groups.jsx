@@ -24,7 +24,6 @@ export default function Groups() {
 
       if (groupData) {
         setInfo(groupData);
-        console.log(groupData);
       }
       setLoading(false);
     })();

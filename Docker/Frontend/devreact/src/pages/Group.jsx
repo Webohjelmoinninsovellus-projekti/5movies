@@ -117,8 +117,6 @@ export default function Group() {
 
   if (!info.name) return <h2>Group not found</h2>;
 
-  console.log(members);
-
   return (
     <div className="container">
       <div className="group-layout">

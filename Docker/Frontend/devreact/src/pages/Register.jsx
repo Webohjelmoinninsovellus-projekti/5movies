@@ -63,7 +63,6 @@ export default function Register() {
                 passwordRegex.test(password)
               ) {
                 const result = await register(username, password);
-                console.log(result);
 
                 switch (result.status) {
                   case 201:

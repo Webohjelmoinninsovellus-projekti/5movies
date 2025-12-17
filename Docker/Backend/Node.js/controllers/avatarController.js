@@ -2,7 +2,13 @@ import { fileTypeFromFile } from "file-type";
 import fs from "fs/promises";
 import { updateAvatar } from "../models/avatarModel.js";
 
-const whitelist = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
+const whitelist = [
+  "image/png",
+  "image/jpeg",
+  "image/jpg",
+  "image/webp",
+  "image/gif",
+];
 
 export async function uploadAvatar(req, res, next) {
   try {

@@ -2,7 +2,13 @@ import * as model from "../models/groupModel.js";
 import fs from "fs/promises";
 import { fileTypeFromFile } from "file-type";
 
-const whitelist = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
+const whitelist = [
+  "image/png",
+  "image/jpeg",
+  "image/jpg",
+  "image/webp",
+  "image/gif",
+];
 
 export async function listGroups(req, res, next) {
   try {
@@ -73,10 +79,8 @@ export async function addItem(req, res, next) {
 export async function removeItem(req, res, next) {
   try {
     const deleted = await model.deleteGroupItem(
-      req.params.name,
-      req.user.user_id,
-      req.body.type,
-      req.body.title
+      req.body.itemId,
+      req.user.user_id
     );
     if (!deleted)
       return res.status(403).json({ message: "Not allowed or not found." });

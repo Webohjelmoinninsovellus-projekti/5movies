@@ -16,7 +16,6 @@ export default function Login() {
 
   const loginTest = async () => {
     const data = await login(username, password);
-    console.log(data);
     if (data) {
       const confetti = (await import("https://cdn.skypack.dev/canvas-confetti"))
         .default;

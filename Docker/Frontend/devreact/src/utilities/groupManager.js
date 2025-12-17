@@ -50,11 +50,10 @@ async function addItem(groupName, item) {
 
 async function removeItem(groupName, itemId) {
   try {
-    const res = await axios.post(
-      `${url}/group/${groupName}/remove-item`,
-      { itemId },
-      { withCredentials: true }
-    );
+    const res = await axios.delete(`${url}/group/${groupName}/remove-item`, {
+      data: { itemId },
+      withCredentials: true,
+    });
 
     return res.data;
   } catch (err) {
