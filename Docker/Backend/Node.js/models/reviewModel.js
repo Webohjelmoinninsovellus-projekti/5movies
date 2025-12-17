@@ -6,7 +6,7 @@ export async function findReviews(type, id) {
     FROM user_review
     INNER JOIN "user" ON user_review.user_id = "user".id_user
     WHERE "user".deactivation_date IS NULL AND user_review.type = $1 AND user_review.tmdb_id = $2
-    ORDER BY user_review.id_review DESC LIMIT 6`,
+    ORDER BY user_review.id_review DESC`,
     [type === "movie" ? true : false, id]
   );
 

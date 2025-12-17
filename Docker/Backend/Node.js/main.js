@@ -2,7 +2,6 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
-
 import tmdbRouter from "./routers/tmdbRouter.js";
 import userRouter from "./routers/userRouter.js";
 import reviewRouter from "./routers/reviewRouter.js";
@@ -13,7 +12,7 @@ import avatarRouter from "./routers/avatarRouter.js";
 dotenv.config();
 
 const app = express();
-app.use(cors({ credentials: true, origin: "http://localhost:5556" }));
+app.use(cors({ credentials: true, origin: process.env.REACT_IP }));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

@@ -85,8 +85,9 @@ function InTheatersSlider() {
             className="marquee-item"
           >
             <img
-              src={`https://image.tmdb.org/t/p/original${item.backdrop_path}`}
+              src={`https://image.tmdb.org/t/p/w1280${item.backdrop_path}`}
               alt={item.title}
+              loading="lazy"
             />
             <h2>{item.title}</h2>
           </Link>

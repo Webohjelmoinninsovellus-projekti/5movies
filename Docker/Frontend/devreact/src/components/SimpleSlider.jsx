@@ -40,7 +40,8 @@ function SimpleSlider() {
             <Link to={`/movie/${item.id}`} reloadDocument={true}>
               <h2>{item.title}</h2>
               <img
-                src={`https://image.tmdb.org/t/p/original${item.backdrop_path}`}
+                src={`https://image.tmdb.org/t/p/w1280${item.backdrop_path}`}
+                loading="lazy"
               ></img>
             </Link>
           </div>

@@ -1,18 +1,20 @@
-import { useLayoutEffect } from "react";
+import { useLayoutEffect, lazy } from "react";
 import { Routes, Route, useParams, useLocation } from "react-router-dom";
-import Snowfall from "react-snowfall";
+
+const Snowfall = lazy(() => import("react-snowfall"));
 
 import Header from "./components/Header";
-import Footer from "./components/Footer";
-import Home from "./pages/Home";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Profile from "./pages/Profile";
-import Info from "./pages/Info";
-import Groups from "./pages/Groups";
-import Group from "./pages/Group";
-import Series from "./pages/Series";
-import Movies from "./pages/Movies";
+
+const Home = lazy(() => import("./pages/Home"));
+const Login = lazy(() => import("./pages/Login"));
+const Register = lazy(() => import("./pages/Register"));
+const Profile = lazy(() => import("./pages/Profile"));
+const Info = lazy(() => import("./pages/Info"));
+const Groups = lazy(() => import("./pages/Groups"));
+const Group = lazy(() => import("./pages/Group"));
+const Series = lazy(() => import("./pages/Series"));
+const Movies = lazy(() => import("./pages/Movies"));
+const Footer = lazy(() => import("./components/Footer"));
 
 const Wrapper = ({ children }) => {
   const location = useLocation();

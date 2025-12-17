@@ -86,9 +86,9 @@ export default function Profile() {
           <section className="profile-section">
             <div className="avatar">
               {avatar ? (
-                <img src={avatar}></img>
+                <img loading="lazy" src={avatar}></img>
               ) : (
-                <img src="/avatars/user.png"></img>
+                <img loading="lazy" src="/avatars/user.png"></img>
               )}
             </div>
             <div className="profile-info">
@@ -192,6 +192,7 @@ export default function Profile() {
                   >
                     {item.poster_path ? (
                       <img
+                        loading="lazy"
                         src={`https://image.tmdb.org/t/p/w400${item.poster_path}`}
                         alt={item.title}
                       />
@@ -243,6 +244,7 @@ export default function Profile() {
                     <div className="group-poster">
                       {group.icon_path && (
                         <img
+                          loading="lazy"
                           src={`${url}/uploads/${group.icon_path}`}
                           alt={group.name}
                         />
@@ -250,7 +252,9 @@ export default function Profile() {
                     </div>
                     <div className="movie-info">
                       <h3 className="movie-title">{group.name}</h3>
-                      <p className="movie-year">{group.count || 0} members</p>
+                      <p className="movie-year">
+                        {group.member_count || 0} members
+                      </p>
                     </div>
                   </Link>
                 </div>

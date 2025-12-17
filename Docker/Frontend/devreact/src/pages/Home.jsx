@@ -4,10 +4,12 @@ import { useState, useEffect } from "react";
 import { fetchDiscovery } from "../utilities/tmdbFetcher";
 import SimpleSlider from "../components/SimpleSlider";
 import InTheatersSlider from "../components/InTheatersSlider";
+import LoadingElement from "../components/LoadingElement";
 
 export default function Home() {
   const [movies, setMovies] = useState([]);
   const [series, setSeries] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadMovies() {
@@ -25,11 +27,11 @@ export default function Home() {
 
   return (
     <main>
-      <section className="slider">
+      <section class="slider">
         <SimpleSlider />
       </section>
 
-      <div className="container">
+      <div class="container">
         <Link to="/movies">
           <h2 className="section-title">Movies</h2>
         </Link>
@@ -66,13 +68,13 @@ export default function Home() {
                 </Link>
               </div>
             ))}
-          <div className="slider-title">
+          <div class="slider-title">
             <h2>Now in theaters</h2>
           </div>
         </div>
       </div>
 
-      <section className="slider">
+      <section class="slider">
         <InTheatersSlider />
       </section>
     </main>

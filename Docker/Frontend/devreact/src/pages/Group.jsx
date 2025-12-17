@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../components/AuthContext";
 import { useParams, useLocation } from "react-router";
+
 import { getProfile } from "../utilities/userManager";
 import LoadingElement from "../components/LoadingElement";
 import GroupRequests from "../components/GroupRequests";
@@ -122,11 +123,14 @@ export default function Group() {
     <div className="container">
       <div className="group-layout">
         <div>
+          <h2 className="group-info">{info.name}</h2>
+          <p className="group-info">{info.description}</p>
           <div className="group-img">
             {info.icon_path ? (
               <img
                 src={`${url}/uploads/${info.icon_path}`}
                 alt={info.name}
+                loading="lazy"
                 style={{
                   width: "100%",
                   height: "100%",
@@ -183,10 +187,7 @@ export default function Group() {
         </div>
 
         <div className="group-info">
-          <h2>{info.name}</h2>
-          <p>{info.description}</p>
-
-          <h3 className="section-title">Added movies/series</h3>
+          <h3 className="group-section-title">Added movies/series</h3>
           <div className="card-row"></div>
           {Items && Items.length > 0 ? (
             Items.map((item) => (
@@ -197,6 +198,7 @@ export default function Group() {
                 >
                   {item.poster_path ? (
                     <img
+                      loading="lazy"
                       src={`https://image.tmdb.org/t/p/w400${item.poster_path}`}
                       alt={item.title}
                     />
@@ -240,9 +242,10 @@ export default function Group() {
         <div>
           <div className="member-block">
             <h3>Group owner</h3>
-            <div className="member">
+            <Link to={`/profile/${members[0].username}`} className="member">
               <img
                 className="review-avatar"
+                loading="lazy"
                 src={
                   members[0].avatar_path
                     ? url + "/uploads/" + members[0].avatar_path
@@ -250,28 +253,31 @@ export default function Group() {
                 }
               />
               <span className="member-name">{members[0].username}</span>
-            </div>
+            </Link>
           </div>
           <div className="member-block">
             <h3>Members</h3>
-            <div className="member">
-              {members
-                .filter((member, index) => index > 0)
-                .map((member) => (
-                  <div key={member.username}>
-                    <img
-                      className="review-avatar"
-                      src={
-                        member.avatar_path
-                          ? url + "/uploads/" + member.avatar_path
-                          : "/avatars/user.png"
-                      }
-                    ></img>
-                    <span className="member-name">{member.username}</span>
-                  </div>
-                ))}
-              {owner && <GroupRequests groupId={info.id_group} />}
-            </div>
+            {members
+              .filter((member, index) => index > 0)
+              .map((member) => (
+                <Link
+                  to={`/profile/${member.username}`}
+                  key={member.username}
+                  className="member"
+                >
+                  <img
+                    className="review-avatar"
+                    loading="lazy"
+                    src={
+                      member.avatar_path
+                        ? url + "/uploads/" + member.avatar_path
+                        : "/avatars/user.png"
+                    }
+                  ></img>
+                  <span className="member-name">{member.username}</span>
+                </Link>
+              ))}
+            {owner && <GroupRequests groupId={info.id_group} />}
           </div>
         </div>
       </div>
