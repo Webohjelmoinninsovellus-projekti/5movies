@@ -185,9 +185,11 @@ export default function Group() {
         </div>
 
         <div className="group-info">
-          <h3 className="group-section-title">Added movies/series</h3>
+          <h3 className="group-section-title">
+            {isMember ? "Added movies/series" : "Restricted Content"}
+          </h3>
           <div className="card-row"></div>
-          {Items && Items.length > 0 ? (
+          {isMember && Items && Items.length > 0 ? (
             Items.map((item) => (
               <div key={item.id_group_item} className="movie-card">
                 <Link
@@ -233,7 +235,7 @@ export default function Group() {
               </div>
             ))
           ) : (
-            <p>No movies added yet.</p>
+            <p>{isMember && "No movies added yet."}</p>
           )}
         </div>
 
@@ -254,27 +256,28 @@ export default function Group() {
             </Link>
           </div>
           <div className="member-block">
-            <h3>Members</h3>
-            {members
-              .filter((member, index) => index > 0)
-              .map((member) => (
-                <Link
-                  to={`/profile/${member.username}`}
-                  key={member.username}
-                  className="member"
-                >
-                  <img
-                    className="review-avatar"
-                    loading="lazy"
-                    src={
-                      member.avatar_path
-                        ? url + "/uploads/" + member.avatar_path
-                        : "/avatars/user.png"
-                    }
-                  ></img>
-                  <span className="member-name">{member.username}</span>
-                </Link>
-              ))}
+            {isMember && <h3>Members</h3>}
+            {isMember &&
+              members
+                .filter((member, index) => index > 0)
+                .map((member) => (
+                  <Link
+                    to={`/profile/${member.username}`}
+                    key={member.username}
+                    className="member"
+                  >
+                    <img
+                      className="review-avatar"
+                      loading="lazy"
+                      src={
+                        member.avatar_path
+                          ? url + "/uploads/" + member.avatar_path
+                          : "/avatars/user.png"
+                      }
+                    ></img>
+                    <span className="member-name">{member.username}</span>
+                  </Link>
+                ))}
             {owner && <GroupRequests groupId={info.id_group} />}
           </div>
         </div>

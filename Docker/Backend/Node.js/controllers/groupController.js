@@ -12,8 +12,7 @@ const whitelist = [
 
 export async function listGroups(req, res, next) {
   try {
-    const my = req.query.my === "true";
-    const rows = await model.findGroupsForUser(req.user.user_id, my);
+    const rows = await model.findGroupsForUser(req.query.userId, req.query.my);
     return res.json(rows);
   } catch (e) {
     next(e);

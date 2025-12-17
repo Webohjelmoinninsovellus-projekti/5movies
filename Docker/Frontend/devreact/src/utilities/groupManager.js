@@ -2,10 +2,12 @@ import axios from "axios";
 
 const url = import.meta.env.VITE_IP;
 
-async function getGroups(myGroups = false) {
+async function getGroups(my = false, userId = -1) {
   try {
-    const getUrl = myGroups ? `${url}/group?my=true` : `${url}/group`;
-    const response = await axios.get(getUrl, { withCredentials: true });
+    const response = await axios.get(`${url}/group`, {
+      params: { userId, my },
+      withCredentials: true,
+    });
 
     if (response) return response.data;
   } catch (error) {

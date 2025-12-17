@@ -1,18 +1,16 @@
 import { pool } from "../helper/db.js";
 
 export async function findGroupsForUser(userId, my) {
-  if (my)
+  if (my && userId != -1)
     return (
       await pool.query(
-        `SELECT DISTINCT "group".*
+        `SELECT *
         FROM "group"
-        LEFT JOIN user_group ON user_group.group_id = "group".id_group
-        WHERE (user_group.user_id = $1 AND user_group.active = true) OR "group".owner_id = $1
-        ORDER BY "group".name`,
+        WHERE owner_id = $1
+        ORDER BY name`,
         [userId]
       )
     ).rows;
-
   return (await pool.query(`SELECT * FROM "group" ORDER BY name`)).rows;
 }
 

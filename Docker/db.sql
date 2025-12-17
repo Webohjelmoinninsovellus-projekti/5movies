@@ -66,6 +66,7 @@ create table "group"
     owner_id     integer                      not null
         constraint group_user_id_user_fk
             references "user"
+            on delete cascade
 );
 
 alter table "group"

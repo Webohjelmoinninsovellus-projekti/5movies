@@ -57,7 +57,7 @@ export default function Info() {
       if (reviewsData) setReviews(reviewsData);
 
       if (user) {
-        const userGroups = await getGroups(true);
+        const userGroups = await getGroups(true, user.userId);
         if (userGroups) setGroups(userGroups);
       }
 

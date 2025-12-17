@@ -30,6 +30,7 @@ async function getAuthenticatedProfile(req, res, next) {
 
       return res.status(200).json({
         username: req.user.username,
+        userId: req.user.user_id,
         avatar: user.avatar_path,
       });
     } else {
@@ -128,7 +129,7 @@ async function loginUser(req, res, next) {
       if (accessToken) {
         res.cookie("JWT", accessToken, {
           httpOnly: true,
-          secure: false,
+          secure: true,
           sameSite: "Strict",
           maxAge: 1000 * 60 * 30, // 30 minutes
         });

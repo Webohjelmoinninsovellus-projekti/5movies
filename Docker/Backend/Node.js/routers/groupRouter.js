@@ -20,7 +20,7 @@ import multer from "multer";
 
 const groupRouter = Router();
 
-groupRouter.get("/", verifyToken, listGroups);
+groupRouter.get("/", listGroups);
 groupRouter.get("/:name", getGroupByName);
 groupRouter.get("/members/:name", getMembers);
 groupRouter.post("/create", verifyToken, createGroup);
