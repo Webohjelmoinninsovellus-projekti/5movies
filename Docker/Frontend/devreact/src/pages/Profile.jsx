@@ -85,7 +85,7 @@ export default function Profile() {
         <div className="container">
           <section className="profile-section">
             <div className="avatar">
-              {avatar ? (
+              {info.avatar_path ? (
                 <img loading="lazy" src={avatar}></img>
               ) : (
                 <img loading="lazy" src="/avatars/user.png"></img>

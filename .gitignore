@@ -11,3 +11,4 @@
 .idea
 
 /Docker/Backend/Node.js/uploads/**
+**/dist

@@ -10,4 +10,9 @@ COPY . .
 
 EXPOSE 5556
 
-CMD ["npm", "run", "dev"]
+CMD ["sh", "-c", "\
+  if [ \"$ENV\" = 'production' ]; then \
+    npm run build && npx serve -s dist -l 5556; \
+  else \
+    npm run dev; \
+  fi"]

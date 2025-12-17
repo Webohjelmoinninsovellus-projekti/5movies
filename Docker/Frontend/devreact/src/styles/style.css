@@ -130,8 +130,8 @@ nav a:hover {
 }
 
 .user-icon {
-  width: 35px;
-  height: 35px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
 }
 
@@ -751,7 +751,6 @@ a:active {
 #movieCard {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
   gap: 1rem;
   margin: 1rem;
   padding: 0.6rem;
@@ -818,7 +817,7 @@ footer a {
   position: relative;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 800px) {
   .nav-items {
     margin: auto;
   }
@@ -837,11 +836,6 @@ footer a {
 
   .profile-section {
     margin-top: 5%;
-  }
-
-  .search-box input {
-    width: 100%;
-    margin: auto;
   }
 
   .review {
@@ -875,11 +869,14 @@ footer a {
     justify-content: center;
   }
 
-  .group-layout,
   .movie-grid,
+  .group-layout,
   .category-row,
   .media-row {
     grid-template-columns: 1fr;
+    text-align: center;
+    padding-left: 20px;
+    padding-right: 20px;
   }
 
   .slider {
