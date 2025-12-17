@@ -29,6 +29,7 @@ create table user_review
     user_id      integer                   not null
         constraint user_review_user_id_user_fk
             references "user"
+            on delete cascade
 );
 
 alter table user_review
@@ -46,6 +47,7 @@ create table user_favourite
     user_id      integer                      not null
         constraint user_favourite_user_id_user_fk
             references "user"
+            on delete cascade
 );
 
 alter table user_favourite
