@@ -20,9 +20,11 @@ dotenv.config();
 
 const userRouter = Router();
 
-cron.schedule("* 14 * * *", async () => {
+cron.schedule("0 12 * * *", async () => {
+  console.log("Schedule ran.");
+
   pool.query(
-    "DELETE FROM public.user WHERE active = false AND CURRENT_DATE - deactivation_date >= 30",
+    `DELETE FROM "user" WHERE CURRENT_DATE - deactivation_date >= 30`,
     (err, result) => {
       if (err) console.log(err);
       else console.log(result);
