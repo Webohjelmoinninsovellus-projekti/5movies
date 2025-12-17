@@ -38,8 +38,8 @@ export default function GroupRequests({ groupId }) {
   const handleAccept = async (requestid) => {
     try {
       await acceptRequest(requestid);
-      alert("Request accepted!");
       refetchRequests();
+      window.location.reload();
     } catch (error) {
       alert("Failed to accept request.");
     }
@@ -48,7 +48,6 @@ export default function GroupRequests({ groupId }) {
   const handleReject = async (requestid) => {
     try {
       await rejectRequest(requestid);
-      alert("Request rejected.");
       refetchRequests();
     } catch (error) {
       alert("Failed to reject request.");

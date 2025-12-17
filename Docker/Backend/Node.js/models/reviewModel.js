@@ -14,10 +14,30 @@ export async function findReviews(type, id) {
 }
 
 export async function insertReview(type, tmdbId, rating, comment, userId) {
+  const exists = await pool.query(
+    `SELECT id_review
+    FROM user_review
+    WHERE type = $1 AND tmdb_id = $2 AND user_id = $3`,
+    [type, tmdbId, userId]
+  );
+
+  if (exists.rowCount > 0) {
+    const result = await pool.query(
+      `UPDATE user_review
+      SET rating = $1,
+        comment = $2,
+        date_created = CURRENT_DATE
+      WHERE id_review = $3
+      RETURNING *`,
+      [rating, comment, exists.rows[0].id_review]
+    );
+
+    return result.rows[0];
+  }
+
   const result = await pool.query(
     `INSERT INTO user_review (type, tmdb_id, rating, comment, user_id)
-    SELECT $1, $2, $3, $4, $5
-    WHERE NOT EXISTS (SELECT 1 FROM user_review WHERE type = $1 AND tmdb_id = $2 AND user_id = $5)
+    VALUES ($1, $2, $3, $4, $5)
     RETURNING *`,
     [type, tmdbId, rating, comment, userId]
   );

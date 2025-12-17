@@ -53,7 +53,7 @@ export default function Group() {
   const handleLeaveGroup = async () => {
     try {
       await leaveGroup(info.name);
-      setMessage("You have left the group.");
+      window.location.reload();
     } catch (error) {
       console.error("Failed to leave group:", error);
       if (error.response?.status === 403) {
