@@ -65,10 +65,8 @@ function InTheatersSlider() {
 
   useEffect(() => {
     async function load() {
-      setLoading(true);
       const results = await inTheatersData();
       setMovies(results);
-      setLoading(false);
     }
     load();
   }, []);
@@ -76,7 +74,6 @@ function InTheatersSlider() {
   return (
     <div className="marquee">
       <div className="marquee-content">
-        {loading && <LoadingElement />}
         {movies.concat(movies).map((item, index) => (
           <Link
             key={index}

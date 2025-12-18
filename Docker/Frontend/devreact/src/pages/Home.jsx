@@ -12,6 +12,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     async function loadMovies() {
       const results = await fetchDiscovery("movie", 1);
       setMovies(results);
@@ -20,6 +21,7 @@ export default function Home() {
     async function loadSeries() {
       const results = await fetchDiscovery("tv", 1);
       setSeries(results);
+      setLoading(false);
     }
     loadMovies();
     loadSeries();
@@ -27,6 +29,11 @@ export default function Home() {
 
   return (
     <main>
+      {loading && (
+        <li>
+          <LoadingElement />
+        </li>
+      )}
       <section className="slider">
         <SimpleSlider />
       </section>
@@ -36,38 +43,39 @@ export default function Home() {
           <h2 className="section-title">Movies</h2>
         </Link>
         <div className="media-row">
-          {movies
-            .filter((movie, index) => index < 4)
-            .map((item) => (
-              <div key={item.id} className="card">
-                <Link to={`/movie/${item.id}`} reloadDocument={true}>
-                  <img
-                    src={`https://image.tmdb.org/t/p/w500${item.backdrop_path}`}
-                    alt={item.title}
-                  />
-                  <span>{item.title}</span>
-                </Link>
-              </div>
-            ))}
+          {!loading &&
+            movies
+              .filter((movie, index) => index < 4)
+              .map((item) => (
+                <div key={item.id} className="card">
+                  <Link to={`/movie/${item.id}`} reloadDocument={true}>
+                    <img
+                      src={`https://image.tmdb.org/t/p/w500${item.backdrop_path}`}
+                      alt={item.title}
+                    />
+                    <span>{item.title}</span>
+                  </Link>
+                </div>
+              ))}
         </div>
-
         <Link to="/series">
           <h2 className="section-title">Series</h2>
         </Link>
         <div className="media-row">
-          {series
-            .filter((movie, index) => index < 4)
-            .map((item) => (
-              <div key={item.id} className="card">
-                <Link to={`/tv/${item.id}`} reloadDocument={true}>
-                  <img
-                    src={`https://image.tmdb.org/t/p/w500${item.backdrop_path}`}
-                    alt={item.name}
-                  />
-                  <span>{item.name}</span>
-                </Link>
-              </div>
-            ))}
+          {!loading &&
+            series
+              .filter((movie, index) => index < 4)
+              .map((item) => (
+                <div key={item.id} className="card">
+                  <Link to={`/tv/${item.id}`} reloadDocument={true}>
+                    <img
+                      src={`https://image.tmdb.org/t/p/w500${item.backdrop_path}`}
+                      alt={item.name}
+                    />
+                    <span>{item.name}</span>
+                  </Link>
+                </div>
+              ))}
           <div className="slider-title">
             <h2>Now in theaters</h2>
           </div>

@@ -22,10 +22,8 @@ function SimpleSlider() {
 
   useEffect(() => {
     async function load() {
-      setLoading(true);
       const results = await fetchPopular();
       setPopulars(results);
-      setLoading(false);
     }
 
     load();
@@ -33,7 +31,6 @@ function SimpleSlider() {
 
   return (
     <div className="theater-slider">
-      {loading && <LoadingElement />}
       <Slider {...settings}>
         {populars.map((item) => (
           <div className="slide">
@@ -41,7 +38,6 @@ function SimpleSlider() {
               <h2>{item.title}</h2>
               <img
                 src={`https://image.tmdb.org/t/p/w1280${item.backdrop_path}`}
-                loading="lazy"
               ></img>
             </Link>
           </div>
